@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/SceneGL.dir/src/main.cpp.o CMakeFiles/SceneGL.dir/dependencies/imgui/backends/imgui_impl_sdl.cpp.o CMakeFiles/SceneGL.dir/dependencies/imgui/backends/imgui_impl_opengl3.cpp.o CMakeFiles/SceneGL.dir/dependencies/tinyfiledialogs/tinyfiledialogs.c.o -o SceneGL  -lGL -lGLEW 

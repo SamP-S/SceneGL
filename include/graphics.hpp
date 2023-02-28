@@ -18,6 +18,7 @@
 #include "shader.hpp"
 #include "texture.hpp"
 #include "mesh.hpp"
+#include "resource_manager.hpp"
 
 enum Comparison {
     NEVER = 0,
@@ -36,8 +37,8 @@ class GraphicsEngine {
         void* context;
         WindowManager* window;
         frame_timer ft = frame_timer();
-        std::vector<Shader> shaders = std::vector<Shader>();
-        std::vector<Mesh> meshes = std::vector<Mesh>();
+        ResourceManager<Shader> shaders = ResourceManager<Shader>();
+        ResourceManager<Mesh> meshes = ResourceManager<Mesh>();
         int width, height;
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;
@@ -61,11 +62,11 @@ class GraphicsEngine {
              
             GL_Interface::BindFrameBufferObj(0);
 
-            shaders.push_back(Shader("shaders/base.vs", "shaders/base.fs"));
-            meshes.push_back(Mesh(cubeVertices, cubeColours, cubeIndicies));
-            meshes.push_back(Mesh(quadVertices));
+            shaders.Add("base", new Shader("shaders/base.vs", "shaders/base.fs"));
+            meshes.Add("cube", new Mesh(cubeVertices, cubeColours, cubeIndicies));
+            meshes.Add("quad", new Mesh(quadVertices));
 
-            shaders[0].Use();
+            shaders.Get("base")->Use();
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
         }
 
@@ -108,19 +109,19 @@ class GraphicsEngine {
             GL_Interface::SetViewport(width, height);
             /* Clear The Screen And The Depth Buffer */
             GL_Interface::ClearColourDepth();
-            GL_Interface::BindVertexArrayObject(meshes[0].vao);
+            GL_Interface::BindVertexArrayObject(meshes.Get("cube")->vao);
             // GL_Interface::DisableFeature(FEATURE_DEPTH);
             GL_Interface::DisableFeature(FEATURE_CULL);
             GL_Interface::EnableFeature(FEATURE_DEPTH);
             // GL_Interface::EnableFeature(FEATURE_CULL);
             GL_Interface::SetFrontFace(FRONT_CW);
 
-            shaders[0].Use();
+            shaders.Get("base")->Use();
 
-            shaders[0].SetVec3("iResolution", window->width, window->height, 1.0f);
-            shaders[0].SetFloat("iTime", ft.GetTotalElapsed());
-            shaders[0].SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            shaders[0].SetInt("iFrame", _frameNum);
+            shaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
+            shaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
+            shaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
+            shaders.Get("base")->SetInt("iFrame", _frameNum);
 
             GL_Interface::DrawElements(DRAW_TRIANGLES, cubeIndicies.size(), TYPE_UINT);
             // GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, 6);

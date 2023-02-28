@@ -50,49 +50,49 @@ class GL_Interface {
 
         static uint32_t GenVertexBufferObj(const std::vector<vec3>* data) {
             if (data->size() <= 0) {
-                std::cout << "Error: GL_Interface::GenVertexBufferObj - Empty data array" << std::endl;
+                // std::cout << "Error: GL_Interface::GenVertexBufferObj - Empty data array" << std::endl;
                 return -1;
             }
             uint32_t vbo = 0;
             glGenBuffers(1, &vbo);
-            std::cout << "glGenBuffers(" << 1 << ", " << vbo << ")" << std::endl;
+            // std::cout << "glGenBuffers(" << 1 << ", " << vbo << ")" << std::endl;
             BindVertexBufferObj(vbo);
             glBufferData(GL_ARRAY_BUFFER, data->size() * sizeof(vec3), &data->front(), GL_STATIC_DRAW);
-            std::cout << "glBufferData(GL_ARRAY_BUFFER, " << data->size() * sizeof(vec3) << ", " << &data[0]<< ", GL_STATIC_DRAW)" << std::endl;
+            // std::cout << "glBufferData(GL_ARRAY_BUFFER, " << data->size() * sizeof(vec3) << ", " << &data[0]<< ", GL_STATIC_DRAW)" << std::endl;
             ErrorCheck();
             return vbo;
         }
 
         static void BindVertexBufferObj(uint32_t vbo) {
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            std::cout << "glBindBuffer(GL_ARRAY_BUFFER" << ", " << vbo << ")" << std::endl;
+            // std::cout << "glBindBuffer(GL_ARRAY_BUFFER" << ", " << vbo << ")" << std::endl;
             ErrorCheck();
         }
 
         static uint32_t GenElementBufferObj(const std::vector<uint32_t>* indicies) {
             if (indicies->size() <= 0) {
-                std::cout << "Error: GL_Interface::GenElementBufferObj - Empty indicies array" << std::endl;
+                // std::cout << "Error: GL_Interface::GenElementBufferObj - Empty indicies array" << std::endl;
                 return -1;
             }
             uint32_t ebo = 0;
             glGenBuffers(1, &ebo);
-            std::cout << "glGenBuffers(" << 1 << ", " << ebo << ")" << std::endl;
+            // std::cout << "glGenBuffers(" << 1 << ", " << ebo << ")" << std::endl;
             BindElementBufferObj(ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicies->size() * sizeof(uint32_t), &indicies->front(), GL_STATIC_DRAW);
-            std::cout << "glBufferData(GL_ELEMENT_ARRAY_BUFFER, " << indicies->size() * sizeof(uint32_t) << ", " << &indicies[0]<< ", GL_STATIC_DRAW)" << std::endl;
+            // std::cout << "glBufferData(GL_ELEMENT_ARRAY_BUFFER, " << indicies->size() * sizeof(uint32_t) << ", " << &indicies[0]<< ", GL_STATIC_DRAW)" << std::endl;
             ErrorCheck();
             return ebo;
         }
 
         static void BindElementBufferObj(uint32_t ebo) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            std::cout << "glBindBuffer(GL_ELEMENT_ARRAY_BUFFER" << ", " << ebo << ")" << std::endl;
+            // std::cout << "glBindBuffer(GL_ELEMENT_ARRAY_BUFFER" << ", " << ebo << ")" << std::endl;
             ErrorCheck();
         }
 
         static void DelVertexBufferObj(uint32_t vbo) {
             glDeleteBuffers(1, &vbo);
-            std::cout << "glDeleteBuffers(1" << ", " << vbo << ")" << std::endl;
+            // std::cout << "glDeleteBuffers(1" << ", " << vbo << ")" << std::endl;
             ErrorCheck();
         }
 
@@ -101,7 +101,7 @@ class GL_Interface {
         static uint32_t GenFrameBufferObj() {
             uint32_t fbo;
             glGenFramebuffers(1, &fbo);
-            std::cout << "glGenFramebuffers(1, " << fbo << ")" << std::endl;
+            // std::cout << "glGenFramebuffers(1, " << fbo << ")" << std::endl;
             BindFrameBufferObj(fbo);
             ErrorCheck();
             return fbo;
@@ -109,7 +109,7 @@ class GL_Interface {
 
         static void BindFrameBufferObj(uint32_t fbo) {
             glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-            std::cout << "glBindFramebuffer(GL_FRAMEBUFFER, " << fbo << ")" << std::endl;
+            // std::cout << "glBindFramebuffer(GL_FRAMEBUFFER, " << fbo << ")" << std::endl;
             ErrorCheck();
         }
 
@@ -117,7 +117,7 @@ class GL_Interface {
             BindFrameBufferObj(fbo);
             glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
                                     GL_TEXTURE_2D, tex, 0);
-            std::cout << "glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, " << tex << ", " << 0 << ")" << std::endl;
+            // std::cout << "glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, " << tex << ", " << 0 << ")" << std::endl;
             CheckFrameBuffer();
         }
 
@@ -125,7 +125,7 @@ class GL_Interface {
             BindFrameBufferObj(fbo);
             glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, 
                                     GL_TEXTURE_2D, tex, 0);
-            std::cout << "glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, " << tex << ", " << 0 << ")" << std::endl;
+            // std::cout << "glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, " << tex << ", " << 0 << ")" << std::endl;
             CheckFrameBuffer();
         }
 
@@ -143,7 +143,7 @@ class GL_Interface {
         static uint32_t GenVertexArrayObject() {
             uint32_t vao = 0;
             glGenVertexArrays(1, &vao);
-            std::cout << "glGenVertexArrays(1, " << vao << ")" << std::endl;
+            // std::cout << "glGenVertexArrays(1, " << vao << ")" << std::endl;
             BindVertexArrayObject(vao);
             ErrorCheck();
             return vao;
@@ -151,15 +151,15 @@ class GL_Interface {
 
         static void BindVertexArrayObject(uint32_t vao) {
             glBindVertexArray(vao);
-            std::cout << "glBindVertexArray(" << vao << ")" << std::endl;
+            // std::cout << "glBindVertexArray(" << vao << ")" << std::endl;
             ErrorCheck();
         }
 
         static void VertexAttribPtr(uint32_t attribLoc, int size, uint32_t type) {
             glVertexAttribPointer(attribLoc, size, type, GL_FALSE, 0, 0);
-            std::cout << "glVertexAttribPointer(" << attribLoc << ", " << size << ", " << type << ", GL_FALSE, 0, 0)" << std::endl;
+            // std::cout << "glVertexAttribPointer(" << attribLoc << ", " << size << ", " << type << ", GL_FALSE, 0, 0)" << std::endl;
             glEnableVertexAttribArray(attribLoc);
-            std::cout << "glEnableVertexAttribArray(" << attribLoc << ")" << std::endl;
+            // std::cout << "glEnableVertexAttribArray(" << attribLoc << ")" << std::endl;
             ErrorCheck();
         }
 
@@ -189,7 +189,7 @@ class GL_Interface {
 
         static bool UseShader(uint32_t shader) {
             glUseProgram(shader);
-            std::cout <<"glUseProgram(" << shader << ")" << std::endl;
+            // std::cout <<"glUseProgram(" << shader << ")" << std::endl;
             return ErrorCheck();
         }
 
@@ -197,22 +197,22 @@ class GL_Interface {
 
         static void SetViewport(uint32_t width, uint32_t height) {
             glViewport(0, 0, width, height);
-            std::cout << "glViewport(0, 0, " << width << ", " << height << ")" << std::endl;
+            // std::cout << "glViewport(0, 0, " << width << ", " << height << ")" << std::endl;
         }
 
         static void SetClearColour(float r, float g, float b, float a) {
             glClearColor(r, g, b, a);
-            std::cout << "glClearColor(" << r << ", "<< g << ", " << b << ", " << a << ")" << std::endl;
+            // std::cout << "glClearColor(" << r << ", "<< g << ", " << b << ", " << a << ")" << std::endl;
         }
 
         static void ClearColourDepth() {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            std::cout << "glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)" << std::endl;
+            // std::cout << "glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)" << std::endl;
         }
 
         static void EnableFeature(uint32_t feature) {
             glEnable(feature);
-            std::cout << "glEnable(" << feature << ")" << std::endl;
+            // std::cout << "glEnable(" << feature << ")" << std::endl;
             ErrorCheck();
         }
 
@@ -223,7 +223,7 @@ class GL_Interface {
 
         static void DisableFeature(uint32_t feature) {
             glDisable(feature);
-            std::cout << "glDisable(" << feature << ")" << std::endl;
+            // std::cout << "glDisable(" << feature << ")" << std::endl;
             ErrorCheck();
         }
 
@@ -231,13 +231,13 @@ class GL_Interface {
 
         static void DrawArrays(uint32_t mode, uint32_t first, uint32_t count) {
             glDrawArrays(mode, first, count);
-            std::cout << "glDrawArrays(" << mode << ", " << first << ", " << count << ")" << std::endl;
+            // std::cout << "glDrawArrays(" << mode << ", " << first << ", " << count << ")" << std::endl;
             ErrorCheck();
         }
 
         static void DrawElements(uint32_t mode, uint32_t count, uint32_t type) {
             glDrawElements(mode, count, type, 0);
-            std::cout << "glDrawElements(" << mode << ", " << count << ", " << type << ", 0)" << std::endl;
+            // std::cout << "glDrawElements(" << mode << ", " << count << ", " << type << ", 0)" << std::endl;
             ErrorCheck();
         }
 
@@ -269,7 +269,7 @@ class GL_Interface {
 
         static void BindTexture(uint32_t tex) {
             glBindTexture(GL_TEXTURE_2D, tex);
-            std::cout << "glBindTexture(GL_TEXTURE_2D, " << tex << ")" << std::endl;
+            // std::cout << "glBindTexture(GL_TEXTURE_2D, " << tex << ")" << std::endl;
             ErrorCheck();
         }
 
@@ -279,24 +279,24 @@ class GL_Interface {
             uint32_t error = glGetError();
 
             if (error == GL_NO_ERROR) {
-                // std::cout << "OK: all good" << std::endl;
+                // // std::cout << "OK: all good" << std::endl;
                 return true;
             } else {
-                std::cout << "ERROR: ";
+                // std::cout << "ERROR: ";
             }
 
             if (error == GL_INVALID_OPERATION) {
-                std::cout << "INVALID OPERATION" << std::endl;
+                // std::cout << "INVALID OPERATION" << std::endl;
             } else if (error == GL_INVALID_VALUE) {
-                std::cout << "INVALID VALUE" << std::endl;
+                // std::cout << "INVALID VALUE" << std::endl;
             } else if (error == GL_OUT_OF_MEMORY) {
-                std::cout << "NO MEMORY" << std::endl;
+                // std::cout << "NO MEMORY" << std::endl;
             } else if (error == GL_STACK_OVERFLOW) {
-                std::cout << "NO OVERFLOW" << std::endl;
+                // std::cout << "NO OVERFLOW" << std::endl;
             } else if (error == GL_INVALID_FRAMEBUFFER_OPERATION) {
-                std::cout << "Invalid Framebuffer" << std::endl;
+                // std::cout << "Invalid Framebuffer" << std::endl;
             } else if (error == GL_OUT_OF_MEMORY) {
-                std::cout << "Out of Memory" << std::endl;
+                // std::cout << "Out of Memory" << std::endl;
             }
             return false;
         }
@@ -335,27 +335,27 @@ class GL_Interface {
 
         static uint32_t CreateShader(const char* source, uint32_t type) {
             uint32_t shader = glCreateShader(type);
-            std::cout << "glCreateShader(" << type << ")" << std::endl;
+            // std::cout << "glCreateShader(" << type << ")" << std::endl;
             glShaderSource(shader, 1, &source, NULL);
-            std::cout << "glShaderSource(" << shader << ", 1, " << &source << ", NULL)" << std::endl;
+            // std::cout << "glShaderSource(" << shader << ", 1, " << &source << ", NULL)" << std::endl;
             glCompileShader(shader);
-            std::cout << "glCompileShader(" << shader << ")" << std::endl;
+            // std::cout << "glCompileShader(" << shader << ")" << std::endl;
             CheckShaderCompile(shader);
             return shader;
         }
 
         static uint32_t LinkShaderProgram(uint32_t vertex, uint32_t fragment) {
             uint32_t program = glCreateProgram();
-            std::cout << "glCreateProgram()" << std::endl;
+            // std::cout << "glCreateProgram()" << std::endl;
             glAttachShader(program, vertex);
-            std::cout << "glAttachShader(" << program << ", " << vertex << ")" << std::endl;
+            // std::cout << "glAttachShader(" << program << ", " << vertex << ")" << std::endl;
             glAttachShader(program, fragment);
-            std::cout << "glAttachShader(" << program << ", " << fragment << ")" << std::endl;
+            // std::cout << "glAttachShader(" << program << ", " << fragment << ")" << std::endl;
             // glBindFragDataLocation(program, 0, SHADER_OUTPUT_FRAG);
-            // std::cout << "glBindFragDataLocation(" << program << ", " << 0 << ", SHADER_OUTPUT_FRAG)" << std::endl;
+            // // std::cout << "glBindFragDataLocation(" << program << ", " << 0 << ", SHADER_OUTPUT_FRAG)" << std::endl;
             glBindFragDataLocation(program, 0, SHADER_OUTPUT_FRAG);
             glLinkProgram(program);
-            std::cout << "glLinkProgram(" << program << ")" << std::endl;
+            // std::cout << "glLinkProgram(" << program << ")" << std::endl;
             CheckProgramCompile(program);
             // delete the shaders as they're linked into our program now and no longer necessary
             glDeleteShader(vertex);

@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "GL_Interface.hpp"
+#include "gl_interface.hpp"
 
 /*
     IMPLEMENT

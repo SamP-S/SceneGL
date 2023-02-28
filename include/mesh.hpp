@@ -136,10 +136,10 @@ class Mesh {
 
         /// NO VALIDATION OF CORRECT BUFFER CREATION/FILLING
         void GenerateBuffers() {
-            this->vao = GL_Interface::GenVertexArrayObject();
             this->vertexBO = GL_Interface::GenVertexBufferObj(&_vertices);
             this->colourBO = GL_Interface::GenVertexBufferObj(&_colours);
             this->indicieBO = GL_Interface::GenElementBufferObj(&_indicies);
+            this->vao = GL_Interface::GenVertexArrayObject();
             GL_Interface::BindVertexBufferObj(this->vertexBO);
             GL_Interface::VertexAttribPtr(ATTRIB_LOC_POSITION, 3, TYPE_FLOAT);
             if (_colours.size() > 0) {

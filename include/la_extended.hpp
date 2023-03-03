@@ -69,9 +69,9 @@ namespace LA {
         mat4 to_return = mat4(0.0f);
         float tan_half_angle = tan(fov * (PI/180) / 2);
         to_return[0][0] = 1 / (aspect * tan_half_angle);
-        to_return[1][1] = 1 / (aspect * tan_half_angle);
+        to_return[1][1] = 1 / (tan_half_angle);
         to_return[2][2] = -(far + near) / (far - near);
-        to_return[2][3] = -1.0f;
+        to_return[2][3] = -1;
         to_return[3][2] = -(2 * far * near) / (far - near);
         return to_return;
     }

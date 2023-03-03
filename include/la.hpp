@@ -887,10 +887,10 @@ namespace LA {
     // print
     template<int N, typename T>
     std::ostream& operator<<(std::ostream& os, vec<N, T>& obj) {
-        for (int i = 0; i < obj.length(); i++) {
-            os << obj[i];
+        for (int i = 0; i < obj.length() - 1; i++) {
+            os << obj[i] << ", ";
         }
-        return os << std::endl;
+        return os << obj[obj.length() - 1] << std::endl;
     }
 
     template<int N, int M, typename T>

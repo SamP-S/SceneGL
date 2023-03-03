@@ -113,8 +113,8 @@ class Shader : public Resource {
             glUniform4f(glGetUniformLocation(id, name.c_str()), x, y, z, w);
         }
 
-        void SetMat4(const std::string& name, mat4 m) const {
-            glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &m[0][0]);
+        void SetMat4(const std::string& name, float* mPtr) const {
+            glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, mPtr);
         }
 
 };

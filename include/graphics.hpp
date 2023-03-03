@@ -45,6 +45,7 @@ class GraphicsEngine {
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;
         std::vector<Object*> world = std::vector<Object*>();
+        mat4 view = mat4();
 
         GraphicsEngine(WindowManager* window) {
             AttachWindow(window);
@@ -71,7 +72,10 @@ class GraphicsEngine {
 
             world.push_back(new Object("cube0", NULL, 0));
             world.push_back(new Object("cube1", NULL, 0));
-            world.at(0)->trans.Scale(-0.5f, -0.5f, -0.5f);
+            world.at(0)->trans.Translate(0.0f, 0.0f, -10.0f);
+            world.at(0)->trans.SetScale({0.5f, 0.5f, 0.5f});
+            world.at(1)->trans.Translate(0.0f, 0.0f, 10.0f);
+            world.at(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
             shaders.Get("base")->Use();
         }
 
@@ -114,12 +118,12 @@ class GraphicsEngine {
             mat4 pos = Translate(obj->trans.GetPosition());
             mat4 rot = Rotate(obj->trans.GetRotation());
             mat4 scl = Scale(obj->trans.GetScale());
-            std::cout << "pos:\n" << pos << std::endl;
-            std::cout << "rot:\n" << rot << std::endl;
-            std::cout << "scl:\n" << scl << std::endl;
+            // std::cout << "pos:\n" << pos << std::endl;
+            // std::cout << "rot:\n" << rot << std::endl;
+            // std::cout << "scl:\n" << scl << std::endl;
             mat4 model = pos * rot * scl * mat4();
             // std::cout << "model:\n" << model << std::endl;
-            shaders.Get("base")->SetMat4("iModel", model);
+            shaders.Get("base")->SetMat4("iModel", &model[0][0]);
             
             Mesh* mesh = meshes.Get(obj->GetMesh());
             GL_Interface::BindVertexArrayObject(mesh->vao);
@@ -142,8 +146,9 @@ class GraphicsEngine {
 
             shaders.Get("base")->Use();
 
-            // mat4 view = Perspective(45.0f, window->width/window->height, 0.1f, 100f);
-            // shaders.Get("base")->SetMat4
+            view = Perspective(45.0f, (float)width/(float)height, 0.1f, 100.0f);
+            // std::cout << "view:\n" << view << std::endl;
+            shaders.Get("base")->SetMat4("iView", &view[0][0]);
 
             shaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             shaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
@@ -153,8 +158,9 @@ class GraphicsEngine {
             world.at(0)->trans.Rotate(PI/580, PI/720, 0.0f);
             float tmp = 0.4 + 0.1*sin(ft.GetTotalElapsed()*PI/2);
             world.at(0)->trans.SetScale({tmp, tmp, tmp});
+            world.at(0)->trans.SetPosition({0.0f, 0.0f, -5 + 2*sin(ft.GetTotalElapsed()*PI/2)});
             RenderObject(world.at(0));
-            // RenderObject(world.at(1));
+            RenderObject(world.at(1));
 
             GL_Interface::BindFrameBufferObj(0);
             

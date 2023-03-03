@@ -14,7 +14,7 @@ class ResourceManager {
 
         int GetId(std::string name) {
             for (auto const& [id, item] : _resourceMap) {
-                if ((Resource*)item->GetName() == name) {
+                if (((Resource*)item)->GetName() == name) {
                     return id;
                 }
             }

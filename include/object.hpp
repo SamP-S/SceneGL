@@ -1,15 +1,25 @@
+#pragma once
 #include <vector>
+#include <string>
 
+#include "resource.hpp"
 #include "transform.hpp"
 
-class Object {
+class Object : public Resource {
 
+    int _meshId = -1;
+        
     public:
         Transform trans = Transform();
 
-        Object(Object* parent) :
+        Object(std::string name, Object* parent) :
+            Resource(name),
             _parent(parent) {};
 
+        Object(std::string name, Object* parent, int meshId) :
+            Object(name, parent) {
+                _meshId = meshId;
+            };
 
         void AddChild(Object* childPtr) {
             _children.push_back(childPtr);
@@ -27,6 +37,14 @@ class Object {
 
         void SetParent(Object* parent) {
             _parent = parent;
+        }
+
+        int GetMesh() {
+            return _meshId;
+        }
+
+        void SetMesh(int meshId) {
+            this->_meshId = meshId;
         }
 
     private:

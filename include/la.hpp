@@ -456,8 +456,9 @@ namespace LA {
 
 		// -- Constructors --
 
+        // Identity Matrix
 		mat() {
-            for (int i = 0; i < (N < M ? N : M); i++) {
+            for (int i = 0; i < this->length(); i++) {
                 this->operator[](i)[i] = 1;
             }
         }
@@ -901,7 +902,7 @@ namespace LA {
     }
 
     template<int N, typename T>
-    void print(vec<N, T> const& v, bool hasNewline = true) {
+    void print(vec<N, T> const& v, bool hasNewline = false) {
         std::cout << "Vector: " << std::endl;
         for (int i = 0; i < v.length(); i++) {
             std::cout << v[i] << "\n";
@@ -912,7 +913,7 @@ namespace LA {
     }
 
     template<int N, int M, typename T>
-    void print(mat<N, M, T> const& m, bool hasNewline = true) {
+    void print(mat<N, M, T> const& m, bool hasNewline = false) {
         std::cout << "Matrix: " << std::endl;
         for (int j = 0; j < m.height(); j++) {
             for (int i = 0; i < m.width(); i++) {

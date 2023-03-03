@@ -7,6 +7,7 @@ g++ src/main.cpp \
     bin/linux/graphics \
     -std=c++17 \
     -w \
+    -Wfatal-errors \
     -Idependencies/imgui \
     -Idependencies/tinyfiledialogs \
     -Idependencies/stb-master \

@@ -4,3 +4,4 @@
 # ingore build directories
 bin/
 build/
+test/

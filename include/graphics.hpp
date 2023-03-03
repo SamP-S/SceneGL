@@ -19,6 +19,8 @@
 #include "texture.hpp"
 #include "mesh.hpp"
 #include "resource_manager.hpp"
+#include "object.hpp"
+#include "la_extended.hpp"
 
 enum Comparison {
     NEVER = 0,
@@ -42,7 +44,7 @@ class GraphicsEngine {
         int width, height;
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;
-        
+        std::vector<Object*> world = std::vector<Object*>();
 
         GraphicsEngine(WindowManager* window) {
             AttachWindow(window);
@@ -61,18 +63,24 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferStencil2D(fbo, texDepthStencil);
              
             GL_Interface::BindFrameBufferObj(0);
+            GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
             shaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
             meshes.Add(new Mesh("cube", cubeVertices, cubeColours, cubeIndicies));
             meshes.Add(new Mesh("quad", quadVertices));
 
+            world.push_back(new Object("cube0", NULL, 0));
+            world.push_back(new Object("cube1", NULL, 0));
+            world.at(0)->trans.Scale(-0.5f, -0.5f, -0.5f);
             shaders.Get("base")->Use();
-            GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
         }
 
         ~GraphicsEngine() {
             // delete context; delete makes error even though pointer?!?
             // delete window; causesd unknown signal error?
+            for (auto obj : world) {
+                delete obj;
+            }
         }
 
         bool AttachWindow(WindowManager* window) {
@@ -102,6 +110,22 @@ class GraphicsEngine {
             return 1;
         }
 
+        void RenderObject(Object* obj) {
+            mat4 pos = Translate(obj->trans.GetPosition());
+            mat4 rot = Rotate(obj->trans.GetRotation());
+            mat4 scl = Scale(obj->trans.GetScale());
+            std::cout << "pos:\n" << pos << std::endl;
+            std::cout << "rot:\n" << rot << std::endl;
+            std::cout << "scl:\n" << scl << std::endl;
+            mat4 model = pos * rot * scl * mat4();
+            // std::cout << "model:\n" << model << std::endl;
+            shaders.Get("base")->SetMat4("iModel", model);
+            
+            Mesh* mesh = meshes.Get(obj->GetMesh());
+            GL_Interface::BindVertexArrayObject(mesh->vao);
+            GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
+            // GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, 6);
+        }
 
         void Render() {
             GL_Interface::BindFrameBufferObj(fbo);
@@ -109,7 +133,7 @@ class GraphicsEngine {
             GL_Interface::SetViewport(width, height);
             /* Clear The Screen And The Depth Buffer */
             GL_Interface::ClearColourDepth();
-            GL_Interface::BindVertexArrayObject(meshes.Get("cube")->vao);
+            
             // GL_Interface::DisableFeature(FEATURE_DEPTH);
             GL_Interface::DisableFeature(FEATURE_CULL);
             GL_Interface::EnableFeature(FEATURE_DEPTH);
@@ -118,13 +142,19 @@ class GraphicsEngine {
 
             shaders.Get("base")->Use();
 
+            // mat4 view = Perspective(45.0f, window->width/window->height, 0.1f, 100f);
+            // shaders.Get("base")->SetMat4
+
             shaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             shaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
             shaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
             shaders.Get("base")->SetInt("iFrame", _frameNum);
 
-            GL_Interface::DrawElements(DRAW_TRIANGLES, cubeIndicies.size(), TYPE_UINT);
-            // GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, 6);
+            world.at(0)->trans.Rotate(PI/580, PI/720, 0.0f);
+            float tmp = 0.4 + 0.1*sin(ft.GetTotalElapsed()*PI/2);
+            world.at(0)->trans.SetScale({tmp, tmp, tmp});
+            RenderObject(world.at(0));
+            // RenderObject(world.at(1));
 
             GL_Interface::BindFrameBufferObj(0);
             

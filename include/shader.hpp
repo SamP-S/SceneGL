@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "gl_interface.hpp"
+#include "resource.hpp"
 
 /*
     IMPLEMENT
@@ -17,7 +18,7 @@
     glGetAttribLocation
 */
 
-class Shader {
+class Shader : public Resource {
 
     private:
         bool _validShader = false;
@@ -66,7 +67,8 @@ class Shader {
         std::string vertexCode = "";
         std::string fragmentCode = "";
 
-        Shader(std::string vs, std::string fs) {
+        Shader(std::string name, std::string vs, std::string fs)
+            : Resource(name) {
             if (vs == "" || fs == "") {
                 throw "Shader Source Invalid";
             }
@@ -75,8 +77,8 @@ class Shader {
             this->_validShader = Compile();
         }
 
-        Shader(const char* vFilePath, const char* fFilePath) :
-            Shader(GetSourceFromFile(vFilePath), GetSourceFromFile(fFilePath)) {
+        Shader(std::string name, const char* vFilePath, const char* fFilePath)
+            : Shader(name, GetSourceFromFile(vFilePath), GetSourceFromFile(fFilePath)) {
         } 
 
         bool Use() {

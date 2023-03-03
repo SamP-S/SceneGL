@@ -62,9 +62,9 @@ class GraphicsEngine {
              
             GL_Interface::BindFrameBufferObj(0);
 
-            shaders.Add("base", new Shader("shaders/base.vs", "shaders/base.fs"));
-            meshes.Add("cube", new Mesh(cubeVertices, cubeColours, cubeIndicies));
-            meshes.Add("quad", new Mesh(quadVertices));
+            shaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
+            meshes.Add(new Mesh("cube", cubeVertices, cubeColours, cubeIndicies));
+            meshes.Add(new Mesh("quad", quadVertices));
 
             shaders.Get("base")->Use();
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);

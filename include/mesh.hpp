@@ -1,8 +1,10 @@
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include "la.hpp"
 #include "gl_interface.hpp"
+#include "resource.hpp"
 
 using namespace LA;
 
@@ -51,7 +53,7 @@ const std::vector<vec3> cubeColours = {
     {1.0f, 1.0f, 1.0f}   // White
 };
 
-class Mesh {
+class Mesh : public Resource {
 
 
     public:
@@ -61,17 +63,20 @@ class Mesh {
         uint32_t vao = 0;
 
     // todo add assimp loaded meshes
-        Mesh() {
+        Mesh(std::string name)
+            : Resource(name) {
             std::cout << "Ok: Created empty mesh" << std::endl;
         }
 
-        Mesh(std::vector<vec3> vertices) {
+        Mesh(std::string name, std::vector<vec3> vertices)
+            : Resource(name) {
             Clear();
             _vertices = vertices;
             GenerateBuffers();
         }
 
-        Mesh(std::vector<vec3> vertices, std::vector<vec3> colours, std::vector<uint32_t> indicies) {
+        Mesh(std::string name, std::vector<vec3> vertices, std::vector<vec3> colours, std::vector<uint32_t> indicies)
+            : Resource(name) {
             Clear();
             _vertices = vertices;
             _colours = colours;

@@ -94,6 +94,8 @@ class Mesh : public Resource {
             Clear();
             _vertices = vertices;
         }
+        int GetVerticesSize() { return _vertices.size(); }
+
         std::vector<vec2> GetUVs() { return _uv; }
         void SetUVs(std::vector<vec2> uv) {
             if (uv.size() != _vertices.size())
@@ -101,6 +103,8 @@ class Mesh : public Resource {
             else
                 _uv = uv;
         }
+        int GetUVsSize() { return _uv.size(); }
+
         std::vector<vec3> GetNormals() { return _normals; }
         void SetNormals(std::vector<vec3> normals) { 
             if (normals.size() != _vertices.size())
@@ -108,6 +112,8 @@ class Mesh : public Resource {
             else
                 _normals = normals;
         }
+        int GetNormalsSize() { return _normals.size(); } 
+
         std::vector<vec3> GetColours() { return _colours; }
         void SetColours(std::vector<vec3> colours) {
             if (colours.size() != _vertices.size())
@@ -115,6 +121,8 @@ class Mesh : public Resource {
             else
                 _colours = colours;
         }
+        int GetColoursSize() { return _colours.size(); }
+
         std::vector<uint32_t> GetIndicies() { return _indicies; }
         void SetIndicies(std::vector<uint32_t> indicies) {
             if (indicies.size() != _vertices.size())
@@ -122,6 +130,7 @@ class Mesh : public Resource {
             else
                 _indicies = indicies;
         }
+        int GetIndiciesSize() { return _indicies.size(); }
 
     private:
 

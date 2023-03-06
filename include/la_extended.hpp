@@ -19,28 +19,31 @@ namespace LA {
 
     mat4 RotateX(float angle) {
         mat4 to_return = mat4();
-        to_return[1][1] = cos(angle);
-        to_return[2][1] = sin(angle);
-        to_return[1][2] = -sin(angle);
-        to_return[2][2] = cos(angle);
+        float radians = angle * PI / 180;
+        to_return[1][1] = cos(radians);
+        to_return[2][1] = sin(radians);
+        to_return[1][2] = -sin(radians);
+        to_return[2][2] = cos(radians);
         return to_return;
     }
 
     mat4 RotateY(float angle) {
         mat4 to_return = mat4();
-        to_return[0][0] = cos(angle);
-        to_return[0][2] = sin(angle);
-        to_return[2][0] = -sin(angle);
-        to_return[2][2] = cos(angle);
+        float radians = angle * PI / 180;
+        to_return[0][0] = cos(radians);
+        to_return[0][2] = sin(radians);
+        to_return[2][0] = -sin(radians);
+        to_return[2][2] = cos(radians);
         return to_return;
     }
 
     mat4 RotateZ(float angle) {
         mat4 to_return = mat4();
-        to_return[0][0] = cos(angle);
-        to_return[0][1] = sin(angle);
-        to_return[1][0] = -sin(angle);
-        to_return[1][1] = cos(angle);
+        float radians = angle * PI / 180;
+        to_return[0][0] = cos(radians);
+        to_return[0][1] = sin(radians);
+        to_return[1][0] = -sin(radians);
+        to_return[1][1] = cos(radians);
         return to_return;
     }
 

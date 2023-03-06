@@ -25,6 +25,7 @@ class Application {
         bool show_editor_window = true;
         bool show_render_window = true;
         bool show_stats_window = true;
+        bool show_world_window = true;
         bool show_assets_window = true;
         bool show_demo_window = false;
         bool show_file_explorer = false;
@@ -107,13 +108,46 @@ class Application {
                     ImGui::SetNextWindowViewport(viewport->ID);
                     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
                     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+                    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
+                    window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
                     window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
                 }
 
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-                ImGui::Begin("DockSpaceWindow", NULL, window_flags);
+                ImGui::Begin("CoreWindow", NULL, window_flags);
                 ImGui::PopStyleVar(3);
+
+                ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+                ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
+                ImVec2 dockspace_size = ImVec2(0, 0);
+                ImGui::DockSpace(dockspace_id, dockspace_size, dockspace_flags);
+
+                static bool resetDocking = true;
+                if (resetDocking) {
+                    ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
+                    ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags | ImGuiDockNodeFlags_DockSpace);
+                    ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+                    // split the dockspace into 2 nodes -- DockBuilderSplitNode takes in the following args in the following order
+                    // window ID to split, direction, fraction (between 0 and 1), 
+                    //          the final two setting let's us choose which id we want (which ever one we DON'T set as NULL, will be returned by the function)
+                    //          out_id_at_dir is the id of the node in the direction we specified earlier, out_id_at_opposite_dir is in the opposite direction
+                    ImGuiID dock_id_right;
+                    ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dock_id_right);
+                    ImGuiID dock_id_left_up;
+                    ImGuiID dock_id_left_down = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.3f, nullptr, &dock_id_left_up);
+                    ImGuiID dock_id_right_up;
+                    ImGuiID dock_id_right_down = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.1f, nullptr, &dock_id_right_up);
+
+                    // dock windows into the docking node we made above
+                    ImGui::DockBuilderDockWindow("Render Window", dock_id_right_up);
+                    ImGui::DockBuilderDockWindow("World Tree", dock_id_left_up);
+                    ImGui::DockBuilderDockWindow("Statistics Monitor", dock_id_right_down);
+                    // ImGui::DockBuilderDockWindow("Asset Manager", dock_id_left_down);
+                    ImGui::DockBuilderFinish(dockspace_id);
+                    resetDocking = false;
+                }
+
                 MenuBar();
                 ImGui::End();
 
@@ -122,6 +156,9 @@ class Application {
                 }
                 if (show_stats_window) {
                     StatisticsWindow();
+                }
+                if (show_world_window) {
+                    WorldWindow();
                 }
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
@@ -160,6 +197,7 @@ class Application {
                 if (ImGui::BeginMenu("Window")) {
                     ImGui::MenuItem("Render Display", NULL, &show_render_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
+                    ImGui::MenuItem("World Tree", NULL, &show_world_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }
@@ -194,6 +232,19 @@ class Application {
             ImGuiWindowFlags statsWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Statistics Monitor", &show_stats_window, statsWindowFlags);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        
+        void WorldWindow() {
+            ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
+            ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
+            ImGui::Text("Tree:");
+            for (int i = 0; i < Graphics.world.size(); i++) {
+                if (ImGui::TreeNode(std::to_string(i).c_str())) {
+                    ImGui::Text(Graphics.world[i]->GetName().c_str());
+                    ImGui::TreePop();
+                }                
+            }
             ImGui::End();
         }
 

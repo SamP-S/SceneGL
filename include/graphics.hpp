@@ -44,6 +44,7 @@ class GraphicsEngine {
         int width, height;
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;
+        int worldSelected = 0;
         std::vector<Object*> world = std::vector<Object*>();
         mat4 view = mat4();
 
@@ -155,10 +156,10 @@ class GraphicsEngine {
             shaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
             shaders.Get("base")->SetInt("iFrame", _frameNum);
 
-            world.at(0)->trans.Rotate(PI/580, PI/720, 0.0f);
-            float tmp = 0.4 + 0.1*sin(ft.GetTotalElapsed()*PI/2);
-            world.at(0)->trans.SetScale({tmp, tmp, tmp});
-            world.at(0)->trans.SetPosition({0.0f, 0.0f, -5 + 2*sin(ft.GetTotalElapsed()*PI/2)});
+            // world.at(0)->trans.Rotate(PI/580, PI/720, 0.0f);
+            // float tmp = 0.4 + 0.1*sin(ft.GetTotalElapsed()*PI/2);
+            // world.at(0)->trans.SetScale({tmp, tmp, tmp});
+            // world.at(0)->trans.SetPosition({0.0f, 0.0f, -5 + 2*sin(ft.GetTotalElapsed()*PI/2)});
             RenderObject(world.at(0));
             RenderObject(world.at(1));
 

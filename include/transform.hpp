@@ -12,7 +12,9 @@ class Transform {
 
         // Position
         LA::vec3 GetPosition() { return _position; }
-        void SetPosition(LA::vec3 position) { this->_position = position; }
+        void SetPosition(LA::vec3 position) { 
+            std::cout << "SetPos: " << position.x << " " << position.y << " " << position.z << std::endl;
+            this->_position = position; }
         void Translate(float x, float y, float z) {
             _position += vec3({x, y, z});
         }

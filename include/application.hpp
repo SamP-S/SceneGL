@@ -26,11 +26,14 @@ class Application {
         bool show_render_window = true;
         bool show_stats_window = true;
         bool show_world_window = true;
-        bool show_assets_window = true;
+        bool show_properties_window = true;
         bool show_demo_window = false;
         bool show_file_explorer = false;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
+        float prop_pos[3] = {0.0f, 0.0f, 0.0f};
+        float prop_rot[3] = {0.0f, 0.0f, 0.0f};
+        float prop_scl[3] = {0.0f, 0.0f, 0.0f};
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -143,7 +146,7 @@ class Application {
                     ImGui::DockBuilderDockWindow("Render Window", dock_id_right_up);
                     ImGui::DockBuilderDockWindow("World Tree", dock_id_left_up);
                     ImGui::DockBuilderDockWindow("Statistics Monitor", dock_id_right_down);
-                    // ImGui::DockBuilderDockWindow("Asset Manager", dock_id_left_down);
+                    ImGui::DockBuilderDockWindow("Object Properties", dock_id_left_down);
                     ImGui::DockBuilderFinish(dockspace_id);
                     resetDocking = false;
                 }
@@ -159,6 +162,9 @@ class Application {
                 }
                 if (show_world_window) {
                     WorldWindow();
+                }
+                if (show_properties_window) {
+                    PropertiesWindow();
                 }
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
@@ -244,6 +250,41 @@ class Application {
                     ImGui::Text(Graphics.world[i]->GetName().c_str());
                     ImGui::TreePop();
                 }                
+            }
+            ImGui::End();
+        }
+
+        void PropertiesWindow() {
+            ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
+            ImGui::Begin("Object Properties", &show_world_window, worldWindowFlags);
+            if (Graphics.worldSelected == -1) {
+                ImGui::Text("Nothing selected");
+            } else {
+                Object* obj = Graphics.world[Graphics.worldSelected];
+                ImGui::Text(obj->GetName().c_str());
+                ImGui::Text("Transform:");
+                // ImGui::Text("Position:");
+                // position
+                memcpy(&prop_pos, &obj->trans.GetPosition()[0], sizeof(float) * 3);
+                ImGui::Text("Pos");
+                ImGui::SameLine();
+                if (ImGui::InputFloat3("##PosInput", prop_pos)) {
+                    obj->trans.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
+                }
+                // rotation
+                memcpy(&prop_rot, &obj->trans.GetRotation()[0], sizeof(float) * 3);
+                ImGui::Text("Rot");
+                ImGui::SameLine();
+                if (ImGui::InputFloat3("##RotInput", prop_rot)) {
+                    obj->trans.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
+                }
+                // scale
+                memcpy(&prop_scl, &obj->trans.GetScale()[0], sizeof(float) * 3);
+                ImGui::Text("Scl");
+                ImGui::SameLine();
+                if (ImGui::InputFloat3("##SclInput", prop_scl)) {
+                    obj->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
+                }
             }
             ImGui::End();
         }

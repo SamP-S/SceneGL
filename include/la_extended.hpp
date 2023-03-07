@@ -6,6 +6,52 @@ namespace LA {
 
     const float PI = 3.14159;
 
+    template<int N, typename T>
+    double Mag(vec<N, T> v) {
+        return Magnitude(v);
+    }
+
+    template<int N, typename T>
+    double Magnitude(vec<N, T> v) {
+        double total = 0;
+        for (int i = 0; i < v.len(); i++) {
+            total += v[i] * v[i];
+        }
+        return sqrt(total);
+    }
+
+    template<int N, typename T>
+    vec<N, T> Norm(vec<N, T> v) {
+        return Normalise(v);
+    }
+
+    template<int N, typename T>
+    vec<N, T> Normalise(vec<N, T> v) {
+        vec<N, T> n = vec<N, T>();
+        double total = Magnitude(v);
+        if (total == 0.0) {
+            return n;
+        }
+        for (int i = 0; i < v.len(); i++) {
+            n[i] = v[i] / total;
+        }
+        return n;
+    }
+
+    template<int N, typename T>
+    double Dot(vec<N, T> a, vec<N, T> b) {
+        double total = 0.0;
+        for (int i = 0; i < a.len(); i++) {
+            total += a[i] * b[i];
+        }
+        return total;
+    }
+
+    template<int N, typename T>
+    T AngleBetween(vec<N, T> a, vec<N, T> b) {
+        return acosf(Dot(a, b) / (Mag(a) * Mag(b)));
+    }
+
     mat4 Translate(float x, float y, float z) {
         mat4 to_return = mat4();
         to_return[3][0] = x;
@@ -77,6 +123,33 @@ namespace LA {
         to_return[2][3] = -1;
         to_return[3][2] = -(2 * far * near) / (far - near);
         return to_return;
+    }
+
+    vec3 Cross(vec3 a, vec3 b) {
+    return vec3({a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
+                a.x * b.y - a.y * b.x
+            });
+    }
+
+    mat4 LookAt (vec3 from, vec3 to, vec3 up) {
+        mat4 to_return = mat4();
+        to += from;
+        vec3 z = Normalise(to);
+		vec3 x = Normalise(Cross(up, z));
+		vec3 y = Cross(z, x);
+		return mat4({
+			x.x,  x.y,  x.z, (float)-Dot(from, x),
+			y.x,  y.y,  y.z, (float)-Dot(from, y),
+			z.x,  z.y,  z.z, (float)-Dot(from, z),
+			0.0f, 0.0f, 0.0f, 1.0f
+        });
+        return to_return;
+    }
+
+    vec4 Project(vec4 from, vec4 onto) {
+        onto *= (float)Dot(from, onto) / (float)Dot(onto, onto);
+        return onto;
     }
 
 }

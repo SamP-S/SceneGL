@@ -21,6 +21,7 @@
 #include "resource_manager.hpp"
 #include "object.hpp"
 #include "la_extended.hpp"
+#include "camera.hpp"
 
 enum Comparison {
     NEVER = 0,

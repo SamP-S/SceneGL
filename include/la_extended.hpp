@@ -114,6 +114,13 @@ namespace LA {
         return Scale(v.x, v.y, v.z);
     }
 
+    mat4 Transformation(vec3 position, vec3 rotation, vec3 scale) {
+        mat4 pos = Translate(position);
+        mat4 rot = Rotate(rotation);
+        mat4 scl = Scale(scale);
+        return pos * rot * scl;
+    }
+
     mat4 Perspective(float fov, float aspect, float near, float far) {
         mat4 to_return = mat4(0.0f);
         float tan_half_angle = tan(fov * (PI/180) / 2);

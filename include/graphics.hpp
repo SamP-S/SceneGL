@@ -47,7 +47,8 @@ class GraphicsEngine {
         unsigned int _frameNum = 0;
         int worldSelected = 0;
         std::vector<Object*> world = std::vector<Object*>();
-        mat4 view = mat4();
+        mat4 proj = mat4();
+        Camera camera = Camera();
 
         GraphicsEngine(WindowManager* window) {
             AttachWindow(window);
@@ -79,6 +80,15 @@ class GraphicsEngine {
             world.at(1)->trans.Translate(0.0f, 0.0f, 10.0f);
             world.at(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
             shaders.Get("base")->Use();
+            camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
+
+            std::cout << "view:\n" << camera.view << std::endl;
+            for (int i = 0; i < 10; i++) {
+                camera.Move(MOVE_FORWARD);
+                camera.Move(MOVE_RIGHT);
+                camera.Move(MOVE_UP);
+            }
+            std::cout << "view:\n" << camera.view << std::endl;
         }
 
         ~GraphicsEngine() {
@@ -117,14 +127,7 @@ class GraphicsEngine {
         }
 
         void RenderObject(Object* obj) {
-            mat4 pos = Translate(obj->trans.GetPosition());
-            mat4 rot = Rotate(obj->trans.GetRotation());
-            mat4 scl = Scale(obj->trans.GetScale());
-            // std::cout << "pos:\n" << pos << std::endl;
-            // std::cout << "rot:\n" << rot << std::endl;
-            // std::cout << "scl:\n" << scl << std::endl;
-            mat4 model = pos * rot * scl * mat4();
-            // std::cout << "model:\n" << model << std::endl;
+            mat4 model = obj->trans.GetTransform();
             shaders.Get("base")->SetMat4("iModel", &model[0][0]);
             
             Mesh* mesh = meshes.Get(obj->GetMesh());
@@ -148,19 +151,17 @@ class GraphicsEngine {
 
             shaders.Get("base")->Use();
 
-            view = Perspective(45.0f, (float)width/(float)height, 0.1f, 100.0f);
-            // std::cout << "view:\n" << view << std::endl;
-            shaders.Get("base")->SetMat4("iView", &view[0][0]);
+            camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
+            proj = Perspective(45.0f, (float)width/(float)height, 0.1f, 100.0f);
+            // std::cout << "camera:\n" << camera.proj << std::endl;
+            // std::cout << "proj:\n" << proj << std::endl;
+            shaders.Get("base")->SetMat4("iView", &proj[0][0]);
 
             shaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             shaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
             shaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
             shaders.Get("base")->SetInt("iFrame", _frameNum);
 
-            // world.at(0)->trans.Rotate(PI/580, PI/720, 0.0f);
-            // float tmp = 0.4 + 0.1*sin(ft.GetTotalElapsed()*PI/2);
-            // world.at(0)->trans.SetScale({tmp, tmp, tmp});
-            // world.at(0)->trans.SetPosition({0.0f, 0.0f, -5 + 2*sin(ft.GetTotalElapsed()*PI/2)});
             RenderObject(world.at(0));
             RenderObject(world.at(1));
 

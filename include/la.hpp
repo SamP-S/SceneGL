@@ -71,12 +71,13 @@ namespace LA {
     struct vec : vec_data<N, T> {
 
         public:
-        static int length() {
-            return N;
-        }
-        static int size() {
-            return N;
-        }
+        static int length() { return N; }
+        static int size() { return N; }
+
+        // ---  Nullary Functions --- //
+        int len() const { return N; }
+        int height() const { return N; }
+        int width() const { return 1; }
 
         // --- Constructors --- //
         vec(T scalar = 0) {
@@ -214,20 +215,6 @@ namespace LA {
             return *this;
         }
 
-
-        // ---  Nullary Functions --- //
-
-        int len() {
-            return N;
-        }
-
-        int height() {
-            return N;
-        }
-
-        int width() {
-            return 1;
-        }
     };
 
     // --- Binary Arithmetic Operator Functions --- //
@@ -436,10 +423,15 @@ namespace LA {
 	public:
 
 		static length_t length() { return M; }
-        static length_t width() { return M; }
-        static length_t height() { return N; }
-        static length_t columns() { return M; }
-        static length_t rows() { return N; }
+        static length_t size() { return M; }
+
+        // ---  Nullary Functions --- //
+
+        length_t len() const { return M; }
+        length_t width() const { return M; }
+        length_t height() const { return N; }
+        length_t columns() const { return M; }
+        length_t rows() const { return N; }
         
 		col_type & operator[](int i) {
             if (i > this->width() || i < 0) {
@@ -598,6 +590,7 @@ namespace LA {
             }
             return *this;
         }
+
 	};
 
     // --- Unary Operator --- ///

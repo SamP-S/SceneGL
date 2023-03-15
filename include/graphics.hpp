@@ -144,6 +144,7 @@ class GraphicsEngine {
             shaders.Get("base")->Use();
 
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
+            camera.Update();
             // std::cout << "camera:\n" << camera.proj << std::endl;
             // std::cout << "proj:\n" << proj << std::endl;
             shaders.Get("base")->SetMat4("iView", &camera.view[0][0]);

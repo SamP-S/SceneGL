@@ -1,7 +1,8 @@
 #pragma once
 
 #include "transform.hpp"
-#include "la_extended.hpp" 
+#include "la_extended.hpp"
+#include "input.hpp"
 
 #define MODE_STOP 0
 #define MOVE_LEFT 1
@@ -19,7 +20,7 @@ class Camera {
         mat4 view = mat4();
         mat4 proj = mat4();
 
-        float mouseSens = 0.1f;
+        float mouseSens = 0.3f;
         float speed = 0.01f;
         float FOV = 70.0f;
 
@@ -29,7 +30,6 @@ class Camera {
         void SetProjection(float FOV, float window_width, float window_height, float plane_near, float plane_far)
         {
             proj = Perspective(FOV, window_width / window_height, plane_near, plane_far);
-            Update();
         }
 
         void RotateCamera(double dx, double dy)
@@ -42,7 +42,7 @@ class Camera {
                 sinf(verticalAngle),
                 cosf(verticalAngle) * cosf(horizontalAngle)
             }));
-            Update();
+            view = trans.GetTransform();
         }
 
         void Move(int dir)
@@ -69,13 +69,23 @@ class Camera {
                     break;
             };
             trans.Translate(translate);
-            Update();
+            view = trans.GetTransform();
         }
 
         void Update()
         {
-            // view = LookAt(from, to, up);
-            view = trans.GetTransform();
+            if (Input::GetKeyState("w"))
+                Move(MOVE_FORWARD);
+            if (Input::GetKeyState("s"))
+                Move(MOVE_BACKWARD);
+            if (Input::GetKeyState("a"))
+                Move(MOVE_LEFT);
+            if (Input::GetKeyState("d"))
+                Move(MOVE_RIGHT);
+            if (Input::GetKeyState("left ctrl"))
+                Move(MOVE_DOWN);
+            if (Input::GetKeyState("space"))
+                Move(MOVE_UP);
         }
 
 };

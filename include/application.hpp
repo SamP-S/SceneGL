@@ -12,6 +12,7 @@
 #include <tinyfiledialogs.h>
 
 #include "graphics.hpp"
+#include "input.hpp"
 
 
 class Application {
@@ -91,8 +92,10 @@ class Application {
                     ImGui_ImplSDL2_ProcessEvent(&event);
                     switch (event.type) {
                         case SDL_KEYUP:
+                            Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
+                            break;
                         case SDL_KEYDOWN:
-                            std::cout << (char)event.key.keysym.sym << std::endl;
+                            Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
                             break;
                         case SDL_QUIT:
                             windowManager.isQuit = true;

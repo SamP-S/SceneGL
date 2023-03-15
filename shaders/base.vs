@@ -15,7 +15,7 @@ uniform float   iTime;
 
 uniform mat4	iModel;
 uniform mat4	iView;
-uniform mat4	iPerspective;
+uniform mat4	iProjection;
 
 // uniform mat4 uTransform;
 
@@ -24,5 +24,5 @@ void main()
     float pi = 3.14159;
     fColour = iColour;
     // gl_Position = vec4(iPosition * 0.3 * (cos(iTime) * 0.4 + 1.2), 1.0) * rotationY(pi * cos(iTime) * 0.2) * rotationX(pi * sin(iTime) * 0.3);
-	gl_Position = iView * iModel * vec4(iPosition, 1.0f);
+	gl_Position = iView * iProjection * iModel * vec4(iPosition, 1.0f);
 }

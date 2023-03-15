@@ -1,3 +1,8 @@
+#pragma once
+
+#include "SDL_scancode.h"
+#include "SDL_keyboard.h"
+#include "SDL_mouse.h"
 
 #define KEY_UP 0
 #define KEY_DOWN 1
@@ -6,24 +11,33 @@
 
 class Input {
     public:
-        void KeyEvent(int key, int state) {
-            _keyStates[key] = state;
+        static void KeyEvent(int scancode, int state) {
+            _keyStates[scancode] = state;
         }
 
-        void MouseButtonEvent(int button, int state) {
-            _mouseButtonStates[button] = state;
+        // static void MouseButtonEvent(int button, int state) {
+        //     _mouseButtonStates[button] = state;
+        // }
+
+        static int GetKeyState(const char* key) {
+            int scancode = SDL_GetScancodeFromName(key);
+            return _keyStates[scancode];
         }
 
-        int GetKeyState(int key) {
-            return _keyStates[key];
-        }
 
-        int GetMouseButtonState(int button) {
-            return _mouseButtonStates[button];
-        }
+        // static int GetMouseButtonState(const char* button) {
+        //     return _mouseButtonStates[SDL_GetMouseState(NULL, NULL)]
+        // }
+
+        // static int GetMouseButtonState(int button) {
+        //     return _mouseButtonStates[button];
+        // }
 
 
     private:
-        int _keyStates[256] = {KEY_UP};
-        int _mouseButtonStates[32] = {BUTTON_UP};
+        static int _keyStates[SDL_NUM_SCANCODES];
+        static int _mouseButtonStates[32];
 };
+
+int Input::_keyStates[SDL_NUM_SCANCODES] = {KEY_UP};
+int Input::_mouseButtonStates[32] = {BUTTON_UP};

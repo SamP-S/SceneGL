@@ -81,14 +81,6 @@ class GraphicsEngine {
             world.at(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
             shaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
-
-            std::cout << "view:\n" << camera.view << std::endl;
-            for (int i = 0; i < 10; i++) {
-                camera.Move(MOVE_FORWARD);
-                camera.Move(MOVE_RIGHT);
-                camera.Move(MOVE_UP);
-            }
-            std::cout << "view:\n" << camera.view << std::endl;
         }
 
         ~GraphicsEngine() {
@@ -152,10 +144,10 @@ class GraphicsEngine {
             shaders.Get("base")->Use();
 
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
-            proj = Perspective(45.0f, (float)width/(float)height, 0.1f, 100.0f);
             // std::cout << "camera:\n" << camera.proj << std::endl;
             // std::cout << "proj:\n" << proj << std::endl;
-            shaders.Get("base")->SetMat4("iView", &proj[0][0]);
+            shaders.Get("base")->SetMat4("iView", &camera.view[0][0]);
+            shaders.Get("base")->SetMat4("iProjection", &camera.proj[0][0]);
 
             shaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             shaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());

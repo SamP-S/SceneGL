@@ -20,7 +20,7 @@ class Camera {
         mat4 proj = mat4();
 
         float mouseSens = 0.1f;
-        float speed = 1.0f;
+        float speed = 0.01f;
         float FOV = 70.0f;
 
         float horizontalAngle = 0.0f;

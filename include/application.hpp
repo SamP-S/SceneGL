@@ -90,6 +90,10 @@ class Application {
                 while (SDL_PollEvent(&event)) {
                     ImGui_ImplSDL2_ProcessEvent(&event);
                     switch (event.type) {
+                        case SDL_KEYUP:
+                        case SDL_KEYDOWN:
+                            std::cout << (char)event.key.keysym.sym << std::endl;
+                            break;
                         case SDL_QUIT:
                             windowManager.isQuit = true;
                             break;

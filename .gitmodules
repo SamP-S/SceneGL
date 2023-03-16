@@ -1,0 +1,3 @@
+[submodule "dependencies/tinyfiledialogs"]
+	path = dependencies/tinyfiledialogs
+	url = https://github.com/SamP-S/libtinyfiledialogs

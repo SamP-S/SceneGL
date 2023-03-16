@@ -1,3 +1,0 @@
-/mnt/d/Taben/source/repos/Engines/SceneGL/build/CMakeFiles/SceneGL.dir
-/mnt/d/Taben/source/repos/Engines/SceneGL/build/CMakeFiles/edit_cache.dir
-/mnt/d/Taben/source/repos/Engines/SceneGL/build/CMakeFiles/rebuild_cache.dir

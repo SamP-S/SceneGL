@@ -307,7 +307,7 @@ class GL_Interface {
         
         static void CheckShaderCompile(uint32_t shader) {
             int success;
-            char infoLog[1024];
+            static char infoLog[1024];
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success) {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
@@ -317,7 +317,7 @@ class GL_Interface {
 
         static void CheckProgramCompile(uint32_t program) {
             int success;
-            char infoLog[1024];
+            static char infoLog[1024];
             glGetProgramiv(program, GL_LINK_STATUS, &success);
             if (!success) {
                 glGetProgramInfoLog(program, 1024, NULL, infoLog);

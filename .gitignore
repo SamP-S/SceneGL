@@ -1,5 +1,6 @@
 # ignore development environment setup
 .vscode/
+*.log
 
 # ingore build directories
 bin/

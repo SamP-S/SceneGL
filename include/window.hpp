@@ -12,6 +12,8 @@ class WindowManager {
         //static int winWidth;
         //static int winHeight;
 
+        int gl_major = 3;
+        int gl_minor = 3;
         const char* glsl_version = "#version 420";
         SDL_GLContext gl_context;
         SDL_Window* window;
@@ -29,12 +31,18 @@ class WindowManager {
             if (_height < WINDOW_HEIGHT)
                 _height = WINDOW_HEIGHT;
 
-            // GL 4.2 + GLSL 420
-            glsl_version = "#version 420";
+            // Initialise SDL subsystems
+            SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
+
+            // can fail to set version
+            // GL 3.3 + GLSL 330
+            glsl_version = "#version 330";
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major) != 0)
+                gl_major = 0;
+            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_minor) != 0)
+                gl_minor = 0;
 
             // Create window with graphics context
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);

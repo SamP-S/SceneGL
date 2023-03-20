@@ -35,6 +35,10 @@ class Application {
         float prop_pos[3] = {0.0f, 0.0f, 0.0f};
         float prop_rot[3] = {0.0f, 0.0f, 0.0f};
         float prop_scl[3] = {0.0f, 0.0f, 0.0f};
+        bool renderer_focused = false;
+        ImVec2 render_region_min = ImVec2();
+        ImVec2 render_region_max = ImVec2();
+        ImVec2 window_pos = ImVec2();
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -90,16 +94,43 @@ class Application {
                 // SDL_PollEvent returns 1 while there is an event in the queue
                 while (SDL_PollEvent(&event)) {
                     ImGui_ImplSDL2_ProcessEvent(&event);
-                    switch (event.type) {
-                        case SDL_KEYUP:
-                            Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
-                            break;
-                        case SDL_KEYDOWN:
-                            Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
-                            break;
-                        case SDL_QUIT:
-                            windowManager.isQuit = true;
-                            break;
+                    if (event.type == SDL_QUIT) {
+                        windowManager.isQuit = true;
+                    }
+                                
+                    if (renderer_focused) {
+                        switch (event.type) {
+                            case SDL_KEYUP:
+                                Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
+                                break;
+                            case SDL_KEYDOWN:
+                                Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
+                                break;
+                            case SDL_MOUSEMOTION:
+                                {
+                                    // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
+                                    // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
+                                    if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
+                                        && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
+                                        int x = event.motion.x - render_region_min.x;
+                                        int y = event.motion.y - render_region_min.y;
+                                        x = ((x >= 0) ? x : 0);
+                                        y = ((y >= 0) ? y : 0);
+                                        x = ((x <= render_region_max.x) ? x : render_region_max.x);
+                                        y = ((y <= render_region_max.y) ? y : render_region_max.y);
+                                        Input::MouseMoved(x, y);
+                                    }
+                                }
+                                break;
+                            case SDL_MOUSEBUTTONDOWN:
+                                Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
+                                break;
+                            case SDL_MOUSEBUTTONUP:
+                                Input::MouseButtonEvent(event.button.button, BUTTON_UP);
+                                break;
+                        }
+                    } else {
+                        Input::ClearStates();
                     }
                 }
 
@@ -125,6 +156,7 @@ class Application {
 
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
                 ImGui::Begin("CoreWindow", NULL, window_flags);
+                window_pos = ImGui::GetWindowPos();
                 ImGui::PopStyleVar(3);
 
                 ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -162,6 +194,7 @@ class Application {
                 ImGui::End();
 
                 if (show_render_window) {
+                    // std::cout << ImGui::GetWindowPos().x << "#" << ImGui::GetWindowPos().y << std::endl;
                     RenderWindow();
                 }
                 if (show_stats_window) {
@@ -231,13 +264,29 @@ class Application {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             ImGui::Begin("Render Window", &show_render_window, renderWindowFlags);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
             ImGui::PopStyleVar(1);
+            renderer_focused = ImGui::IsWindowFocused();
 
             // content size
-            float wWidth = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
-            float wHeight = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+            ImVec2 pos = ImGui::GetWindowPos();
+            pos.x -= window_pos.x;
+            pos.y -= window_pos.y;
+            // std::cout << "wpos= " << window_pos.x << ":" << window_pos.y << std::endl;
+            // std::cout << "pos= " << pos.x << ":" << pos.y << std::endl;
+            render_region_min = ImGui::GetWindowContentRegionMin();
+            // std::cout << "min= " << render_region_min.x << ":" << render_region_min.y << std::endl;
+            render_region_min.x += pos.x;
+            render_region_min.y += pos.y;
+            // std::cout << "min+= " << render_region_min.x << ":" << render_region_min.y << std::endl;
+            render_region_max = ImGui::GetWindowContentRegionMax();
+            render_region_max.x += pos.x;
+            render_region_max.y += pos.y;
+            
+            float wWidth = render_region_max.x - render_region_min.x;
+            float wHeight = render_region_max.y - render_region_min.y;
             ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
             Graphics.Render();
             ImGui::Image((ImTextureID)Graphics.texColour, wSize, ImVec2(0, 1), ImVec2(1, 0));
+            // ImGui::GetForegroundDrawList()->AddRect(render_region_min + pos, render_region_max + pos, IM_COL32(255, 255, 0, 255));
             ImGui::End();
         }
 

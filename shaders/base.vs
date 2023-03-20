@@ -1,4 +1,4 @@
-#version 420 core
+#version 330 core
 
 // in int gl_VertexID;
 // in int gl_InstanceID;

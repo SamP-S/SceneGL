@@ -6,6 +6,16 @@ namespace LA {
 
     const float PI = 3.14159;
 
+    template<typename T>
+    double RadToDeg(T rad) {
+        return (double)(rad * 180 / PI);
+    }
+
+    template<typename T>
+    double DegToRad(T deg) {
+        return (double)(deg * PI / 180);
+    }
+
     template<int N, typename T>
     double Mag(vec<N, T> v) {
         return Magnitude(v);

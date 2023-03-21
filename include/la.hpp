@@ -125,13 +125,15 @@ namespace LA {
         }
 
         // Addition and assign
-        vec<N, T> & operator+=(T scalar) {
+        template<typename U>
+        vec<N, T> & operator+=(U scalar) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) += scalar;
             }
             return *this;
         }
-        vec<N, T> & operator+=(const vec<N, T>& v) {
+        template<typename U>
+        vec<N, T> & operator+=(const vec<N, U>& v) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) += v.operator[](i);
             }
@@ -139,13 +141,15 @@ namespace LA {
         }
 
         // Subtract and assign
-        vec<N, T> & operator-=(T scalar) {
+        template<typename U>
+        vec<N, T> & operator-=(U scalar) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) -= scalar;
             }
             return *this;
         }
-        vec<N, T> & operator-=(const vec<N, T>& v) {
+        template<typename U>
+        vec<N, T> & operator-=(const vec<N, U>& v) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) -= v.operator[](i);
             }
@@ -153,14 +157,16 @@ namespace LA {
         }
 
         // Scalar multiplication
-        vec<N, T> & operator*=(T scalar) {
+        template<typename U>
+        vec<N, T> & operator*=(U scalar) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) *= scalar;
             }
             return *this;
         }
         // Component-wise multiplication
-        vec<N, T> & operator*=(const vec<N, T>& v) {
+        template<typename U>
+        vec<N, T> & operator*=(const vec<N, U>& v) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) *= v[i];
             }
@@ -168,14 +174,16 @@ namespace LA {
         }
 
         // Scalar division
-        vec<N, T> & operator/=(T scalar) {
+        template<typename U>
+        vec<N, T> & operator/=(U scalar) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) /= scalar;
             }
             return *this;
         }
         // Component-wise division
-        vec<N, T> & operator/=(const vec<N, T>& v) {
+        template<typename U>
+        vec<N, T> & operator/=(const vec<N, U>& v) {
             for (int i = 0; i < this->length(); i++) {
                 if (v[i] == 0) {
                     throw "ERROR: Divide by 0";
@@ -220,24 +228,24 @@ namespace LA {
     // --- Binary Arithmetic Operator Functions --- //
 
     // Addition
-    template<int N, typename T>
-    vec<N, T> operator+(vec<N, T> const& v, T scalar) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator+(vec<N, T> const& v, U scalar) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = v[i] + scalar;
         }
         return total;
     }
-    template<int N, typename T>
-    vec<N, T> operator+(T scalar, vec<N, T> const& v) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator+(U scalar, vec<N, T> const& v) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = scalar + v[i];
         }
         return total;
     }
-    template<int N, typename T>
-    vec<N, T> operator+(vec<N, T> const& v1, vec<N, T> const& v2) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator+(vec<N, T> const& v1, vec<N, U> const& v2) {
         vec<N, T> total;
         for (int i = 0; i < v1.len(); i++) {
             total[i] = v1[i] + v2[i];
@@ -246,24 +254,24 @@ namespace LA {
     }
 
     // Subtraction
-    template<int N, typename T>
-    vec<N, T> operator-(vec<N, T> const& v, T scalar) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator-(vec<N, T> const& v, U scalar) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = v[i] - scalar;
         }
         return total;
     }
-    template<int N, typename T>
-    vec<N, T> operator-(T scalar, vec<N, T> const& v) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator-(U scalar, vec<N, T> const& v) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = scalar - v[i];
         }
         return total;
     }
-    template<int N, typename T>
-    vec<N, T> operator-(vec<N, T> const& v1, vec<N, T> const& v2) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator-(vec<N, T> const& v1, vec<N, U> const& v2) {
         vec<N, T> total;
         for (int i = 0; i < v1.len(); i++) {
             total[i] = v1[i] - v2[i];
@@ -272,16 +280,16 @@ namespace LA {
     }
 
     // Scalar multiplication
-    template<int N, typename T>
-    vec<N, T> operator*(vec<N, T> const& v, T scalar) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator*(vec<N, T> const& v, U scalar) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = v[i] * scalar;
         }
         return total;
     }
-    template<int N, typename T>
-    vec<N, T> operator*(T scalar, vec<N, T> const& v) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator*(U scalar, vec<N, T> const& v) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = scalar * v[i];
@@ -289,12 +297,12 @@ namespace LA {
         return total;
     }
     // Component-wise multiplication
-    template<int N, typename T>
-    vec<N, T> operator*(vec<N, T> const& v1, vec<N, T> const& v2); 
+    template<int N, typename T, typename U>
+    vec<N, T> operator*(vec<N, T> const& v1, vec<N, U> const& v2); 
 
     // Scalar division
-    template<int N, typename T>
-    vec<N, T> operator/(vec<N, T> const& v, T scalar) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator/(vec<N, T> const& v, U scalar) {
         if (scalar == 0) {
             throw "ERROR: Divide by 0";
         }
@@ -304,8 +312,8 @@ namespace LA {
         }
         return total;
     }
-    template<int N, typename T>
-    vec<N, T> operator/(T scalar, vec<N, T> const& v) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator/(U scalar, vec<N, T> const& v) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             if (v[i] == 0) {
@@ -316,8 +324,8 @@ namespace LA {
         return total;
     }
     // Component-wise division
-    template<int N, typename T>
-    vec<N, T> operator/(vec<N, T> const& v1, vec<N, T> const& v2) {
+    template<int N, typename T, typename U>
+    vec<N, T> operator/(vec<N, T> const& v1, vec<N, U> const& v2) {
         vec<N, T> total;
         for (int i = 0; i < v1.len(); i++) {
             if (v2[i] == 0) {
@@ -328,8 +336,8 @@ namespace LA {
         return total;
     }
 
-    template<int N, typename T>
-	vec<N, T> operator%(vec<N, T> const& v, T scalar) {
+    template<int N, typename T, typename U>
+	vec<N, T> operator%(vec<N, T> const& v, U scalar) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = v[i] % scalar;
@@ -337,8 +345,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, typename T>
-	vec<N, T> operator%(T scalar, vec<N, T> const& v) {
+	template<int N, typename T, typename U>
+	vec<N, T> operator%(U scalar, vec<N, T> const& v) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = scalar % v[i];
@@ -346,8 +354,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, typename T>
-	vec<N, T> operator%(vec<N, T> const& v1, vec<N, T> const& v2) {
+	template<int N, typename T, typename U>
+	vec<N, T> operator%(vec<N, T> const& v1, vec<N, U> const& v2) {
         vec<N, T> total;
         for (int i = 0; i < v1.len(); i++) {
             total[i] = v1[i] % v2[i];
@@ -356,8 +364,8 @@ namespace LA {
     }
 
 
-	template<int N, typename T>
-	vec<N, T> operator^(vec<N, T> const& v, T scalar) {
+	template<int N, typename T, typename U>
+	vec<N, T> operator^(vec<N, T> const& v, U scalar) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = v[i] ^ scalar;
@@ -365,8 +373,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, typename T>
-	vec<N, T> operator^(T scalar, vec<N, T> const& v) {
+	template<int N, typename T, typename U>
+	vec<N, T> operator^(U scalar, vec<N, T> const& v) {
         vec<N, T> total;
         for (int i = 0; i < v.len(); i++) {
             total[i] = scalar ^ v[i];
@@ -374,8 +382,8 @@ namespace LA {
         return total;
     }
     
-	template<int N, typename T>
-	vec<N, T> operator^(vec<N, T> const& v1, vec<N, T> const& v2) {
+	template<int N, typename T, typename U>
+	vec<N, T> operator^(vec<N, T> const& v1, vec<N, U> const& v2) {
         vec<N, T> total;
         for (int i = 0; i < v1.len(); i++) {
             total[i] = v1[i] ^ v2[i];
@@ -398,8 +406,8 @@ namespace LA {
         return true;
     }
 
-	template<int N, typename T>
-	bool operator!=(vec<N, T> const& v1, vec<N, T> const& v2) {
+	template<int N, typename T, int M, typename U>
+	bool operator!=(vec<N, T> const& v1, vec<M, U> const& v2) {
         if (v1 == v2) {
             return false;
         } else {
@@ -595,18 +603,18 @@ namespace LA {
 
     // --- Unary Operator --- ///
 
-    // Inverse of a square matrix
-    template<int N, typename T>
-    mat<N, N, T> inverse(mat<N, N, T> const& m) {
-        double det = determinant(m);
-        if (det == 0) {
-            throw "ERROR: cannot inverse non-singular matrix";
-            return m;
-        } 
-        mat<N, N, T> co = cofactor(m);
-        mat<N, N, T> ct = transpose(co);
-        return ct * (1 / det);
-    }
+    // // Inverse of a square matrix
+    // template<int N, typename T>
+    // mat<N, N, T> inverse(mat<N, N, T> const& m) {
+    //     float det = (float)determinant(m);
+    //     if (det == 0) {
+    //         throw "ERROR: cannot inverse non-singular matrix";
+    //         return m;
+    //     } 
+    //     mat<N, N, T> co = cofactor(m);
+    //     mat<N, N, T> ct = transpose(co);
+    //     return ct * (1 / det);
+    // }
 
     template<int N, int M, typename T>
     mat<N, M, T> transpose(mat<M, N, T> const& m) {
@@ -620,87 +628,136 @@ namespace LA {
     }
 
     template<int N, typename T>
-    double determinant(mat<N, N, T> a) {
-        int n = a.length();
-        double det = 0;
-        mat<N, N, T> m = mat<N, N, T>();
-
-        if (n < 1) {
-            throw "ERROR: How the fuck?!?";
-        } else if (n == 1) {
-            det = a[0][0];
-        } else if (n == 2) {
-            det = a[0][0] * a[1][1] - a[1][0] * a[0][1];
-        } else {
-            det = 0;
-            for (int j1 = 0; j1 < n; j1++) {
-                for (int i = 1; i < n; i++) {
-                    int j2 = 0;
-                    for (int j=0;j<n;j++) {
-                        if (j == j1)
-                            continue;
-                        m[i-1][j2] = a[i][j];
-                        j2++;
+    mat<N-1, N-1, T> sub_matrix(mat<N, N, T> a, int i, int j) {
+        if (i < 0 || i >= N || j < 0 || j >= N) {
+            return mat<N-1, N-1, T>();
+        }
+        int row = 0;
+        int col = 0;
+        mat<N-1, N-1, T> m = mat<N-1, N-1, T>();
+        for (int q = 0; q < N; q++) {
+            if (q != j) {
+                for (int p = 0; p < N; p++) {
+                    if (p != i) {
+                        m[row][col] = a[q][p];
+                        col++;
                     }
-                }
-                det += pow(-1.0, j1 + 2.0) * a[0][j1] * determinant(m);
+                } 
+                row++;
+                col = 0;
             }
         }
-        return det;
+        return m;
     }
 
-    template<int N, typename T>
-    mat<N, N, T> cofactor(mat<N, N, T> a) {
-        int n = a.length();
-        double det;
-        mat<N, N, T> b, c;
+    // template <typename T>
+    // double determinant(mat<1,1,T> a) {
+    //     return a[0][0];
+    // }
 
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
+    // template <typename T>
+    // double determinant(mat<2,2,T> a) {
+    //     return a[0][0] * a[1][1] - a[1][0] * a[0][1];
+    // }
 
-                /* Form the adjoint a_ij */
-                int i1 = 0;
-                for (int ii = 0; ii < n; ii++) {
-                    if (ii == i)
-                        continue;
-                    int j1 = 0;
-                    for (int jj = 0; jj < n; jj++) {
-                        if (jj == j)
-                            continue;
-                        c[i1][j1] = a[ii][jj];
-                        j1++;
-                    }
-                    i1++;
-                }
+    // template<int N, typename T>
+    // double determinant(mat<N, N, T> a) {
+    //     static_assert(N >= 3, "Matrix size must 3+");
+    //     int n = N;
+    //     mat<N, N, T> m = mat<N, N, T>();
+    //     int sign = 1;
+    //     double det = 0;
+    //     for (int k = 0; k < N; k++) {
+    //         det += sign * m[k][0] * determinant(sub_matrix(a, 0, k));
+    //         sign = -sign;
+    //     }
+    //     return det;
+    // }
 
-                /* Calculate the determinate */
-                det = determinant(c);
+    // template<int N, typename T>
+    // double determinant(mat<N, N, T> a) {
+    //     int n = a.length();
+    //     double det = 0;
+    //     mat<N, N, T> m = mat<N, N, T>();
 
-                /* Fill in the elements of the cofactor */
-                b[i][j] = pow(-1.0, i + j + 2.0) * det;
-            }
-        }
-        return b;
-    }
+    //     if (n < 1) {
+    //         throw "ERROR: How the fuck?!?";
+    //     } else if (n == 1) {
+    //         det = a[0][0];
+    //     } else if (n == 2) {
+    //         det = a[0][0] * a[1][1] - a[1][0] * a[0][1];
+    //     } else {
+    //         det = 0;
+
+
+    //         for (int j1 = 0; j1 < n; j1++) {
+    //             for (int i = 1; i < n; i++) {
+    //                 int j2 = 0;
+    //                 for (int j=0;j<n;j++) {
+    //                     if (j == j1)
+    //                         continue;
+    //                     m[i-1][j2] = a[i][j];
+    //                     j2++;
+    //                 }
+    //             }
+    //             det += pow(-1.0, j1 + 2.0) * a[0][j1] * determinant(m);
+    //         }
+    //     }
+    //     return det;
+    // }
+
+    // template<int N, typename T>
+    // mat<N, N, T> cofactor(mat<N, N, T> a) {
+    //     int n = a.length();
+    //     double det;
+    //     mat<N, N, T> b, c;
+
+    //     for (int j = 0; j < n; j++) {
+    //         for (int i = 0; i < n; i++) {
+
+    //             /* Form the adjoint a_ij */
+    //             int i1 = 0;
+    //             for (int ii = 0; ii < n; ii++) {
+    //                 if (ii == i)
+    //                     continue;
+    //                 int j1 = 0;
+    //                 for (int jj = 0; jj < n; jj++) {
+    //                     if (jj == j)
+    //                         continue;
+    //                     c[i1][j1] = a[ii][jj];
+    //                     j1++;
+    //                 }
+    //                 i1++;
+    //             }
+
+    //             /* Calculate the determinate */
+    //             det = determinant(c);
+
+    //             /* Fill in the elements of the cofactor */
+    //             b[i][j] = pow(-1.0, i + j + 2.0) * det;
+    //         }
+    //     }
+    //     return b;
+    // }
 	
-	template<int N, int M, typename T>
-	mat<N, M, T> operator+(mat<N, M, T> const& m, T scalar) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator+(mat<N, M, T> const& m, U scalar) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = m[i] + scalar;
         }
         return total;
     }
-	template<int N, int M, typename T>
-	mat<N, M, T> operator+(T scalar, mat<N, M, T> const& m) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator+(U scalar, mat<N, M, T> const& m) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = scalar + m[i];
         }
         return total;
     }
-	template<int N, int M, typename T>
-	mat<N, M, T> operator+(mat<N, M, T> const& m1, mat<N, M, T> const& m2) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator+(mat<N, M, T> const& m1, mat<N, M, U> const& m2) {
         mat<N, M, T> total;
         for (int i = 0; i < m1.width(); i++) {
             total[i] = m1[i] + m2[i];
@@ -708,24 +765,24 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	mat<N, M, T> operator-(mat<N, M, T> const& m, T scalar) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator-(mat<N, M, T> const& m, U scalar) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = m[i] - scalar;
         }
         return total;
     }
-	template<int N, int M, typename T>
-	mat<N, M, T> operator-(T scalar, mat<N, M, T> const& m) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator-(U scalar, mat<N, M, T> const& m) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = scalar - m[i];
         }
         return total;
     }
-	template<int N, int M, typename T>
-	mat<N, M, T> operator-(mat<N, M, T> const& m1, mat<N, M, T> const& m2) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator-(mat<N, M, T> const& m1, mat<N, M, U> const& m2) {
         mat<N, M, T> total;
         for (int i = 0; i < m1.width(); i++) {
             total[i] = m1[i] -  m2[i];
@@ -733,8 +790,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	mat<N, M, T> operator*(mat<N, M, T> const& m, T scalar) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator*(mat<N, M, T> const& m, U scalar) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = m[i] * scalar;
@@ -742,8 +799,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	mat<N, M, T> operator*(T scalar, mat<N, M, T> const& m) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator*(U scalar, mat<N, M, T> const& m) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = scalar * m[i];
@@ -751,8 +808,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	typename mat<N, M, T>::col_type operator*(mat<N, M, T> const& m, typename mat<N, M, T>::col_type const& v) {
+	template<int N, int M, typename T, typename U>
+	typename mat<N, M, T>::col_type operator*(mat<N, M, T> const& m, typename mat<N, M, U>::col_type const& v) {
         typename mat<N, M, T>::col_type total;
         for (int i = 0; i < total.length(); i++) {
             T t = 0;
@@ -764,8 +821,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	typename mat<N, M, T>::row_type operator*(typename mat<N, M, T>::row_type const& v, mat<N, M, T> const& m) {
+	template<int N, int M, typename T, typename U>
+	typename mat<N, M, T>::row_type operator*(typename mat<N, M, U>::row_type const& v, mat<N, M, T> const& m) {
         typename mat<N, M, T>::row_type total = mat<N, M, T>::row_type();
         for (int i = 0; i < total.length(); i++) {
             T t = 0;
@@ -777,8 +834,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, int O, typename T>
-	mat<N, O, T> operator*(mat<N, M, T> const& m1, mat<M, O, T> const& m2) {
+	template<int N, int M, int O, typename T, typename U>
+	mat<N, O, T> operator*(mat<N, M, T> const& m1, mat<M, O, U> const& m2) {
         mat<N, O, T> total;
         for (int i = 0; i < m2.width(); i++) {
             for (int j = 0; j < m1.height(); j++) {
@@ -792,8 +849,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	mat<N, M, T> operator/(mat<N, M, T> const& m, T scalar) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator/(mat<N, M, T> const& m, U scalar) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = m[i] / scalar;
@@ -801,8 +858,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	mat<N, M, T> operator/(T scalar, mat<N, M, T> const& m) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator/(U scalar, mat<N, M, T> const& m) {
         mat<N, M, T> total;
         for (int i = 0; i < m.width(); i++) {
             total[i] = scalar / m[i];
@@ -810,8 +867,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	typename mat<N, M, T>::col_type operator/(mat<N, M, T> const& m, typename mat<N, M, T>::col_type const& v) {
+	template<int N, int M, typename T, typename U>
+	typename mat<N, M, T>::col_type operator/(mat<N, M, T> const& m, typename mat<N, M, U>::col_type const& v) {
         mat<M, M, T> inv = inverse(m);
         if (m == inv) {
             throw "ERROR: cannot divide using non-singular matrix";
@@ -828,8 +885,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	typename mat<N, M, T>::row_type operator/(typename mat<N, M, T>::row_type const& v, mat<N, M, T> const& m) {
+	template<int N, int M, typename T, typename U>
+	typename mat<N, M, T>::row_type operator/(typename mat<N, M, T>::row_type const& v, mat<N, M, U> const& m) {
         mat<M, M, T> inv = inverse(m);
         if (m == inv) {
             throw "ERROR: cannot divide using non-singular matrix";
@@ -846,8 +903,8 @@ namespace LA {
         return total;
     }
 
-	template<int N, int M, typename T>
-	mat<N, M, T> operator/(mat<N, M, T> const& m1, mat<M, M, T> const& m2) {
+	template<int N, int M, typename T, typename U>
+	mat<N, M, T> operator/(mat<N, M, T> const& m1, mat<M, M, U> const& m2) {
         mat<M, M, T> inv = inverse(m2);
         if (m2 == inv) {
             throw "ERROR: cannot divide using non-singular matrix";
@@ -858,8 +915,8 @@ namespace LA {
 
 	// -- Boolean operators --
 
-	template<int N, int M, typename T>
-	bool operator==(mat<N, M, T> const& m1, mat<N, M, T> const& m2) {
+	template<int N, int M, typename T, typename U>
+	bool operator==(mat<N, M, T> const& m1, mat<N, M, U> const& m2) {
         for (int i = 0; i < m1.width(); i++) {
             if (m1[i] != m2[i]) {
                 return false;
@@ -868,8 +925,8 @@ namespace LA {
         return true;
     }
 
-	template<int N, int M, typename T>
-	bool operator!=(mat<N, M, T> const& m1, mat<N, M, T> const& m2) {
+	template<int N, int M, typename T, typename U>
+	bool operator!=(mat<N, M, T> const& m1, mat<N, M, U> const& m2) {
         if (m1 == m2) {
             return false;
         } else {
@@ -895,27 +952,17 @@ namespace LA {
     }
 
     template<int N, typename T>
-    void print(vec<N, T> const& v, bool hasNewline = false) {
-        std::cout << "Vector: " << std::endl;
+    void print(vec<N, T> const& v) {
         for (int i = 0; i < v.length(); i++) {
-            std::cout << v[i] << "\n";
+            std::cout << v[i] << " ";
         }
-        if (hasNewline) {
-            std::cout << std::endl;
-        }
+        std::cout << std::endl;
     }
 
     template<int N, int M, typename T>
-    void print(mat<N, M, T> const& m, bool hasNewline = false) {
-        std::cout << "Matrix: " << std::endl;
+    void print(mat<N, M, T> const& m) {
         for (int j = 0; j < m.height(); j++) {
-            for (int i = 0; i < m.width(); i++) {
-                std::cout << m[i][j] << "\t";
-            }
-            std::cout << std::endl;
-        }
-        if (hasNewline) {
-            std::cout << std::endl;
+            print(m[j]);
         }
     }
 

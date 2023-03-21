@@ -18,11 +18,10 @@ class Camera {
         Transform trans = Transform();
 
         mat4 view = mat4();
-        mat4 view_inv = mat4();
         mat4 proj = mat4();
 
-        float mouseSens = 0.3f;
-        float speed = 0.01f;
+        float mouseSens = 0.5f;
+        float speed = 0.05f;
         float FOV = 70.0f;
 
         bool active = false;
@@ -37,44 +36,41 @@ class Camera {
 
         void RotateCamera(int dx, int dy)
         {
-            float dxf = mouseSens * float(-dx);
+            float dxf = mouseSens * float(dx);
             float dyf = mouseSens * float(dy);
-
-            trans.Rotate(0.0f, dxf, dyf);
-            view = trans.GetTransform();
-            view_inv = inverse(trans.GetTransform());
+            trans.Rotate(dyf, dxf, 0.0f);
         }
 
         void Move(int dir)
         {
             vec3 translate = vec3();
+            vec3 right = trans.GetRight();
+            right.y = 0.0f;
+            right = Normalise(right);
+            vec3 forward = trans.GetForward();
+            forward.y = 0.0f;
+            forward = Normalise(forward);
             switch (dir) {
                 case MOVE_LEFT:
-                    translate = trans.GetRight() * -speed;
+                    translate = right * -speed;
                     break;
                 case MOVE_RIGHT:
-                    translate = trans.GetRight() * speed;
+                    translate = right * speed;
                     break;
                 case MOVE_UP:
-                    translate = trans.GetUp() * speed;
+                    translate = vec3({0.0f, 1.0f, 0.0f}) * speed;
                     break;
                 case MOVE_DOWN:
-                    translate = trans.GetUp() * -speed;
+                    translate = vec3({0.0f, 1.0f, 0.0f}) * -speed;
                     break;
                 case MOVE_FORWARD:
-                    translate = trans.GetForward() * speed;
+                    translate = forward * -speed;
                     break;
                 case MOVE_BACKWARD:
-                    translate = trans.GetForward() * -speed;
+                    translate = forward * speed;
                     break;
             };
             trans.Translate(translate);
-            view = trans.GetTransform();
-            view_inv = inverse(trans.GetTransform());
-            std::cout << "view" << std::endl;
-            print(view);
-            std::cout << "view_inverse:" << std::endl;
-            print(view_inv);
         }
 
         void Update()
@@ -98,10 +94,12 @@ class Camera {
                 } else {
                     int dx = Input::GetMouseX() - x;
                     int dy = Input::GetMouseY() - y;
-                    // RotateCamera(dx, dy);
+                    RotateCamera(dx, dy);
                 }
                 x = Input::GetMouseX();
                 y = Input::GetMouseY();
+
+                view = inverse(trans.GetTransform());
             } else {
                 active = false;
             }

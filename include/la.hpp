@@ -603,19 +603,6 @@ namespace LA {
 
     // --- Unary Operator --- ///
 
-    // // Inverse of a square matrix
-    // template<int N, typename T>
-    // mat<N, N, T> inverse(mat<N, N, T> const& m) {
-    //     float det = (float)determinant(m);
-    //     if (det == 0) {
-    //         throw "ERROR: cannot inverse non-singular matrix";
-    //         return m;
-    //     } 
-    //     mat<N, N, T> co = cofactor(m);
-    //     mat<N, N, T> ct = transpose(co);
-    //     return ct * (1 / det);
-    // }
-
     template<int N, int M, typename T>
     mat<N, M, T> transpose(mat<M, N, T> const& m) {
         mat<N, M, T> inv;
@@ -650,95 +637,64 @@ namespace LA {
         return m;
     }
 
-    // template <typename T>
-    // double determinant(mat<1,1,T> a) {
-    //     return a[0][0];
-    // }
+    template <typename T>
+    double determinant(mat<1,1,T> a) {
+        return a[0][0];
+    }
 
-    // template <typename T>
-    // double determinant(mat<2,2,T> a) {
-    //     return a[0][0] * a[1][1] - a[1][0] * a[0][1];
-    // }
+    template <typename T>
+    double determinant(mat<2,2,T> a) {
+        return a[0][0] * a[1][1] - a[1][0] * a[0][1];
+    }
 
-    // template<int N, typename T>
-    // double determinant(mat<N, N, T> a) {
-    //     static_assert(N >= 3, "Matrix size must 3+");
-    //     int n = N;
-    //     mat<N, N, T> m = mat<N, N, T>();
-    //     int sign = 1;
-    //     double det = 0;
-    //     for (int k = 0; k < N; k++) {
-    //         det += sign * m[k][0] * determinant(sub_matrix(a, 0, k));
-    //         sign = -sign;
-    //     }
-    //     return det;
-    // }
+    template<int N, typename T>
+    double determinant(mat<N, N, T> m) {
+        static_assert(N >= 3, "Matrix size must 3+");
+        double det = 0.0;
+        int sign = 1;
+        for (int k = 0; k < N; k++) {
+            det += sign * m[0][k] * determinant(sub_matrix(m, k, 0));
+            sign = -sign;
+        }
+        return det;
+    }
 
-    // template<int N, typename T>
-    // double determinant(mat<N, N, T> a) {
-    //     int n = a.length();
-    //     double det = 0;
-    //     mat<N, N, T> m = mat<N, N, T>();
+    template<int N, typename T>
+    mat<N, N, T> minors(mat<N, N, T> m) {
+        mat<N, N, T> n = mat<N, N, T>();
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i < N; i++) {
+                n[j][i] = determinant(sub_matrix(m, i, j));
+            }
+        }
+        return n;
+    }
 
-    //     if (n < 1) {
-    //         throw "ERROR: How the fuck?!?";
-    //     } else if (n == 1) {
-    //         det = a[0][0];
-    //     } else if (n == 2) {
-    //         det = a[0][0] * a[1][1] - a[1][0] * a[0][1];
-    //     } else {
-    //         det = 0;
+    template<int N, typename T>
+    mat<N, N, T> cofactors(mat<N, N, T> m) {
+        mat<N, N, T> min = minors(m);
+        // std::cout << "minors" << std::endl;
+        // print(min);
+        mat<N, N, T> n = mat<N, N, T>();
+        for (int j = 0; j < N; j++){
+            for (int i = 0; i < N; i++) {
+                n[j][i] = ((i + j) % 2 == 0 ? 1 : -1) * min[j][i];
+            }
+        }
+        return n;
+    }
 
-
-    //         for (int j1 = 0; j1 < n; j1++) {
-    //             for (int i = 1; i < n; i++) {
-    //                 int j2 = 0;
-    //                 for (int j=0;j<n;j++) {
-    //                     if (j == j1)
-    //                         continue;
-    //                     m[i-1][j2] = a[i][j];
-    //                     j2++;
-    //                 }
-    //             }
-    //             det += pow(-1.0, j1 + 2.0) * a[0][j1] * determinant(m);
-    //         }
-    //     }
-    //     return det;
-    // }
-
-    // template<int N, typename T>
-    // mat<N, N, T> cofactor(mat<N, N, T> a) {
-    //     int n = a.length();
-    //     double det;
-    //     mat<N, N, T> b, c;
-
-    //     for (int j = 0; j < n; j++) {
-    //         for (int i = 0; i < n; i++) {
-
-    //             /* Form the adjoint a_ij */
-    //             int i1 = 0;
-    //             for (int ii = 0; ii < n; ii++) {
-    //                 if (ii == i)
-    //                     continue;
-    //                 int j1 = 0;
-    //                 for (int jj = 0; jj < n; jj++) {
-    //                     if (jj == j)
-    //                         continue;
-    //                     c[i1][j1] = a[ii][jj];
-    //                     j1++;
-    //                 }
-    //                 i1++;
-    //             }
-
-    //             /* Calculate the determinate */
-    //             det = determinant(c);
-
-    //             /* Fill in the elements of the cofactor */
-    //             b[i][j] = pow(-1.0, i + j + 2.0) * det;
-    //         }
-    //     }
-    //     return b;
-    // }
+    template<int N, typename T>
+    mat<N, N, T> inverse(mat<N, N, T> m) {
+        // mat<N, N, T> adj = adjucate(m);
+        mat<N, N, T> cof = cofactors(m);
+        mat<N, N, T> tran = transpose(cof);
+        // std::cout << "adj" << std::endl;
+        // print(adj);
+        double det = determinant(m);
+        // std::cout << "det = " << det << std::endl;
+        return  (1 / det) * tran;  
+    }
 	
 	template<int N, int M, typename T, typename U>
 	mat<N, M, T> operator+(mat<N, M, T> const& m, U scalar) {

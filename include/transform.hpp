@@ -49,7 +49,7 @@ class Transform {
         // negative the z as opengl looks down the z axis
         LA::vec3 GetForward() {
             mat4 total = GetTransform();
-            return vec3({ total[2][0], total[2][1], -total[2][2] });
+            return vec3({ total[2][0], total[2][1], total[2][2] });
         }
 
         LA::vec3 GetRight() {

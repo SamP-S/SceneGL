@@ -24,7 +24,7 @@ class Input {
         }
 
         static void MouseMoved(int x, int y) {
-            std::cout << "x: " << x << " \ty: " << y << std::endl;
+            // std::cout << "x: " << x << " \ty: " << y << std::endl;
             _mouseX = x;
             _mouseY = y;
         }

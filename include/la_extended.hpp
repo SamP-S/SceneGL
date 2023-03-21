@@ -104,7 +104,7 @@ namespace LA {
     }
 
     mat4 Rotate(float x, float y, float z) {
-        return RotateX(x) * RotateY(y) * RotateZ(z);
+        return RotateZ(z) * RotateY(y) * RotateX(x);
     }
 
     mat4 Rotate(vec3 v) {

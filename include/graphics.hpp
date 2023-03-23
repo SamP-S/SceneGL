@@ -21,6 +21,7 @@
 #include "object.hpp"
 #include "la_extended.hpp"
 #include "camera.hpp"
+#include "model.hpp"
 
 enum Comparison {
     NEVER = 0,
@@ -65,6 +66,8 @@ class GraphicsEngine {
              
             GL_Interface::BindFrameBufferObj(0);
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
+
+            Model model = Model("test", "/root/SceneGL/models/iso_fbx/Room #1.fbx");
 
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
             resourceMeshes.Add(new Mesh("cube", cubeVertices, cubeColours, cubeIndicies));

@@ -11,86 +11,109 @@
 #include "resource.hpp"
 #include "mesh.hpp"
 #include "la.hpp"
+#include "transform.hpp"
 
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
+class ModelNode {
+	public:
+		Transform trans = Transform();
+		std::vector<ModelNode> children = std::vector<ModelNode>();
+		std::vector<int> meshes = std::vector<int>();
+};
 
 class Model : public Resource {
 
+	void ProcessNode(aiNode *node, ModelNode* modelNode, const aiScene *scene) {
+		aiVector3D pos, rot, scl;
+		node->mTransformation.Decompose(scl, rot, pos);
+		modelNode->trans = Transform(	vec3({pos.x, pos.y, pos.z}),
+										vec3({rot.x, rot.y, rot.z}),
+										vec3({scl.x, scl.y, scl.z})
+		);
 
-	void ProcessNode(aiNode *node, const aiScene *scene) {
-		if (!node->mNumMeshes && node->mNumChildren > 0) {
-			for (uint i = 0; i < node->mNumChildren; i++) {
-				ProcessNode(node->mChildren[i], scene);
-			}
+		for (int i = 0; i < node->mNumMeshes; i++) {
+			modelNode->meshes.push_back(meshes[node->mMeshes[i]]);
 		}
 
-		for (uint i = 0; i < node->mNumMeshes; i++) {
-			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			meshes.push_back(ProcessMesh(mesh));
+		for (int i = 0; i < node->mNumChildren; i++) {
+			modelNode->children.push_back(ModelNode());
+			ProcessNode(node->mChildren[i], &modelNode->children.back(), scene);
 		}
 	}
 
-	Mesh ProcessMesh(aiMesh *mesh) {
+	int ProcessMesh(aiMesh *mesh) {
 		std::vector<vec3> vertices;
 		std::vector<vec3> normals;
-		std::vector<vec2> uv;
+		std::vector<vec2> uvs;
 		std::vector<vec3> colours;
-		std::vector<uint> indices;
+		std::vector<uint32_t> indices;
 
-		for (uint i = 0; i < mesh->mNumVertices; i++) {
-			vertices.push_back(vec3(mesh->mVertices[i]));
+		for (int i = 0; i < mesh->mNumVertices; i++) {
+			vertices.push_back(vec3({mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}));
 		
 			if (mesh->mTextureCoords[0]) {
-				uvs.push_back(vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
+				uvs.push_back(vec2({mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}));
 			}
 			if (!mesh->mNormals != NULL) {
-				normals.push_back(vec3(mesh->mNormals[i]));
+				normals.push_back(vec3({mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z}));
 			}
-			if (mesh->mNormals != NULL) {
-				colours.push_back(vec3(mesh->mColors[0]));
-			}
+			// CAUSES SEG FAULT
+			// if (mesh->mColors != NULL) {
+			// 	colours.push_back(vec3({mesh->mColors[0]->r, mesh->mColors[0]->g, mesh->mColors[0]->b}));
+			// }
 		}
 
-		for (uint i = 0; i < mesh->mNumFaces; i++) {
-			for (uint j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
+		for (int i = 0; i < mesh->mNumFaces; i++) {
+			for (int j = 0; j < mesh->mFaces[i].mNumIndices; j++) {
 				indices.push_back(mesh->mFaces[i].mIndices[j]);
 			}
 		}
-
-		return Mesh(vertices, normals, uv, colours, indices);
+		
+		return resourceMeshes.Add(new Mesh(mesh->mName.C_Str(), vertices, normals, uvs, colours, indices));
 	}
 
 	
 public:
 	bool isOk = false;
-	std::string name;
 	std::string filePath;
 	std::vector<int> meshes;
+	ModelNode rootNode;
+	
 
 	Model(std::string name, std::string path) 
 	: Resource(name) {
 		filePath = path;
 		Assimp::Importer importer;
 		const aiScene *scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
-
 		if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 			std::cout << "ERROR: ASSIMP cannot load file: " << importer.GetErrorString() << std::endl;
-			return false;
+			return;
 		}
 
-		ProcessNode(scene->mRootNode, scene);
-
-		for (int i = 0; i < meshes.size(); i++) {
-			if (meshes[i].vertices.size() == 0)
-				return false;
+		for (int i = 0; i < scene->mNumMaterials; i++) {
+			aiMaterial* material = scene->mMaterials[i];
+			for (int j = 0; j < material->GetTextureCount(); j++) {
+				// aiTexture* texture = scene->mTextures[i];
+				// aiTextureType;
+				// material->GetTexture(aiTextureType)
+				// load texture
+				material->GetTexture
+			}
+			// Load texture
 		}
-		return true;
+
+		for (int i = 0; i < scene->mNumMeshes; i++) {
+			aiMesh* mesh = scene->mMeshes[i];
+			meshes.push_back(ProcessMesh(mesh));
+		}
+
+		ProcessNode(scene->mRootNode, &rootNode, scene);
+		isOk = true;
 	}
-
 
 };
 
-ResourceManager<Model> models = ResourceManager<Model>();
+ResourceManager<Model> resourceModels = ResourceManager<Model>();

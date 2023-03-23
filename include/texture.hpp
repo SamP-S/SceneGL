@@ -2,6 +2,8 @@
 
 #include <string>
 #include "image_interface.hpp"
+#include "resource.hpp"
+#include "resource_manager.hpp"
 
 enum Tex_Filtering {
     NEAREST = 0,
@@ -229,3 +231,5 @@ class Cubemap : public Texture {
         }
         
 };
+
+ResourceManager<Texture2D> textures2D = ResourceManager<Texture2D>();

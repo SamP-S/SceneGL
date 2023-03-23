@@ -18,7 +18,6 @@
 #include "shader.hpp"
 #include "texture.hpp"
 #include "mesh.hpp"
-#include "resource_manager.hpp"
 #include "object.hpp"
 #include "la_extended.hpp"
 #include "camera.hpp"
@@ -40,8 +39,6 @@ class GraphicsEngine {
         void* context;
         WindowManager* window;
         frame_timer ft = frame_timer();
-        ResourceManager<Shader> shaders = ResourceManager<Shader>();
-        ResourceManager<Mesh> meshes = ResourceManager<Mesh>();
         int width, height;
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;

@@ -5,6 +5,7 @@
 #include "la.hpp"
 #include "gl_interface.hpp"
 #include "resource.hpp"
+#include "resource_manager.hpp"
 
 using namespace LA;
 
@@ -183,6 +184,6 @@ class Mesh : public Resource {
             }
             GL_Interface::BindElementBufferObj(this->indicieBO);
         }
-
-
 };
+
+ResourceManager<Mesh> meshes = ResourceManager<Mesh>();

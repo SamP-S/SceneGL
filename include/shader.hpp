@@ -10,6 +10,7 @@
 
 #include "gl_interface.hpp"
 #include "resource.hpp"
+#include "resource_manager.hpp"
 
 /*
     IMPLEMENT
@@ -118,3 +119,5 @@ class Shader : public Resource {
         }
 
 };
+
+ResourceManager<Shader> shaders = ResourceManager<Shader>();

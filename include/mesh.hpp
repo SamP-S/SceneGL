@@ -86,12 +86,12 @@ class Mesh : public Resource {
         }
 
         Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<vec2> uvs,
-                std::vector<vec3> colours, std::vector<uint32> indices)
+                std::vector<vec3> colours, std::vector<uint32_t> indicies)
             : Resource(name) {
             Clear();
             _vertices = vertices;
             _normals = normals;
-            _uv = uvs;
+            _uvs = uvs;
             _colours = colours;
             _indicies = indicies;
             this->material = 0;
@@ -108,14 +108,14 @@ class Mesh : public Resource {
         }
         int GetVerticesSize() { return _vertices.size(); }
 
-        std::vector<vec2> GetUVs() { return _uv; }
-        void SetUVs(std::vector<vec2> uv) {
-            if (uv.size() != _vertices.size())
+        std::vector<vec2> GetUVs() { return _uvs; }
+        void SetUVs(std::vector<vec2> uvs) {
+            if (uvs.size() != _vertices.size())
                 std::cout << "Warning: Mesh::SetUV - UVs do not match count of vertices" << std::endl;
             else
-                _uv = uv;
+                _uvs = uvs;
         }
-        int GetUVsSize() { return _uv.size(); }
+        int GetUVsSize() { return _uvs.size(); }
 
         std::vector<vec3> GetNormals() { return _normals; }
         void SetNormals(std::vector<vec3> normals) { 
@@ -147,14 +147,14 @@ class Mesh : public Resource {
     private:
 
         std::vector<vec3> _vertices = std::vector<vec3>();
-        std::vector<vec2> _uv = std::vector<vec2>();
+        std::vector<vec2> _uvs = std::vector<vec2>();
         std::vector<vec3> _normals = std::vector<vec3>();
         std::vector<vec3> _colours = std::vector<vec3>();
         std::vector<uint32_t> _indicies = std::vector<uint32_t>();
 
         void Clear() {
             _vertices.clear();
-            _uv.clear();
+            _uvs.clear();
             _normals.clear();
             _colours.clear();
             _indicies.clear();
@@ -167,8 +167,8 @@ class Mesh : public Resource {
             this->vao = GL_Interface::GenVertexArrayObject();
             GL_Interface::BindVertexBufferObj(this->vertexBO);
             GL_Interface::VertexAttribPtr(ATTRIB_LOC_POSITION, 3, TYPE_FLOAT);
-            if (_uv.size() > 0) {
-                this->uvBO = GL_Interface::GenVertexBufferObj(&uvBO);
+            if (_uvs.size() > 0) {
+                this->uvBO = GL_Interface::GenVertexBufferObj(&_uvs);
                 GL_Interface::BindVertexBufferObj(this->uvBO);
                 GL_Interface::VertexAttribPtr(ATTRIB_LOC_UV, 3, TYPE_FLOAT);
             }

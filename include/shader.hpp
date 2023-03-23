@@ -120,4 +120,4 @@ class Shader : public Resource {
 
 };
 
-ResourceManager<Shader> shaders = ResourceManager<Shader>();
+ResourceManager<Shader> resourceShaders = ResourceManager<Shader>();

@@ -66,9 +66,9 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferObj(0);
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
-            shaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
-            meshes.Add(new Mesh("cube", cubeVertices, cubeColours, cubeIndicies));
-            meshes.Add(new Mesh("quad", quadVertices));
+            resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
+            resourceMeshes.Add(new Mesh("cube", cubeVertices, cubeColours, cubeIndicies));
+            resourceMeshes.Add(new Mesh("quad", quadVertices));
 
             world.push_back(new Object("cube0", NULL, 0));
             world.push_back(new Object("cube1", NULL, 0));
@@ -76,7 +76,7 @@ class GraphicsEngine {
             world.at(0)->trans.SetScale({0.5f, 0.5f, 0.5f});
             world.at(1)->trans.Translate(0.0f, 0.0f, 10.0f);
             world.at(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
-            shaders.Get("base")->Use();
+            resourceShaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
         }
 
@@ -117,9 +117,9 @@ class GraphicsEngine {
 
         void RenderObject(Object* obj) {
             mat4 model = obj->trans.GetTransform();
-            shaders.Get("base")->SetMat4("iModel", &model[0][0]);
+            resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
             
-            Mesh* mesh = meshes.Get(obj->GetMesh());
+            Mesh* mesh = resourceMeshes.Get(obj->GetMesh());
             GL_Interface::BindVertexArrayObject(mesh->vao);
             GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
             // GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, 6);
@@ -138,19 +138,19 @@ class GraphicsEngine {
             // GL_Interface::EnableFeature(FEATURE_CULL);
             GL_Interface::SetFrontFace(FRONT_CW);
 
-            shaders.Get("base")->Use();
+            resourceShaders.Get("base")->Use();
 
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
             camera.Update();
             // std::cout << "camera:\n" << camera.proj << std::endl;
             // std::cout << "proj:\n" << proj << std::endl;
-            shaders.Get("base")->SetMat4("iView", &camera.view[0][0]);
-            shaders.Get("base")->SetMat4("iProjection", &camera.proj[0][0]);
+            resourceShaders.Get("base")->SetMat4("iView", &camera.view[0][0]);
+            resourceShaders.Get("base")->SetMat4("iProjection", &camera.proj[0][0]);
 
-            shaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
-            shaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
-            shaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            shaders.Get("base")->SetInt("iFrame", _frameNum);
+            resourceShaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
+            resourceShaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
+            resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
+            resourceShaders.Get("base")->SetInt("iFrame", _frameNum);
 
             RenderObject(world.at(0));
             RenderObject(world.at(1));

@@ -57,7 +57,7 @@ class ResourceManager {
 
         // currently allows for a pointer to be given out and object deleted while pointer is still outside object
         // move to smart pointers?
-        const T* Get(int id) {
+        T* Get(int id) {
             try {
                 return _resourceMap.at(id);
             } catch (std::out_of_range err) {
@@ -66,7 +66,7 @@ class ResourceManager {
             }
         }
 
-        const T* Get(std::string name) {
+        T* Get(std::string name) {
             return Get(GetId(name));
         }
         

@@ -58,7 +58,7 @@ class Mesh : public Resource {
 
 
     public:
-        uint32_t vertexBO, normalBO, uvBO, colourBo, indicieBO = -1;
+        uint32_t vertexBO, normalBO, uvBO, colourBO, indicieBO = -1;
         uint32_t vao = 0;
         uint32_t material = 0;
 
@@ -186,4 +186,4 @@ class Mesh : public Resource {
         }
 };
 
-ResourceManager<Mesh> meshes = ResourceManager<Mesh>();
+ResourceManager<Mesh> resourceMeshes = ResourceManager<Mesh>();

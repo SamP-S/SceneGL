@@ -637,6 +637,9 @@ namespace LA {
         return m;
     }
 
+    // https://www.epsilonify.com/mathematics/linear-algebra/find-the-inverse-of-nxn-matrix-by-using-minors-cofactors-and-adjugate/
+    // https://www.epsilonify.com/mathematics/linear-algebra/how-to-find-the-minors-of-a-nxn-matrix/
+
     template <typename T>
     double determinant(mat<1,1,T> a) {
         return a[0][0];

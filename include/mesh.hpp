@@ -57,10 +57,9 @@ class Mesh : public Resource {
 
 
     public:
-        uint32_t vertexBO = 0;
-        uint32_t colourBO = 0;
-        uint32_t indicieBO = 0;
+        uint32_t vertexBO, normalBO, uvBO, colourBo, indicieBO = -1;
         uint32_t vao = 0;
+        uint32_t material = 0;
 
     // todo add assimp loaded meshes
         Mesh(std::string name)
@@ -83,6 +82,18 @@ class Mesh : public Resource {
             _indicies = indicies;
             GenerateBuffers();
             std::cout << "Ok: Created array mesh" << std::endl;
+        }
+
+        Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> colours, 
+                std::vector<vec3> normals, std::vector<vec2> uvs, std::vector<uint32> indices, uint32_t material)
+            : Resource(name) {
+            Clear();
+            _vertices = vertices;
+            _normals = normals;
+            _uv = uvs;
+            _colours = colours;
+            _indicies = indicies;
+            this->material = material;
         }
 
         ~Mesh() {
@@ -151,12 +162,22 @@ class Mesh : public Resource {
         /// NO VALIDATION OF CORRECT BUFFER CREATION/FILLING
         void GenerateBuffers() {
             this->vertexBO = GL_Interface::GenVertexBufferObj(&_vertices);
-            this->colourBO = GL_Interface::GenVertexBufferObj(&_colours);
             this->indicieBO = GL_Interface::GenElementBufferObj(&_indicies);
             this->vao = GL_Interface::GenVertexArrayObject();
             GL_Interface::BindVertexBufferObj(this->vertexBO);
             GL_Interface::VertexAttribPtr(ATTRIB_LOC_POSITION, 3, TYPE_FLOAT);
+            if (_uv.size() > 0) {
+                this->uvBO = GL_Interface::GenVertexBufferObj(&uvBO);
+                GL_Interface::BindVertexBufferObj(this->uvBO);
+                GL_Interface::VertexAttribPtr(ATTRIB_LOC_UV, 3, TYPE_FLOAT);
+            }
+            if (_normals.size() > 0) {
+                this->normalBO = GL_Interface::GenVertexBufferObj(&_normals);
+                GL_Interface::BindVertexBufferObj(this->normalBO);
+                GL_Interface::VertexAttribPtr(ATTRIB_LOC_NORMAL, 3, TYPE_FLOAT);
+            }
             if (_colours.size() > 0) {
+                this->colourBO = GL_Interface::GenVertexBufferObj(&_colours);
                 GL_Interface::BindVertexBufferObj(this->colourBO);
                 GL_Interface::VertexAttribPtr(ATTRIB_LOC_COLOUR, 3, TYPE_FLOAT);
             }

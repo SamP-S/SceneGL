@@ -50,6 +50,8 @@ class Texture {
         Tex_Filtering mFilteringMin = Tex_Filtering::NEAREST_MIPMAP_LINEAR;
         Tex_Filtering mFilteringMag = Tex_Filtering::LINEAR;
         Tex_Target mTarget = Tex_Target::TEXTURE_2D;
+        std::string path = "";
+        std::string type = "";
 
     public:
         // virtual Texture(std::string _name, std::string _filepath);
@@ -143,6 +145,13 @@ class Texture2D : public Texture {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_FLOAT, mDataf);
             }
             glGenerateMipmap(GL_TEXTURE_2D);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         int GetThumbWidth() {

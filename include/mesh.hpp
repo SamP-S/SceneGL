@@ -84,8 +84,8 @@ class Mesh : public Resource {
             std::cout << "Ok: Created array mesh" << std::endl;
         }
 
-        Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> colours, 
-                std::vector<vec3> normals, std::vector<vec2> uvs, std::vector<uint32> indices, uint32_t material)
+        Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<vec2> uvs,
+                std::vector<vec3> colours, std::vector<uint32> indices)
             : Resource(name) {
             Clear();
             _vertices = vertices;
@@ -93,7 +93,7 @@ class Mesh : public Resource {
             _uv = uvs;
             _colours = colours;
             _indicies = indicies;
-            this->material = material;
+            this->material = 0;
         }
 
         ~Mesh() {

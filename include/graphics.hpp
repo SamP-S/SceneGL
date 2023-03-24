@@ -18,7 +18,7 @@
 #include "shader.hpp"
 #include "texture.hpp"
 #include "mesh.hpp"
-#include "object.hpp"
+#include "entity.hpp"
 #include "la_extended.hpp"
 #include "camera.hpp"
 #include "model.hpp"
@@ -43,9 +43,8 @@ class GraphicsEngine {
         int width, height;
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;
-        int worldSelected = 0;
-        std::vector<Object*> world = std::vector<Object*>();
-        mat4 proj = mat4();
+        EntityId worldSelected = -1;
+        std::vector<EntityId> world = std::vector<EntityId>();
         Camera camera = Camera();
 
         GraphicsEngine(WindowManager* window) {
@@ -67,25 +66,31 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferObj(0);
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
-            Model model1 = Model("test1", "/root/SceneGL/models/cottage/Cottage_FREE.obj");
-            Model model2 = Model("test2", "/root/SceneGL/models/cottage/Cottage_FREE.dae");
-            Model model3 = Model("test3", "/root/SceneGL/models/cottage/Cottage_FREE.3DS");  
-            Model model4 = Model("test4", "/root/SceneGL/models/cottage/Cottage_FREE.fbx");
-            Model model5 = Model("test5", "/root/SceneGL/models/cottage/Cottage_FREE.stl");
+            resourceModels.Add(new Model("test1", "/root/SceneGL/models/cottage/Cottage_FREE.obj"));
+            resourceModels.Add(new Model("test2", "/root/SceneGL/models/cottage/Cottage_FREE.dae"));
+            resourceModels.Add(new Model("test3", "/root/SceneGL/models/cottage/Cottage_FREE.3DS"));  
+            resourceModels.Add(new Model("test4", "/root/SceneGL/models/cottage/Cottage_FREE.fbx"));
+            resourceModels.Add(new Model("test5", "/root/SceneGL/models/cottage/Cottage_FREE.stl"));
 
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
             resourceMeshes.Add(new Mesh("vertex_cube", cubeVertices, cubeColours, cubeIndicies));
             resourceMeshes.Add(new Mesh("vertex_quad", quadVertices));
 
-            world.push_back(new Object("cube0", NULL, resourceMeshes.GetId("vertex_cube")));
-            world.push_back(new Object("cube1", NULL, resourceMeshes.GetId("vertex_cube")));
-            world.push_back(new Object("Cottage", NULL, resourceMeshes.GetId("test1::Cottage_Free")));
-            world.at(0)->trans.Translate(0.0f, 0.0f, -10.0f);
-            world.at(0)->trans.SetScale({0.5f, 0.5f, 0.5f});
-            world.at(1)->trans.Translate(0.0f, 0.0f, 10.0f);
-            world.at(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
-            world.at(2)->trans.Translate({5.0f, 0.0f, -5.0f});
-            world.at(2)->trans.SetScale(0.1f);
+            resourceEntities.Add(new Entity("cube0", NULL, resourceMeshes.GetId("vertex_cube")));
+            resourceEntities.Add(new Entity("cube1", resourceEntities.GetId("cube0"), resourceMeshes.GetId("vertex_cube")));
+            resourceEntities.Get(0)->AddChild(1);
+            resourceEntities.Add(new Entity("Cottage", NULL, resourceMeshes.GetId("test1::Cottage_Free")));
+
+            world.push_back(resourceEntities.GetId("cube0"));
+            world.push_back(resourceEntities.GetId("Cottage"));
+
+            resourceEntities.Get(0)->trans.Translate(0.0f, 0.0f, -10.0f);
+            resourceEntities.Get(0)->trans.SetScale({0.5f, 0.5f, 0.5f});
+            resourceEntities.Get(1)->trans.Translate(0.0f, 0.0f, 10.0f);
+            resourceEntities.Get(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
+            resourceEntities.Get(2)->trans.Translate({5.0f, 0.0f, -5.0f});
+            resourceEntities.Get(2)->trans.SetScale(0.1f);
+
             resourceShaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
         }
@@ -93,9 +98,7 @@ class GraphicsEngine {
         ~GraphicsEngine() {
             // delete context; delete makes error even though pointer?!?
             // delete window; causesd unknown signal error?
-            for (auto obj : world) {
-                delete obj;
-            }
+            
         }
 
         bool AttachWindow(WindowManager* window) {
@@ -125,13 +128,18 @@ class GraphicsEngine {
             return 1;
         }
 
-        void RenderObject(Object* obj) {
-            if (obj->GetMesh() < 0 )
+        void RenderObject(int entityId, mat4 root_trans = mat4()) {
+            Entity* ent = resourceEntities.Get(entityId);
+            mat4 model = ent->trans.GetTransform() * root_trans;
+            for (int i = 0; i < ent->GetNumChildren(); i++) {
+                RenderObject(ent->GetChild(i), model);
+            }
+
+            if (ent->GetMesh() < 0 )
                 return; 
-            mat4 model = obj->trans.GetTransform();
             resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
             
-            Mesh* mesh = resourceMeshes.Get(obj->GetMesh());
+            Mesh* mesh = resourceMeshes.Get(ent->GetMesh());
             GL_Interface::BindVertexArrayObject(mesh->vao);
             GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
             // GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, 6);
@@ -154,8 +162,6 @@ class GraphicsEngine {
 
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
             camera.Update();
-            // std::cout << "camera:\n" << camera.proj << std::endl;
-            // std::cout << "proj:\n" << proj << std::endl;
             resourceShaders.Get("base")->SetMat4("iView", &camera.view[0][0]);
             resourceShaders.Get("base")->SetMat4("iProjection", &camera.proj[0][0]);
 
@@ -166,7 +172,6 @@ class GraphicsEngine {
 
             RenderObject(world.at(0));
             RenderObject(world.at(1));
-            RenderObject(world.at(2));
 
             GL_Interface::BindFrameBufferObj(0);
             

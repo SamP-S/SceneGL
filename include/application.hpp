@@ -13,6 +13,7 @@
 
 #include "graphics.hpp"
 #include "input.hpp"
+#include "entity.hpp"
 
 
 class Application {
@@ -185,7 +186,7 @@ class Application {
                     ImGui::DockBuilderDockWindow("Render Window", dock_id_right_up);
                     ImGui::DockBuilderDockWindow("World Tree", dock_id_left_up);
                     ImGui::DockBuilderDockWindow("Statistics Monitor", dock_id_right_down);
-                    ImGui::DockBuilderDockWindow("Object Properties", dock_id_left_down);
+                    ImGui::DockBuilderDockWindow("Entity Properties", dock_id_left_down);
                     ImGui::DockBuilderFinish(dockspace_id);
                     resetDocking = false;
                 }
@@ -296,59 +297,68 @@ class Application {
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
         }
+
+        void WorldNode(EntityId entId) {
+            Entity* ent = resourceEntities.Get(entId);
+            if (ImGui::TreeNode(ent->GetName().c_str())) {
+                ImGui::Text(ent->GetName().c_str());
+                ImGui::SameLine();
+                if (ImGui::Button("Select")) {
+                    Graphics.worldSelected = entId;
+                }
+                for (int i = 0; i < ent->GetNumChildren(); i++) {
+                    WorldNode(ent->GetChild(i));
+                }
+                ImGui::TreePop();
+            }      
+        }
         
         void WorldWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
             ImGui::Text("Tree:");
             for (int i = 0; i < Graphics.world.size(); i++) {
-                if (ImGui::TreeNode(std::to_string(i).c_str())) {
-                    ImGui::Text(Graphics.world[i]->GetName().c_str());
-                    if (ImGui::Button("Select")) {
-                        Graphics.worldSelected = i;
-                    }
-                    ImGui::TreePop();
-                }                
+                WorldNode(Graphics.world.at(i));
             }
             ImGui::End();
         }
 
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("Object Properties", &show_world_window, worldWindowFlags);
+            ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
             if (Graphics.worldSelected == -1) {
                 ImGui::Text("Nothing selected");
             } else {
-                Object* obj = Graphics.world[Graphics.worldSelected];
-                ImGui::Text(obj->GetName().c_str());
+                Entity* ent = resourceEntities.Get(Graphics.worldSelected);
+                ImGui::Text(ent->GetName().c_str());
                 ImGui::Text("Transform:");
                 // ImGui::Text("Position:");
                 // position
-                memcpy(&prop_pos, &obj->trans.GetPosition()[0], sizeof(float) * 3);
+                memcpy(&prop_pos, &ent->trans.GetPosition()[0], sizeof(float) * 3);
                 ImGui::Text("Pos");
                 ImGui::SameLine();
                 if (ImGui::InputFloat3("##PosInput", prop_pos)) {
-                    obj->trans.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
+                   ent->trans.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
                 }
                 // rotation
-                memcpy(&prop_rot, &obj->trans.GetRotation()[0], sizeof(float) * 3);
+                memcpy(&prop_rot, &ent->trans.GetRotation()[0], sizeof(float) * 3);
                 ImGui::Text("Rot");
                 ImGui::SameLine();
                 if (ImGui::InputFloat3("##RotInput", prop_rot)) {
-                    obj->trans.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
+                   ent->trans.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
                 }
                 // scale
-                memcpy(&prop_scl, &obj->trans.GetScale()[0], sizeof(float) * 3);
+                memcpy(&prop_scl, &ent->trans.GetScale()[0], sizeof(float) * 3);
                 ImGui::Text("Scl");
                 ImGui::SameLine();
                 if (ImGui::InputFloat3("##SclInput", prop_scl)) {
-                    obj->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
+                   ent->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
                 }
-                int meshId = obj->GetMesh();
+                int meshId = ent->GetMesh();
                 if (ImGui::BeginCombo("Select Mesh", ((meshId < 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
                     for (auto it = resourceMeshes.Begin(); it != resourceMeshes.End(); it++) {
                         if (ImGui::Selectable(it->second->GetName().c_str())) {
-                            obj->SetMesh(it->first);
+                           ent->SetMesh(it->first);
                         }
                     }
                     ImGui::EndCombo();

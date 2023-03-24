@@ -19,6 +19,12 @@ class ResourceManager {
 
         ResourceManager() {}
 
+        ~ResourceManager() {
+            for (int i = 0; i < _resourceMap.size(); i++) {
+                delete _resourceMap.at(i);
+            }
+        }
+
         int Add(T* item) {
             int id = idIterator++;
             _resourceMap.insert({id, item});

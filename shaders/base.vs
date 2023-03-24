@@ -7,6 +7,8 @@
 // in int gl_BaseInstance; // Requires GLSL 4.60 or ARB_shader_draw_parameters
 	
 layout(location = 0) in vec3 iPosition;
+layout(location = 1) in vec3 iNormal;
+layout(location = 2) in vec2 iUV;
 layout(location = 3) in vec3 iColour;
 
 out vec3 fColour;
@@ -22,7 +24,7 @@ uniform mat4	iProjection;
 void main()
 {
     float pi = 3.14159;
-    fColour = iColour;
+    fColour = iPosition;
     // gl_Position = vec4(iPosition * 0.3 * (cos(iTime) * 0.4 + 1.2), 1.0) * rotationY(pi * cos(iTime) * 0.2) * rotationX(pi * sin(iTime) * 0.3);
 	gl_Position = iProjection * iView * iModel * vec4(iPosition, 1.0f);
 }

@@ -130,7 +130,7 @@ class GraphicsEngine {
 
         void RenderObject(int entityId, mat4 root_trans = mat4()) {
             Entity* ent = resourceEntities.Get(entityId);
-            mat4 model = ent->trans.GetTransform() * root_trans;
+            mat4 model = root_trans *  ent->trans.GetTransform();
             for (int i = 0; i < ent->GetNumChildren(); i++) {
                 RenderObject(ent->GetChild(i), model);
             }

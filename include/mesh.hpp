@@ -97,6 +97,7 @@ class Mesh : public Resource {
             _colours = colours;
             _indicies = indicies;
             this->material = 0;
+            GenerateBuffers();
         }
 
         ~Mesh() {

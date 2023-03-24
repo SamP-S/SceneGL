@@ -304,6 +304,9 @@ class Application {
             for (int i = 0; i < Graphics.world.size(); i++) {
                 if (ImGui::TreeNode(std::to_string(i).c_str())) {
                     ImGui::Text(Graphics.world[i]->GetName().c_str());
+                    if (ImGui::Button("Select")) {
+                        Graphics.worldSelected = i;
+                    }
                     ImGui::TreePop();
                 }                
             }
@@ -341,6 +344,16 @@ class Application {
                 if (ImGui::InputFloat3("##SclInput", prop_scl)) {
                     obj->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
                 }
+                int meshId = obj->GetMesh();
+                if (ImGui::BeginCombo("Select Mesh", ((meshId < 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
+                    for (auto it = resourceMeshes.Begin(); it != resourceMeshes.End(); it++) {
+                        if (ImGui::Selectable(it->second->GetName().c_str())) {
+                            obj->SetMesh(it->first);
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+
             }
             ImGui::End();
         }

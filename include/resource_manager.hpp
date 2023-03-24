@@ -14,16 +14,6 @@ class ResourceManager {
     private:
         std::map<int, T*> _resourceMap = {};
 
-        int GetId(std::string name) {
-            for (auto const& [id, item] : _resourceMap) {
-                if (((Resource*)item)->GetName() == name) {
-                    return id;
-                }
-            }
-            std::cout << "Error: ResourceManager::Remove " << name << " does not exist" << std::endl;
-            return -1;
-        }
-
     public:
         static int idIterator;
 
@@ -55,6 +45,37 @@ class ResourceManager {
                 delete item;
             }
             _resourceMap.clear();
+        }
+
+        auto Begin() {
+            return _resourceMap.begin();
+        }
+
+        auto End() {
+            return _resourceMap.end();
+        }
+
+        T* At(int idx) {
+            if (idx < 0 || idx >= Size())
+                return NULL;
+            auto it = Begin();
+            std::advance(it, idx);
+            return it->second;
+        }
+
+        int Size() {
+            return _resourceMap.size();
+        }
+
+        int GetId(std::string name) {
+            for (auto const& [id, item] : _resourceMap) {
+                // std::cout << "mesh " << id << ": " << item->GetName() << std::endl;
+                if (((Resource*)item)->GetName() == name) {
+                    return id;
+                }
+            }
+            std::cout << "Error: ResourceManager::GetId " << name << " does not exist" << std::endl;
+            return -1;
         }
 
         // currently allows for a pointer to be given out and object deleted while pointer is still outside object

@@ -44,7 +44,7 @@ class Model : public Resource {
 		}
 	}
 
-	int ProcessMesh(aiMesh *mesh) {
+	int ProcessMesh(std::string name, aiMesh *mesh) {
 		std::vector<vec3> vertices;
 		std::vector<vec3> normals;
 		std::vector<vec2> uvs;
@@ -72,7 +72,7 @@ class Model : public Resource {
 			}
 		}
 		
-		return resourceMeshes.Add(new Mesh(mesh->mName.C_Str(), vertices, normals, uvs, colours, indices));
+		return resourceMeshes.Add(new Mesh(name + "::" + mesh->mName.C_Str(), vertices, normals, uvs, colours, indices));
 	}
 
 	
@@ -95,19 +95,18 @@ public:
 
 		for (int i = 0; i < scene->mNumMaterials; i++) {
 			aiMaterial* material = scene->mMaterials[i];
-			for (int j = 0; j < material->GetTextureCount(); j++) {
-				// aiTexture* texture = scene->mTextures[i];
-				// aiTextureType;
-				// material->GetTexture(aiTextureType)
-				// load texture
-				material->GetTexture
-			}
+			// for (int j = 0; j < material->GetTextureCount(); j++) {
+			// 	// aiTexture* texture = scene->mTextures[i];
+			// 	// aiTextureType;
+			// 	// material->GetTexture(aiTextureType)
+			// 	// load texture
+			// }
 			// Load texture
 		}
 
 		for (int i = 0; i < scene->mNumMeshes; i++) {
 			aiMesh* mesh = scene->mMeshes[i];
-			meshes.push_back(ProcessMesh(mesh));
+			meshes.push_back(ProcessMesh(name, mesh));
 		}
 
 		ProcessNode(scene->mRootNode, &rootNode, scene);

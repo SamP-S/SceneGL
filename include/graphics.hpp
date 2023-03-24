@@ -67,18 +67,25 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferObj(0);
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
-            Model model = Model("test", "/root/SceneGL/models/iso_fbx/Room #1.fbx");
+            Model model1 = Model("test1", "/root/SceneGL/models/cottage/Cottage_FREE.obj");
+            Model model2 = Model("test2", "/root/SceneGL/models/cottage/Cottage_FREE.dae");
+            Model model3 = Model("test3", "/root/SceneGL/models/cottage/Cottage_FREE.3DS");  
+            Model model4 = Model("test4", "/root/SceneGL/models/cottage/Cottage_FREE.fbx");
+            Model model5 = Model("test5", "/root/SceneGL/models/cottage/Cottage_FREE.stl");
 
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
-            resourceMeshes.Add(new Mesh("cube", cubeVertices, cubeColours, cubeIndicies));
-            resourceMeshes.Add(new Mesh("quad", quadVertices));
+            resourceMeshes.Add(new Mesh("vertex_cube", cubeVertices, cubeColours, cubeIndicies));
+            resourceMeshes.Add(new Mesh("vertex_quad", quadVertices));
 
-            world.push_back(new Object("cube0", NULL, 0));
-            world.push_back(new Object("cube1", NULL, 0));
+            world.push_back(new Object("cube0", NULL, resourceMeshes.GetId("vertex_cube")));
+            world.push_back(new Object("cube1", NULL, resourceMeshes.GetId("vertex_cube")));
+            world.push_back(new Object("Cottage", NULL, resourceMeshes.GetId("test1::Cottage_Free")));
             world.at(0)->trans.Translate(0.0f, 0.0f, -10.0f);
             world.at(0)->trans.SetScale({0.5f, 0.5f, 0.5f});
             world.at(1)->trans.Translate(0.0f, 0.0f, 10.0f);
             world.at(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
+            world.at(2)->trans.Translate({5.0f, 0.0f, -5.0f});
+            world.at(2)->trans.SetScale(0.1f);
             resourceShaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
         }
@@ -119,6 +126,8 @@ class GraphicsEngine {
         }
 
         void RenderObject(Object* obj) {
+            if (obj->GetMesh() < 0 )
+                return; 
             mat4 model = obj->trans.GetTransform();
             resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
             
@@ -157,6 +166,7 @@ class GraphicsEngine {
 
             RenderObject(world.at(0));
             RenderObject(world.at(1));
+            RenderObject(world.at(2));
 
             GL_Interface::BindFrameBufferObj(0);
             

@@ -300,23 +300,23 @@ class Application {
 
         void WorldNode(EntityId entId) {
             Entity* ent = resourceEntities.Get(entId);
-            if (ImGui::TreeNode(ent->GetName().c_str())) {
-                ImGui::Text(ent->GetName().c_str());
-                ImGui::SameLine();
-                if (ImGui::Button("Select")) {
-                    Graphics.worldSelected = entId;
-                }
+            ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+            if (Graphics.worldSelected == entId)
+                node_flags |= ImGuiTreeNodeFlags_Selected;
+            bool node_open = ImGui::TreeNodeEx(ent->GetName().c_str(), node_flags);
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                Graphics.worldSelected = entId;
+            if (node_open) {
                 for (int i = 0; i < ent->GetNumChildren(); i++) {
                     WorldNode(ent->GetChild(i));
                 }
                 ImGui::TreePop();
-            }      
+            }   
         }
         
         void WorldWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
-            ImGui::Text("Tree:");
             for (int i = 0; i < Graphics.world.size(); i++) {
                 WorldNode(Graphics.world.at(i));
             }

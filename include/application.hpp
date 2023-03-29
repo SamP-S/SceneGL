@@ -303,6 +303,8 @@ class Application {
             ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
             if (Graphics.worldSelected == entId)
                 node_flags |= ImGuiTreeNodeFlags_Selected;
+            if (ent->GetNumChildren() == 0)
+                node_flags |= ImGuiTreeNodeFlags_Leaf;
             bool node_open = ImGui::TreeNodeEx(ent->GetName().c_str(), node_flags);
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                 Graphics.worldSelected = entId;

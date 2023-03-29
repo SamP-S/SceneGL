@@ -232,4 +232,4 @@ class Cubemap : public Texture {
         
 };
 
-ResourceManager<Texture2D> textures2D = ResourceManager<Texture2D>();
+ResourceManager<Texture2D> resourceTextures2D = ResourceManager<Texture2D>();

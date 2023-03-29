@@ -13,6 +13,8 @@
 #include "la.hpp"
 #include "transform.hpp"
 
+#include "material.hpp"
+
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
@@ -94,7 +96,39 @@ public:
 		}
 
 		for (int i = 0; i < scene->mNumMaterials; i++) {
-			aiMaterial* material = scene->mMaterials[i];
+			aiMaterial* aiMaterial = scene->mMaterials[i];
+			
+			Material* material = new Material(aiMaterial->GetName().C_Str());
+			std::cout << "Material: " << aiMaterial->GetName().C_Str() << std::endl;
+			aiColor3D diffuse = aiColor3D();
+			std::cout << "diffuse: " << diffuse.r << "," << diffuse.g << "," << diffuse.b;
+			aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+			std::cout << ";\t" << diffuse.r << "," << diffuse.g << "," << diffuse.b << std::endl;
+			for (int j = 0; j < aiMaterial->mNumProperties; j++) {
+				aiMaterialProperty* property = aiMaterial->mProperties[j];
+				std::cout << "\tProperty: " << property->mKey.C_Str() << std::endl;
+				switch (property->mType) {
+					case aiPTI_Float:
+						std::cout << "\t\tFloat = " << *(float*)property->mData << std::endl;
+						break;
+					case aiPTI_Double:
+						std::cout << "\t\tDouble = " << *(double*)property->mData << std::endl;
+						break;
+					case aiPTI_String:
+						std::cout << "\t\tString = " << ((aiString*)property->mData)->C_Str() << std::endl;
+						break;
+					case aiPTI_Integer:
+						std::cout << "\t\tInteger = " << *(int*)property->mData << std::endl;
+						break;
+					default:
+						std::cout << "Buffer Data" << std::endl;
+						break;
+				}
+				std::cout << "\t\tType = " << property->mType << std::endl;
+				std::cout << "\t\tIndex = " << property->mIndex << std::endl;
+				std::cout << "\t\tSemantic = " << property->mSemantic << std::endl;
+				std::cout << std::endl;
+			}
 			// for (int j = 0; j < material->GetTextureCount(); j++) {
 			// 	// aiTexture* texture = scene->mTextures[i];
 			// 	// aiTextureType;

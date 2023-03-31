@@ -46,70 +46,54 @@ class Model : public Resource {
 		}
 	}
 
+	int ProcessTexture(std::string name, aiTexture* texture) {
+		std::cout << "Texture: " << texture->mWidth << "x" << texture->mHeight;
+		std::cout << " @ " << texture->mFilename.C_Str() << std::endl;
+		return 0;
+	}
+
 	int ProcessMaterial(std::string name, aiMaterial* material) {
 		std::string material_name = material->GetName().C_Str();
 		std::cout << "Material: " << material_name << std::endl;
-		// aiColor3D diffuse, ambient, specular, emissive, transparent, reflective;
-		// material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-		// material->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-		// material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-		// material->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
-		// material->Get(AI_MATKEY_COLOR_TRANSPARENT, transparent);
-		// material->Get(AI_MATKEY_COLOR_REFLECTIVE, reflective);
-		// std::cout << "\tdiffuse: " << diffuse.r << "," << diffuse.g << "," << diffuse.b << std::endl;
-		// std::cout << "\tambient: " << ambient.r << "," << ambient.g << "," << ambient.b << std::endl;
-		// std::cout << "\tspecular: " << specular.r << "," << specular.g << "," << specular.b << std::endl;
-		// std::cout << "\temissive: " << emissive.r << "," << emissive.g << "," << emissive.b << std::endl;
-		// std::cout << "\ttransparent: " << transparent.r << "," << transparent.g << "," << transparent.b << std::endl;
-		// std::cout << "\treflective: " << reflective.r << "," << reflective.g << "," << reflective.b << std::endl;
-
-			for (int j = 0; j < material->mNumProperties; j++) {
-				aiMaterialProperty* property = material->mProperties[j];
-				std::cout << "\t" << property->mKey.C_Str() << "\t(" << property->mType;
-				std::cout << ", " << property->mIndex << ", " << property->mSemantic << ") = \t";
-				int size = 1;
-				int k = 0;
-				switch (property->mType) {
-					case aiPTI_Float:
-						size = property->mDataLength / sizeof(float);
-						std::cout << *((float*)property->mData + k);
-						for (k = 1; k < size; k++) {
-							std::cout << "," << *((float*)property->mData + k);
-						}
-						std::cout << std::endl;
-						break;
-					case aiPTI_Double:
-						size = property->mDataLength / sizeof(double);
-						std::cout << *((double*)property->mData + k);
-						for (k = 1; k < size; k++) {
-							std::cout << "," << *((double*)property->mData + k);
-						}
-						std::cout << std::endl;
-						break;
-					case aiPTI_String:
-						size = property->mDataLength;
-						std::cout << size << " - " << ((aiString*)property->mData)->C_Str() << std::endl;
-						break;
-					case aiPTI_Integer:
-						std::cout << *((int*)property->mData + k);
-						for (k = 1; k < size; k++) {
-							std::cout << "," << *((int*)property->mData + k);
-						}
-						std::cout << std::endl;
-						break;
-					default:
-						std::cout << "Buffer Data" << std::endl;
-						break;
-				}
+		for (int j = 0; j < material->mNumProperties; j++) {
+			aiMaterialProperty* property = material->mProperties[j];
+			std::cout << "\t" << property->mKey.C_Str() << "\t(" << property->mType;
+			std::cout << ", " << property->mIndex << ", " << property->mSemantic << ") = \t";
+			int size = 1;
+			int k = 0;
+			switch (property->mType) {
+				case aiPTI_Float:
+					size = property->mDataLength / sizeof(float);
+					std::cout << *((float*)property->mData + k);
+					for (k = 1; k < size; k++) {
+						std::cout << "," << *((float*)property->mData + k);
+					}
+					std::cout << std::endl;
+					break;
+				case aiPTI_Double:
+					size = property->mDataLength / sizeof(double);
+					std::cout << *((double*)property->mData + k);
+					for (k = 1; k < size; k++) {
+						std::cout << "," << *((double*)property->mData + k);
+					}
+					std::cout << std::endl;
+					break;
+				case aiPTI_String:
+					size = property->mDataLength;
+					std::cout << size << " - " << ((aiString*)property->mData)->C_Str() << std::endl;
+					break;
+				case aiPTI_Integer:
+					std::cout << *((int*)property->mData + k);
+					for (k = 1; k < size; k++) {
+						std::cout << "," << *((int*)property->mData + k);
+					}
+					std::cout << std::endl;
+					break;
+				default:
+					std::cout << "Buffer Data" << std::endl;
+					break;
 			}
-			
-			// for (int j = 0; j < material->GetTextureCount(); j++) {
-			// 	// aiTexture* texture = scene->mTextures[i];
-			// 	// aiTextureType;
-			// 	// material->GetTexture(aiTextureType)
-			// 	// load texture
-			// }
-			// Load texture
+		}
 	}
 
 	int ProcessMesh(std::string name, aiMesh* mesh) {
@@ -149,9 +133,9 @@ public:
 	std::string filePath;
 	std::vector<int> meshes;
 	std::vector<int> materials;
+	std::vector<int> textures;
 	ModelNode rootNode;
 	
-
 	Model(std::string name, std::string path) 
 	: Resource(name) {
 		filePath = path;
@@ -160,6 +144,11 @@ public:
 		if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 			std::cout << "ERROR: ASSIMP cannot load file: " << importer.GetErrorString() << std::endl;
 			return;
+		}
+
+		for (int i = 0; i < scene->mNumTextures; i++) {
+			aiTexture* texture = scene->mTextures[i];
+			textures.push_back(ProcessTexture(name, texture));
 		}
 
 		for (int i = 0; i < scene->mNumMaterials; i++) {

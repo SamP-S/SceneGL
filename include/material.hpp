@@ -7,63 +7,48 @@
 #include "resource.hpp"
 
 typedef enum {
-    kInvalid = -1,
-    kInt     = 0,
-    kUInt    = 1,
-    kFloat   = 3,
-    kVec2    = 4,
-    kVec3    = 5,
-    kVec4    = 6,
-    kString  = 7,
-    kBuffer  = 8
+    kTypeInvalid = 0,
+    kTypeFloat   = 1,
+    kTypeDouble  = 2,
+    kTypeString  = 3,
+    kTypeInteger = 4,
+    kTypeBuffer  = 5
 } ePropertyType;
 
 typedef struct {
-    void* data = NULL;
-    int size = 0;
-    int type = 0;
+    std::string key = "NAME";
+    char* data = NULL;
+    int components = 0;
+    ePropertyType type = kTypeInvalid;
 } MaterialProperty;
 
+
+// add validation that map elements dont exist before assigning
 class Material : public Resource {
 
     private:
-        std::map<std::string, MaterialProperty> _propertyMap;
+        static int id;
+        std::map<std::string, int> _idMap;
+        std::map<int, MaterialProperty> _propertyMap;
 
     public:
         Material(std::string name)
         : Resource(name) {}
 
-        template<typename T>
-        bool Add(std::string key, T* data) {
-            if (_propertyMap.find(key) != _propertyMap.end()) {
-                std::cout << "Error: Material::Add - Property key (" << key << ") already exists" << std::endl;
-                return false;
-            }
-            _propertyMap[key] = {(void*) data, sizeof(T), 0};
-            return true;
+        void Add(std::string key, int* data, int components) {
+            _idMap[key] = id++;
+            _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeInteger};
         }
 
-        template<typename T>
-        T* Remove(std::string key) {
-            T* temp = NULL;
-            try {
-                temp = _propertyMap.at(key);
-            } catch (std::out_of_range err) {
-                std::cout << err.what() << std::endl;
-            }
-            return temp;
+        void Add(std::string key, float* data, int components) {
+            _idMap[key] = id++;
+            _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeFloat};
         }
 
-        template<typename T>
-        T* Get(std::string key) {
-            return (T*)_propertyMap.at(key).data;
+        void Add(std::string key, double* data, int components) {
+            _idMap[key] = id++;
+            _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeDouble};
         }
-
-        void Clear() {
-            for (auto it = _propertyMap.begin(); it != _propertyMap.end(); it++) {
-                delete it->second.data;
-            }
-            _propertyMap.clear();
-        }
-
 };
+
+int Material::id = 0;

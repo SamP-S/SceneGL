@@ -53,6 +53,7 @@ class Model : public Resource {
 	}
 
 	int ProcessMaterial(std::string name, aiMaterial* material) {
+		Material* test = new Material("test material");
 		std::string material_name = material->GetName().C_Str();
 		std::cout << "Material: " << material_name << std::endl;
 		for (int j = 0; j < material->mNumProperties; j++) {
@@ -64,36 +65,27 @@ class Model : public Resource {
 			switch (property->mType) {
 				case aiPTI_Float:
 					size = property->mDataLength / sizeof(float);
-					std::cout << *((float*)property->mData + k);
-					for (k = 1; k < size; k++) {
-						std::cout << "," << *((float*)property->mData + k);
-					}
-					std::cout << std::endl;
+					test->Add(property->mKey.C_Str(), (float*)property->mData, size);
+					
 					break;
 				case aiPTI_Double:
 					size = property->mDataLength / sizeof(double);
-					std::cout << *((double*)property->mData + k);
-					for (k = 1; k < size; k++) {
-						std::cout << "," << *((double*)property->mData + k);
-					}
-					std::cout << std::endl;
+					test->Add(property->mKey.C_Str(), (double*)property->mData, size);
 					break;
 				case aiPTI_String:
 					size = property->mDataLength;
-					std::cout << size << " - " << ((aiString*)property->mData)->C_Str() << std::endl;
+					// test->Add(property->mKey.C_Str(), new std::string(property->mData, property->mDataLength));
 					break;
 				case aiPTI_Integer:
-					std::cout << *((int*)property->mData + k);
-					for (k = 1; k < size; k++) {
-						std::cout << "," << *((int*)property->mData + k);
-					}
-					std::cout << std::endl;
+					size = property->mDataLength / sizeof(int);
+					test->Add(property->mKey.C_Str(), (int*)property->mData, size);
 					break;
 				default:
 					std::cout << "Buffer Data" << std::endl;
 					break;
 			}
 		}
+		std::cout << "end material" << std::endl;
 	}
 
 	int ProcessMesh(std::string name, aiMesh* mesh) {
@@ -146,6 +138,7 @@ public:
 			return;
 		}
 
+		std::cout << "Textures? = " << scene->HasTextures() << std::endl;
 		for (int i = 0; i < scene->mNumTextures; i++) {
 			aiTexture* texture = scene->mTextures[i];
 			textures.push_back(ProcessTexture(name, texture));

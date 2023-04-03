@@ -23,16 +23,6 @@
 #include "camera.hpp"
 #include "model.hpp"
 
-enum Comparison {
-    NEVER = 0,
-    ALWAYS = 1,
-    LESS = 2,
-    LEQUAL = 3,
-    EQUAL = 4,
-    NOT_EQUAL = 5,
-    GEQUAL = 6,
-    GREATER = 7
-};
 
 class GraphicsEngine {
 
@@ -67,10 +57,7 @@ class GraphicsEngine {
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
             resourceModels.Add(new Model("test1", "/root/SceneGL/models/cottage/Cottage_FREE.obj"));
-            resourceModels.Add(new Model("test2", "/root/SceneGL/models/cottage/Cottage_FREE.dae"));
-            resourceModels.Add(new Model("test3", "/root/SceneGL/models/cottage/Cottage_FREE.3DS"));  
-            resourceModels.Add(new Model("test4", "/root/SceneGL/models/cottage/Cottage_FREE.fbx"));
-            resourceModels.Add(new Model("test5", "/root/SceneGL/models/cottage/Cottage_FREE.stl"));
+            resourceModels.Add(new Model("test_room", "/root/SceneGL/models/iso_room/Room #1.obj"));
 
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
             resourceMeshes.Add(new Mesh("vertex_cube", cubeVertices, cubeColours, cubeIndicies));

@@ -38,16 +38,41 @@ class Material : public Resource {
         void Add(std::string key, int* data, int components) {
             _idMap[key] = id++;
             _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeInteger};
+            
+            std::cout << key << "\t";
+            for (int k = 0; k < components; k++) {
+                std::cout << " " << *(data + k);
+            }
+            std::cout << std::endl;
         }
 
         void Add(std::string key, float* data, int components) {
             _idMap[key] = id++;
             _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeFloat};
+
+            std::cout << key << "\t";
+            for (int k = 0; k < components; k++) {
+                std::cout << " " << *(data + k);
+            }
+            std::cout << std::endl;
         }
 
         void Add(std::string key, double* data, int components) {
             _idMap[key] = id++;
             _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeDouble};
+
+            std::cout << key << "\t";
+            for (int k = 0; k < components; k++) {
+                std::cout << " " << *(data + k);
+            }
+            std::cout << std::endl;
+        }
+
+        void Add(std::string key, std::string* data) {
+            _idMap[key] = id++;
+            _propertyMap[_idMap[key]] = {key, (char*)data, 1, kTypeString};
+
+            std::cout << key << "\t" << *data << std::endl;
         }
 };
 

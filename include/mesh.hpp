@@ -45,7 +45,7 @@ const std::vector<uint32_t> cubeIndicies = {
     4, 5, 7, 4, 7, 6
 };
 
-const std::vector<vec3> cubeColours = {
+const std::vector<vec4> cubeColours = {
     {0.0f, 0.0f, 0.0f, 1.0f},  // Black
     {0.0f, 0.0f, 1.0f, 1.0f},  // Blue
     {0.0f, 1.0f, 0.0f, 1.0f},  // Green

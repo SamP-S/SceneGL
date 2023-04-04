@@ -46,14 +46,14 @@ const std::vector<uint32_t> cubeIndicies = {
 };
 
 const std::vector<vec3> cubeColours = {
-    {0.0f, 0.0f, 0.0f},  // Black
-    {0.0f, 0.0f, 1.0f},  // Blue
-    {0.0f, 1.0f, 0.0f},  // Green
-    {0.0f, 1.0f, 1.0f},  // Cyan
-    {1.0f, 0.0f, 0.0f},  // Red
-    {1.0f, 0.0f, 1.0f},  // Magenta
-    {1.0f, 1.0f, 0.0f},  // Orange
-    {1.0f, 1.0f, 1.0f}   // White
+    {0.0f, 0.0f, 0.0f, 1.0f},  // Black
+    {0.0f, 0.0f, 1.0f, 1.0f},  // Blue
+    {0.0f, 1.0f, 0.0f, 1.0f},  // Green
+    {0.0f, 1.0f, 1.0f, 1.0f},  // Cyan
+    {1.0f, 0.0f, 0.0f, 1.0f},  // Red
+    {1.0f, 0.0f, 1.0f, 1.0f},  // Magenta
+    {1.0f, 1.0f, 0.0f, 1.0f},  // Orange
+    {1.0f, 1.0f, 1.0f, 1.0f}   // White
 };
 
 class Mesh : public Resource {
@@ -77,7 +77,7 @@ class Mesh : public Resource {
             GenerateBuffers();
         }
 
-        Mesh(std::string name, std::vector<vec3> vertices, std::vector<vec3> colours, std::vector<uint32_t> indicies)
+        Mesh(std::string name, std::vector<vec3> vertices, std::vector<vec4> colours, std::vector<uint32_t> indicies)
             : Resource(name) {
             Clear();
             _vertices = vertices;
@@ -87,8 +87,8 @@ class Mesh : public Resource {
             std::cout << "Ok: Created array mesh" << std::endl;
         }
 
-        Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<vec2> uvs,
-                std::vector<vec3> colours, std::vector<uint32_t> indicies)
+        Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<vec3> uvs,
+                std::vector<vec4> colours, std::vector<uint32_t> indicies)
             : Resource(name) {
             Clear();
             _vertices = vertices;
@@ -111,8 +111,8 @@ class Mesh : public Resource {
         }
         int GetVerticesSize() { return _vertices.size(); }
 
-        std::vector<vec2> GetUVs() { return _uvs; }
-        void SetUVs(std::vector<vec2> uvs) {
+        std::vector<vec3> GetUVs() { return _uvs; }
+        void SetUVs(std::vector<vec3> uvs) {
             if (uvs.size() != _vertices.size())
                 std::cout << "Warning: Mesh::SetUV - UVs do not match count of vertices" << std::endl;
             else
@@ -129,8 +129,8 @@ class Mesh : public Resource {
         }
         int GetNormalsSize() { return _normals.size(); } 
 
-        std::vector<vec3> GetColours() { return _colours; }
-        void SetColours(std::vector<vec3> colours) {
+        std::vector<vec4> GetColours() { return _colours; }
+        void SetColours(std::vector<vec4> colours) {
             if (colours.size() != _vertices.size())
                 std::cout << "Warning: Mesh::SetColours - Colours do not match count of vertices" << std::endl;
             else
@@ -150,9 +150,9 @@ class Mesh : public Resource {
     private:
 
         std::vector<vec3> _vertices = std::vector<vec3>();
-        std::vector<vec2> _uvs = std::vector<vec2>();
+        std::vector<vec3> _uvs = std::vector<vec3>();
         std::vector<vec3> _normals = std::vector<vec3>();
-        std::vector<vec3> _colours = std::vector<vec3>();
+        std::vector<vec4> _colours = std::vector<vec4>();
         std::vector<uint32_t> _indicies = std::vector<uint32_t>();
 
         void Clear() {
@@ -183,7 +183,7 @@ class Mesh : public Resource {
             if (_colours.size() > 0) {
                 this->colourBO = GL_Interface::GenVertexBufferObj(&_colours);
                 GL_Interface::BindVertexBufferObj(this->colourBO);
-                GL_Interface::VertexAttribPtr(ATTRIB_LOC_COLOUR, 3, TYPE_FLOAT);
+                GL_Interface::VertexAttribPtr(ATTRIB_LOC_COLOUR, 4, TYPE_FLOAT);
             }
             GL_Interface::BindElementBufferObj(this->indicieBO);
         }

@@ -79,6 +79,21 @@ class GL_Interface {
             return vbo;
         }
 
+        static uint32_t GenVertexBufferObj(const std::vector<vec4>* data) {
+            if (data->size() <= 0) {
+                // std::cout << "Error: GL_Interface::GenVertexBufferObj - Empty data array" << std::endl;
+                return -1;
+            }
+            uint32_t vbo = 0;
+            glGenBuffers(1, &vbo);
+            // std::cout << "glGenBuffers(" << 1 << ", " << vbo << ")" << std::endl;
+            BindVertexBufferObj(vbo);
+            glBufferData(GL_ARRAY_BUFFER, data->size() * sizeof(vec4), &data->front(), GL_STATIC_DRAW);
+            // std::cout << "glBufferData(GL_ARRAY_BUFFER, " << data->size() * sizeof(vec3) << ", " << &data[0]<< ", GL_STATIC_DRAW)" << std::endl;
+            ErrorCheck();
+            return vbo;
+        }
+
         static void BindVertexBufferObj(uint32_t vbo) {
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
             // std::cout << "glBindBuffer(GL_ARRAY_BUFFER" << ", " << vbo << ")" << std::endl;

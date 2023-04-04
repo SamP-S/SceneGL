@@ -475,7 +475,7 @@ namespace LA {
             }
         }
         
-        vec(const mat<N,M,T>& m) {
+        mat(const mat<N,M,T>& m) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) = m[i];
             }

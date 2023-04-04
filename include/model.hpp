@@ -66,7 +66,6 @@ class Model : public Resource {
 				case aiPTI_Float:
 					size = property->mDataLength / sizeof(float);
 					test->Add(property->mKey.C_Str(), (float*)property->mData, size);
-					
 					break;
 				case aiPTI_Double:
 					size = property->mDataLength / sizeof(double);
@@ -89,25 +88,37 @@ class Model : public Resource {
 	}
 
 	int ProcessMesh(std::string name, aiMesh* mesh) {
+		int primitive_type = mesh->mPrimitiveTypes;
+		int uv_components = mesh->mNumUVComponents[0];
+		int material = mesh->mMaterialIndex;
 		std::vector<vec3> vertices;
 		std::vector<vec3> normals;
-		std::vector<vec2> uvs;
-		std::vector<vec3> colours;
+		std::vector<vec3> uvs;
+		std::vector<vec4> colours;
+		std::vector<vec3> tangents;
+		std::vector<vec3> bitangents;
 		std::vector<uint32_t> indices;
 
 		for (int i = 0; i < mesh->mNumVertices; i++) {
-			vertices.push_back(vec3({mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}));
+			vertices.push_back(vec3(((vec3*)mesh->mVertices)[i]));
+			// vertices.push_back(vec3({mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}));
 		
-			if (mesh->mTextureCoords[0]) {
-				uvs.push_back(vec2({mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}));
+			if (mesh->mTextureCoords[0] && mesh->HasTextureCoords(0)) {
+				uvs.push_back(vec3(((vec3*)mesh->mTextureCoords[0])[i]));
+				// uvs.push_back(vec2({mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}));
 			}
-			if (!mesh->mNormals != NULL) {
-				normals.push_back(vec3({mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z}));
+			if (!mesh->mNormals != NULL && mesh->HasNormals()) {
+				normals.push_back(vec3(((vec3*)mesh->mNormals)[i]));
+				// normals.push_back(vec3({mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z}));
 			}
-			// CAUSES SEG FAULT
-			// if (mesh->mColors != NULL) {
-			// 	colours.push_back(vec3({mesh->mColors[0]->r, mesh->mColors[0]->g, mesh->mColors[0]->b}));
-			// }
+			if (!mesh->mTangents != NULL && !mesh->mBitangents != NULL && mesh->HasTangentsAndBitangents()) {
+				tangents.push_back(vec3(((vec3*)mesh->mTangents)[i]));
+				bitangents.push_back(vec3(((vec3*)mesh->mBitangents)[i]));
+			}
+			if (mesh->mColors != NULL && mesh->HasVertexColors(0)) {
+				colours.push_back(vec4(((vec4*)mesh->mColors[0])[i]));
+				// colours.push_back(vec3({mesh->mColors[0]->r, mesh->mColors[0]->g, mesh->mColors[0]->b}));
+			}
 		}
 
 		for (int i = 0; i < mesh->mNumFaces; i++) {
@@ -140,18 +151,15 @@ public:
 
 		std::cout << "Textures? = " << scene->HasTextures() << std::endl;
 		for (int i = 0; i < scene->mNumTextures; i++) {
-			aiTexture* texture = scene->mTextures[i];
-			textures.push_back(ProcessTexture(name, texture));
+			textures.push_back(ProcessTexture(name, scene->mTextures[i]));
 		}
 
 		for (int i = 0; i < scene->mNumMaterials; i++) {
-			aiMaterial* material = scene->mMaterials[i];
-			materials.push_back(ProcessMaterial(name, material));
+			materials.push_back(ProcessMaterial(name, scene->mMaterials[i]));
 		}
 
 		for (int i = 0; i < scene->mNumMeshes; i++) {
-			aiMesh* mesh = scene->mMeshes[i];
-			meshes.push_back(ProcessMesh(name, mesh));
+			meshes.push_back(ProcessMesh(name, scene->mMeshes[i]));
 		}
 
 		ProcessNode(scene->mRootNode, &rootNode, scene);

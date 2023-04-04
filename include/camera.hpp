@@ -75,7 +75,7 @@ class Camera {
 
         void Update()
         {
-            if (Input::GetMouseButtonState(2)) {
+            if (Input::GetMouseButtonState(1)) {
                 if (Input::GetKeyState("w"))
                     Move(MOVE_FORWARD);
                 if (Input::GetKeyState("s"))

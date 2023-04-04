@@ -86,6 +86,12 @@ namespace LA {
             }
         }
 
+        vec(const vec<N,T>& v) {
+            for (int i = 0; i < this->length(); i++) {
+                this->operator[](i) = v[i];
+            }
+        }
+
         vec(const T arr[N]) {
             for (int i = 0; i < this->length(); i++) {
                 this->operator[](i) = arr[N];
@@ -468,6 +474,13 @@ namespace LA {
                 this->operator[](i) = col_type(scalar);
             }
         }
+        
+        vec(const mat<N,M,T>& m) {
+            for (int i = 0; i < this->length(); i++) {
+                this->operator[](i) = m[i];
+            }
+        }
+
 
         mat(const T arr[N]) {
             for (int i = 0; i < this->length(); i++) {

@@ -20,8 +20,8 @@ class Camera {
         mat4 view = mat4();
         mat4 proj = mat4();
 
-        float mouseSens = 0.5f;
-        float speed = 0.05f;
+        float mouseSens = 5.0f;
+        float speed = 5.0f;
         float FOV = 70.0f;
 
         bool active = false;
@@ -36,8 +36,8 @@ class Camera {
 
         void RotateCamera(int dx, int dy)
         {
-            float dxf = mouseSens * float(dx);
-            float dyf = mouseSens * float(dy);
+            float dxf = 0.1f * mouseSens * float(dx);
+            float dyf = 0.1f * mouseSens * float(dy);
             trans.Rotate(dyf, dxf, 0.0f);
         }
 
@@ -52,22 +52,22 @@ class Camera {
             forward = Normalise(forward);
             switch (dir) {
                 case MOVE_LEFT:
-                    translate = right * -speed;
+                    translate = right * -speed * 0.01;
                     break;
                 case MOVE_RIGHT:
-                    translate = right * speed;
+                    translate = right * speed * 0.01;
                     break;
                 case MOVE_UP:
-                    translate = vec3({0.0f, 1.0f, 0.0f}) * speed;
+                    translate = vec3({0.0f, 1.0f, 0.0f}) * speed * 0.01;
                     break;
                 case MOVE_DOWN:
-                    translate = vec3({0.0f, 1.0f, 0.0f}) * -speed;
+                    translate = vec3({0.0f, 1.0f, 0.0f}) * -speed * 0.01;
                     break;
                 case MOVE_FORWARD:
-                    translate = forward * -speed;
+                    translate = forward * -speed * 0.01;
                     break;
                 case MOVE_BACKWARD:
-                    translate = forward * speed;
+                    translate = forward * speed * 0.01;
                     break;
             };
             trans.Translate(translate);

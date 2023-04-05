@@ -147,7 +147,7 @@ class GraphicsEngine {
 
             resourceShaders.Get("base")->Use();
 
-            camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
+            camera.SetProjection(camera.FOV, float(width), (float)height, 0.1f, 100.0f);
             camera.Update();
             resourceShaders.Get("base")->SetMat4("iView", &camera.view[0][0]);
             resourceShaders.Get("base")->SetMat4("iProjection", &camera.proj[0][0]);

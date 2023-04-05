@@ -31,6 +31,7 @@ class Application {
         bool show_properties_window = true;
         bool show_demo_window = false;
         bool show_file_explorer = false;
+        bool show_camera_window = true;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         float prop_pos[3] = {0.0f, 0.0f, 0.0f};
@@ -207,6 +208,9 @@ class Application {
                 if (show_properties_window) {
                     PropertiesWindow();
                 }
+                if (show_camera_window) {
+                    CameraWindow();
+                }
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -322,6 +326,18 @@ class Application {
             for (int i = 0; i < Graphics.world.size(); i++) {
                 WorldNode(Graphics.world.at(i));
             }
+            ImGui::End();
+        }
+
+        void CameraWindow() {
+            ImGuiWindowFlags cameraWindowFlags = ImGuiWindowFlags_None;
+            ImGui::Begin("Camera Properties", &show_camera_window, cameraWindowFlags);
+            float mouseSens = 0.5f;
+            float speed = 0.05f;
+            float FOV = 45.0f;
+            ImGui::SliderFloat("Mouse Sensitivity", &Graphics.camera.mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None);
+            ImGui::SliderFloat("Movement Speed", &Graphics.camera.speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None);
+            ImGui::SliderFloat("FOV", &Graphics.camera.FOV, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
             ImGui::End();
         }
 

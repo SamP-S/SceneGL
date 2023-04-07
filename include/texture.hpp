@@ -44,7 +44,7 @@ enum Tex_Target {
 
 class Texture {
     protected:
-        unsigned int mTextureID = 0;
+        uint32_t mTextureID = 0;
         std::string mName = "";
         Tex_Wrapping mWrappingS = Tex_Wrapping::REPEAT;
         Tex_Wrapping mWrappingT = Tex_Wrapping::REPEAT;

@@ -276,7 +276,7 @@ class GL_Interface {
 
         // create definitions for texture parameters
 
-        static uint32_t GenTexture2D(uint32_t width, uint32_t height) {
+        static uint32_t GenTexture2D(int width, int height, int format, void* data) {
             uint32_t tex;
             glGenTextures(1, &tex);
             glBindTexture(GL_TEXTURE_2D, tex);

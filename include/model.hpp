@@ -73,7 +73,7 @@ class Model : public Resource {
 					break;
 				case aiPTI_String:
 					size = property->mDataLength;
-					// test->Add(property->mKey.C_Str(), new std::string(property->mData, property->mDataLength));
+					test->Add(property->mKey.C_Str(), new std::string(property->mData, property->mDataLength));
 					break;
 				case aiPTI_Integer:
 					size = property->mDataLength / sizeof(int);
@@ -101,15 +101,12 @@ class Model : public Resource {
 
 		for (int i = 0; i < mesh->mNumVertices; i++) {
 			vertices.push_back(vec3(((vec3*)mesh->mVertices)[i]));
-			// vertices.push_back(vec3({mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z}));
 		
 			if (mesh->mTextureCoords[0] && mesh->HasTextureCoords(0)) {
 				uvs.push_back(vec3(((vec3*)mesh->mTextureCoords[0])[i]));
-				// uvs.push_back(vec2({mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y}));
 			}
 			if (!mesh->mNormals != NULL && mesh->HasNormals()) {
 				normals.push_back(vec3(((vec3*)mesh->mNormals)[i]));
-				// normals.push_back(vec3({mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z}));
 			}
 			if (!mesh->mTangents != NULL && !mesh->mBitangents != NULL && mesh->HasTangentsAndBitangents()) {
 				tangents.push_back(vec3(((vec3*)mesh->mTangents)[i]));
@@ -117,7 +114,6 @@ class Model : public Resource {
 			}
 			if (mesh->mColors != NULL && mesh->HasVertexColors(0)) {
 				colours.push_back(vec4(((vec4*)mesh->mColors[0])[i]));
-				// colours.push_back(vec3({mesh->mColors[0]->r, mesh->mColors[0]->g, mesh->mColors[0]->b}));
 			}
 		}
 

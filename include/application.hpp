@@ -31,7 +31,7 @@ class Application {
         bool show_properties_window = true;
         bool show_demo_window = false;
         bool show_file_explorer = false;
-        bool show_camera_window = true;
+        bool show_camera_window = false;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         float prop_pos[3] = {0.0f, 0.0f, 0.0f};

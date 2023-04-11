@@ -23,6 +23,12 @@ typedef struct {
 } MaterialProperty;
 
 
+/*
+    Replace pointer system with static variables and inheritance system with data typed stored semantically in integer variable
+    Easy to template, all data is stored inside material property and can use a string look up system to organise and layout material
+    
+*/
+
 // add validation that map elements dont exist before assigning
 class Material : public Resource {
 

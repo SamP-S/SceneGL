@@ -17,6 +17,11 @@
     glGetShaderiv
     glGetShaderInfoLog
     glGetAttribLocation
+
+    Shader needs to be editable and recompilable to allow editing
+    Need to support geometry shader
+    Need to be able to parse the source code and pull the material data structure out
+    
 */
 
 class Shader : public Resource {

@@ -19,6 +19,14 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
+/*
+
+	Need to expand model as a sort of prefab with all the meshes as their own game objects and transforms
+	Need an asset browser with models to drag into the scene tree or right click and add
+
+*/
+
+
 class ModelNode {
 	public:
 		Transform trans = Transform();

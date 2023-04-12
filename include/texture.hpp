@@ -42,10 +42,9 @@ enum Tex_Target {
     TEXTURE_2D_MULTISAMPLE = 6
 };
 
-class Texture {
+class Texture : public Resource {
     protected:
         uint32_t mTextureID = 0;
-        std::string mName = "";
         Tex_Wrapping mWrappingS = Tex_Wrapping::REPEAT;
         Tex_Wrapping mWrappingT = Tex_Wrapping::REPEAT;
         Tex_Wrapping mWrappingR = Tex_Wrapping::REPEAT;
@@ -56,25 +55,14 @@ class Texture {
         std::string type = "";
 
     public:
-        // virtual Texture(std::string _name, std::string _filepath);
+        Texture(std::string _name)
+        : Resource(_name) {}
         // virtual ~Texture();
         virtual void Load(std::string _name, std::string _filepath) {}
 
         virtual int GetThumbWidth() { return 0; }
         virtual int GetThumbHeight() { return 0; }
         virtual float GetThumbAspectRatio() { return 0.0f; }
-
-        void ReName(std::string _name) {
-            this->mName = _name;
-        }
-
-        std::string GetName() {
-            return this->mName;
-        }
-
-        const char* GetNameBuf() {
-            return this->mName.c_str();
-        }
 
         unsigned int GetID() {
             return this->mTextureID;
@@ -126,7 +114,8 @@ class Texture2D : public Texture {
         float* mDataf = NULL;
 
     public:
-        Texture2D(std::string _name, std::string _filepath, TexDataType _type) {
+        Texture2D(std::string _name, std::string _filepath, TexDataType _type = TexDataType::INT)
+        : Texture(_name) {
             this->mTarget = Tex_Target::TEXTURE_2D;
             Load(_name, _filepath, _type); 
         }
@@ -136,7 +125,7 @@ class Texture2D : public Texture {
         }
 
         void Load(std::string _name, std::string _filepath, TexDataType _type) {
-            mName = _name;
+            std::cout << "Texture::Load " << _name << ":" << _filepath << std::endl;
             glGenTextures(1, &mTextureID); 
             glBindTexture(GL_TEXTURE_2D, mTextureID);
             if (_type == TexDataType::INT) {
@@ -207,7 +196,8 @@ class Cubemap : public Texture {
         };
 
     public:
-        Cubemap(std::string _name, std::string _filepath) {
+        Cubemap(std::string _name, std::string _filepath)
+        : Texture(_name) {
             this->mTarget = Tex_Target::TEXTURE_CUBE_MAP;
             Load(_name, _filepath); 
         }
@@ -223,7 +213,6 @@ class Cubemap : public Texture {
         }
 
         void Load(std::string _name, std::string _filepath) {
-            mName = _name;
             for (int i = 0; i < 6; i++) {
                 mData[i] = Image_Interface::LoadImage(_filepath.c_str(), &mWidth[i], &mHeight[i], &mChannels[i]);
             }

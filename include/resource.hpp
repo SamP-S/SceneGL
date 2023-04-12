@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 
 class Resource {
@@ -14,6 +15,10 @@ class Resource {
 
         std::string GetName() {
             return _name;
+        }
+
+        void SetName(std::string name) {
+            _name = name;
         }
 
 };

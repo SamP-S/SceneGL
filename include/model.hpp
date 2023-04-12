@@ -12,6 +12,7 @@
 #include "mesh.hpp"
 #include "la.hpp"
 #include "transform.hpp"
+#include "texture.hpp"
 
 #include "material.hpp"
 
@@ -54,10 +55,14 @@ class Model : public Resource {
 		}
 	}
 
-	int ProcessTexture(std::string name, aiTexture* texture) {
-		std::cout << "Texture: " << texture->mWidth << "x" << texture->mHeight;
-		std::cout << " @ " << texture->mFilename.C_Str() << std::endl;
-		return 0;
+	int ProcessTexture(std::string name, std::string path) {
+		std::cout << "Texture: " << name << ":" << path << std::endl;
+		std::string filename = path.substr(path.find_last_of("/") + 1);
+		int texId = resourceTextures2D.GetId(name + "::" + filename);
+		if (texId == -1) {
+			texId = resourceTextures2D.Add(new Texture2D(std::string(name+"::"+filename), path));
+		}
+		return texId;
 	}
 
 	int ProcessMaterial(std::string name, aiMaterial* material) {
@@ -81,7 +86,12 @@ class Model : public Resource {
 					break;
 				case aiPTI_String:
 					size = property->mDataLength;
-					test->Add(property->mKey.C_Str(), new std::string(property->mData, property->mDataLength));
+					test->Add(property->mKey.data, new std::string(((aiString*)property->mData)->data));
+					std::cout << property->mKey.data << " == " << _AI_MATKEY_TEXTURE_BASE << std::endl;
+					if (std::string(property->mKey.data).compare(_AI_MATKEY_TEXTURE_BASE) == 0) {
+						std::cout << "matching" << std::endl;
+						ProcessTexture(name, ((aiString*)property->mData)->data);
+					}
 					break;
 				case aiPTI_Integer:
 					size = property->mDataLength / sizeof(int);
@@ -154,9 +164,10 @@ public:
 		}
 
 		std::cout << "Textures? = " << scene->HasTextures() << std::endl;
-		for (int i = 0; i < scene->mNumTextures; i++) {
-			textures.push_back(ProcessTexture(name, scene->mTextures[i]));
-		}
+		std::cout << "Scene Textures = " << scene->mNumTextures << std::endl;
+		// for (int i = 0; i < scene->mNumTextures; i++) {
+		// 	textures.push_back(ProcessTexture(name, scene->mTextures[i]));
+		// }
 
 		for (int i = 0; i < scene->mNumMaterials; i++) {
 			materials.push_back(ProcessMaterial(name, scene->mMaterials[i]));

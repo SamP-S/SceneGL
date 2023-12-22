@@ -1,0 +1,8 @@
+test_iso=models/iso_room/Room #1.obj
+test_obj=models/cottage/Cottage_FREE.obj
+test_dae=models/cottage/Cottage_FREE.dae
+test_fbx=models/cottage/Cottage_FREE.fbx
+test_max=models/cottage/Cottage_FREE.max
+test_stl=models/cottage/Cottage_FREE.stl
+test_room=models/iso_room/Room #1.obj
+test_f1=models/f1/F1 low poly.blend

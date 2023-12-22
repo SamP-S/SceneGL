@@ -56,14 +56,7 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferObj(0);
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
-            resourceModels.Add(new Model("test_iso", "models/iso_room/Room #1.obj"));
-            resourceModels.Add(new Model("test_obj", "models/cottage/Cottage_FREE.obj"));
-            resourceModels.Add(new Model("test_dae", "models/cottage/Cottage_FREE.dae"));
-            resourceModels.Add(new Model("test_fbx", "models/cottage/Cottage_FREE.fbx"));
-            // resourceModels.Add(new Model("test_max", "models/cottage/Cottage_FREE.max"));
-            resourceModels.Add(new Model("test_stl", "models/cottage/Cottage_FREE.stl"));  
-            // resourceModels.Add(new Model("test_room", "models/iso_room/Room #1.obj"));
-            resourceModels.Add(new Model("test_f1", "models/f1/F1 low poly.blend"));
+            ReadModelLoadFile("./resources/models.txt");
 
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
             resourceMeshes.Add(new Mesh("vertex_cube", cubeVertices, cubeColours, cubeIndicies));
@@ -92,6 +85,29 @@ class GraphicsEngine {
             // delete context; delete makes error even though pointer?!?
             // delete window; causesd unknown signal error?
             
+        }
+
+        bool ReadModelLoadFile(std::string filepath) {
+            std::ifstream inputFile(filepath);
+
+            if (!inputFile.is_open()) {
+                std::cout << "WARNING: Unable to open default model file." << std::endl;
+                return false;
+            }
+
+            std::string line;
+            while (std::getline(inputFile, line)) {
+                std::istringstream lineStream(line);
+                std::string key, value;
+
+                if (std::getline(lineStream, key, '=')) {
+                    if (std::getline(lineStream, value)) {
+                        std::cout << "Key: " << key << ", Value: " << value << std::endl;
+                        resourceModels.Add(new Model(key, value));
+                    }
+                }
+            }
+            inputFile.close();
         }
 
         bool AttachWindow(WindowManager* window) {

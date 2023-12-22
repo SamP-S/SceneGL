@@ -96,18 +96,21 @@ class GraphicsEngine {
             }
 
             std::string line;
+            std::istringstream lineStream;
+            std::string key, value;
             while (std::getline(inputFile, line)) {
-                std::istringstream lineStream(line);
-                std::string key, value;
-
+                lineStream = std::istringstream(line);
                 if (std::getline(lineStream, key, '=')) {
                     if (std::getline(lineStream, value)) {
                         std::cout << "Key: " << key << ", Value: " << value << std::endl;
                         resourceModels.Add(new Model(key, value));
                     }
+                } else {
+                    std::cout << "WARNING: Default models.txt invalid syntax" << std::endl;
                 }
             }
-            inputFile.close();
+            // inputFile.close();
+            return true;
         }
 
         bool AttachWindow(WindowManager* window) {

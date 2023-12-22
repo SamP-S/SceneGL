@@ -1,3 +1,6 @@
+# custom
+imgui.ini
+
 # ignore development environment setup
 .vscode/
 *.log

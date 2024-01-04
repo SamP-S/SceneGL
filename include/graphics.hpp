@@ -33,8 +33,7 @@ class GraphicsEngine {
         int width, height;
         uint32_t fbo, texColour, texDepthStencil;
         unsigned int _frameNum = 0;
-        EntityId worldSelected = -1;
-        std::vector<EntityId> world = std::vector<EntityId>();
+        EntityId world = 0;
         Camera camera = Camera();
 
         GraphicsEngine(WindowManager* window) {
@@ -56,26 +55,20 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferObj(0);
             GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
-            ReadModelLoadFile("./resources/models.txt");
-
+            // load default shader(s)
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
+
+            // load default model(s)
+            resourceMeshes.Add(new Mesh("empty", std::vector<vec3>()));
             resourceMeshes.Add(new Mesh("vertex_cube", cubeVertices, cubeColours, cubeIndicies));
             resourceMeshes.Add(new Mesh("vertex_quad", quadVertices));
 
-            resourceEntities.Add(new Entity("cube0", NULL, resourceMeshes.GetId("vertex_cube")));
-            resourceEntities.Add(new Entity("cube1", resourceEntities.GetId("cube0"), resourceMeshes.GetId("vertex_cube")));
-            resourceEntities.Get(0)->AddChild(1);
-            resourceEntities.Add(new Entity("Cottage", NULL, resourceMeshes.GetId("test1::Cottage_Free")));
-
-            world.push_back(resourceEntities.GetId("cube0"));
-            world.push_back(resourceEntities.GetId("Cottage"));
-
-            resourceEntities.Get(0)->trans.Translate(0.0f, 0.0f, -10.0f);
-            resourceEntities.Get(0)->trans.SetScale({0.5f, 0.5f, 0.5f});
-            resourceEntities.Get(1)->trans.Translate(0.0f, 0.0f, 10.0f);
-            resourceEntities.Get(1)->trans.SetScale({0.8f, 0.8f, 0.8f});
-            resourceEntities.Get(2)->trans.Translate({5.0f, 0.0f, -5.0f});
-            resourceEntities.Get(2)->trans.SetScale(0.1f);
+            /// TODO: load project shader(s)
+            
+            resourceEntities.Add(new Entity("scene", NULL, 0));
+            resourceEntities.Add(new Entity("cube", resourceEntities.GetId("scene"), resourceMeshes.GetId("vertex_cube")));
+            resourceEntities.Get("scene")->AddChild(resourceEntities.GetId("cube"));
+            world = resourceEntities.GetId("scene");
 
             resourceShaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
@@ -87,8 +80,9 @@ class GraphicsEngine {
             
         }
 
-        bool ReadModelLoadFile(std::string filepath) {
+        bool LoadModelResources(std::string filepath) {
             std::ifstream inputFile(filepath);
+            std::string inputDir = filepath.substr(0, filepath.find_last_of("/"));
 
             if (!inputFile.is_open()) {
                 std::cout << "WARNING: Unable to open default model file." << std::endl;
@@ -99,9 +93,14 @@ class GraphicsEngine {
             std::istringstream lineStream;
             std::string key, value;
             while (std::getline(inputFile, line)) {
+                if (line.length() == 0 || line[0] == '#') {
+                    continue; // Skip the line if it starts with "#" or has length 0
+                }
                 lineStream = std::istringstream(line);
+                
                 if (std::getline(lineStream, key, '=')) {
                     if (std::getline(lineStream, value)) {
+                        value = inputDir + "/" + value;
                         std::cout << "Key: " << key << ", Value: " << value << std::endl;
                         resourceModels.Add(new Model(key, value));
                     }
@@ -182,8 +181,7 @@ class GraphicsEngine {
             resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
             resourceShaders.Get("base")->SetInt("iFrame", _frameNum);
 
-            RenderObject(world.at(0));
-            RenderObject(world.at(1));
+            RenderObject(world);
 
             GL_Interface::BindFrameBufferObj(0);
             

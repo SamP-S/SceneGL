@@ -52,6 +52,7 @@ class Entity : public Resource {
         }
 
         void SetMesh(int meshId) {
+            std::cout << "SetMesh: " << meshId << std::endl;
             this->_meshId = meshId;
         }
 

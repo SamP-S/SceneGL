@@ -41,6 +41,7 @@ class Application {
         ImVec2 render_region_min = ImVec2();
         ImVec2 render_region_max = ImVec2();
         ImVec2 window_pos = ImVec2();
+        EntityId worldSelected = 1;
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -82,6 +83,9 @@ class Application {
             // Setup Platform/Renderer backends
             ImGui_ImplSDL2_InitForOpenGL(windowManager.window, windowManager.gl_context);
             ImGui_ImplOpenGL3_Init(windowManager.glsl_version);
+
+            // Load project folder
+            Graphics.LoadModelResources("./default_project/models.txt");
 
             // Main loop
             bool done = false;
@@ -304,14 +308,14 @@ class Application {
 
         void WorldNode(EntityId entId) {
             Entity* ent = resourceEntities.Get(entId);
-            ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-            if (Graphics.worldSelected == entId)
+            ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
+            if (worldSelected == entId)
                 node_flags |= ImGuiTreeNodeFlags_Selected;
             if (ent->GetNumChildren() == 0)
                 node_flags |= ImGuiTreeNodeFlags_Leaf;
             bool node_open = ImGui::TreeNodeEx(ent->GetName().c_str(), node_flags);
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                Graphics.worldSelected = entId;
+                worldSelected = entId;
             if (node_open) {
                 for (int i = 0; i < ent->GetNumChildren(); i++) {
                     WorldNode(ent->GetChild(i));
@@ -323,8 +327,8 @@ class Application {
         void WorldWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
-            for (int i = 0; i < Graphics.world.size(); i++) {
-                WorldNode(Graphics.world.at(i));
+            if (Graphics.world >= 0) {
+                WorldNode(Graphics.world);
             }
             ImGui::End();
         }
@@ -344,10 +348,10 @@ class Application {
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
-            if (Graphics.worldSelected == -1) {
+            if (worldSelected == -1) {
                 ImGui::Text("Nothing selected");
             } else {
-                Entity* ent = resourceEntities.Get(Graphics.worldSelected);
+                Entity* ent = resourceEntities.Get(worldSelected);
                 ImGui::Text(ent->GetName().c_str());
                 ImGui::Text("Transform:");
                 // ImGui::Text("Position:");

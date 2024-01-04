@@ -42,6 +42,7 @@ class Application {
         ImVec2 render_region_max = ImVec2();
         ImVec2 window_pos = ImVec2();
         EntityId worldSelected = 1;
+        int new_entity_count = 0;
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -247,6 +248,15 @@ class Application {
                     ImGui::MenuItem("Options");
                     ImGui::Separator();
                     ImGui::MenuItem("Close", NULL, false, true);
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Entity")) {
+                    if (ImGui::MenuItem("New Empty")) {
+                        std::cout << "Entity: Create new entity" << std::endl;
+                        std::string new_name = "new_" + std::to_string(new_entity_count);
+                        EntityId new_ent = resourceEntities.Add(new Entity(new_name, 0));
+                        resourceEntities.Get(Graphics.world)->AddChild(new_ent);
+                    }
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Window")) {

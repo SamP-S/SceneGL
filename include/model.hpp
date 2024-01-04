@@ -163,18 +163,44 @@ public:
 			return;
 		}
 
-		std::cout << "Textures? = " << scene->HasTextures() << std::endl;
-		std::cout << "Scene Textures = " << scene->mNumTextures << std::endl;
+		std::cout << "HasAnimations = " << scene->HasAnimations() << std::endl;
+		if (scene->HasAnimations())
+			std::cout << "mNumAnimations = " << scene->mNumAnimations << std::endl;
+
+		std::cout << "HasCameras = " << scene->HasCameras() << std::endl;
+		if (scene->HasCameras())
+			std::cout << "\tmNumCameras = " << scene->mNumCameras << std::endl;
+
+		std::cout << "HasLights = " << scene->HasLights() << std::endl;
+		if (scene->HasLights())
+			std::cout << "\tmNumLights = " << scene->mNumLights << std::endl;
+
+		std::cout << "HasMaterials = " << scene->HasMaterials() << std::endl;
+		if (scene->HasMaterials())
+			std::cout << "\tmNumMaterials = " << scene->mNumMaterials << std::endl;
+
+		std::cout << "HasMeshes = " << scene->HasMeshes() << std::endl;
+		if (scene->HasMeshes())
+			std::cout << "\tmNumMeshes = " << scene->mNumMeshes << std::endl;
+
+		std::cout << "HasSkeletons = " << scene->hasSkeletons() << std::endl;
+		if (scene->hasSkeletons())
+			std::cout << "\tmNumSkeletons = " << scene->mNumSkeletons << std::endl;
+
+		std::cout << "HasTextures = " << scene->HasTextures() << std::endl;
+		if (scene->HasTextures())
+			std::cout << "\tmNumTextures = " << scene->mNumTextures << std::endl;
+		
 		// for (int i = 0; i < scene->mNumTextures; i++) {
 		// 	textures.push_back(ProcessTexture(name, scene->mTextures[i]));
 		// }
 
-		for (int i = 0; i < scene->mNumMaterials; i++) {
-			materials.push_back(ProcessMaterial(name, scene->mMaterials[i]));
-		}
+		// for (int i = 0; i < scene->mNumMaterials; i++) {
+		// 	materials.push_back(ProcessMaterial(name, scene->mMaterials[i]));
+		// }
 
 		for (int i = 0; i < scene->mNumMeshes; i++) {
-			meshes.push_back(ProcessMesh(name, scene->mMeshes[i]));
+			meshes.push_back(ProcessMesh(name + "::" + std::to_string(i), scene->mMeshes[i]));
 		}
 
 		ProcessNode(scene->mRootNode, &rootNode, scene);

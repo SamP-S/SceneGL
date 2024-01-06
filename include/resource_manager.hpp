@@ -75,8 +75,7 @@ class ResourceManager {
 
         int GetId(std::string name) {
             for (auto const& [id, item] : _resourceMap) {
-                // std::cout << "mesh " << id << ": " << item->GetName() << std::endl;
-                if (((Resource*)item)->GetName() == name) {
+                if (((Resource*)item)->GetName().compare(name) == 0) {
                     return id;
                 }
             }

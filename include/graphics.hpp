@@ -22,6 +22,7 @@
 #include "la_extended.hpp"
 #include "camera.hpp"
 #include "model.hpp"
+#include "frame.hpp"
 
 
 class GraphicsEngine {
@@ -30,9 +31,8 @@ class GraphicsEngine {
         void* context;
         WindowManager* window;
         frame_timer ft = frame_timer();
+        Frame* frame = NULL;
         int width, height;
-        uint32_t fbo, texColour, texDepthStencil;
-        unsigned int _frameNum = 0;
         EntityId world = 0;
         Camera camera = Camera();
 
@@ -46,14 +46,10 @@ class GraphicsEngine {
             glewExperimental = GL_TRUE;
             glewInit();
 
-            fbo = GL_Interface::GenFrameBufferObj();
-            texColour = GL_Interface::GenFBTexture2D(width, height);
-            GL_Interface::BindFrameBufferTexture2D(fbo, texColour);
-            texDepthStencil = GL_Interface::GenFBStencil2D(width, height);
-            GL_Interface::BindFrameBufferStencil2D(fbo, texDepthStencil);
+            frame = new Frame(window->width, window->height);
+            frame->SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
              
             GL_Interface::BindFrameBufferObj(0);
-            GL_Interface::SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
 
             // load default shader(s)
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
@@ -77,7 +73,7 @@ class GraphicsEngine {
         ~GraphicsEngine() {
             // delete context; delete makes error even though pointer?!?
             // delete window; causesd unknown signal error?
-            
+            delete frame;
         }
 
         bool LoadModelResources(std::string filepath) {
@@ -157,11 +153,10 @@ class GraphicsEngine {
         }
 
         void Render() {
-            GL_Interface::BindFrameBufferObj(fbo);
+            frame->Bind();
+            frame->Clear();
             
             GL_Interface::SetViewport(width, height);
-            /* Clear The Screen And The Depth Buffer */
-            GL_Interface::ClearColourDepth();
             
             // GL_Interface::DisableFeature(FEATURE_DEPTH);
             GL_Interface::DisableFeature(FEATURE_CULL);
@@ -179,14 +174,13 @@ class GraphicsEngine {
             resourceShaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             resourceShaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
             resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            resourceShaders.Get("base")->SetInt("iFrame", _frameNum);
+            resourceShaders.Get("base")->SetInt("iFrame", ft.GetFrameCount());
 
             RenderObject(world);
 
-            GL_Interface::BindFrameBufferObj(0);
+            frame->Unbind();
             
             ft.Frame();
-            _frameNum += 1;
         }
 
 };

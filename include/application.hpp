@@ -30,8 +30,7 @@ class Application {
         bool show_world_window = true;
         bool show_properties_window = true;
         bool show_demo_window = false;
-        bool show_file_explorer = false;
-        bool show_camera_window = false;
+        bool show_camera_window = true;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         float prop_pos[3] = {0.0f, 0.0f, 0.0f};
@@ -263,6 +262,7 @@ class Application {
                     ImGui::MenuItem("Render Display", NULL, &show_render_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
                     ImGui::MenuItem("World Tree", NULL, &show_world_window);
+                    ImGui::MenuItem("Workspace Camera", NULL, &show_camera_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }
@@ -304,7 +304,7 @@ class Application {
             float wHeight = render_region_max.y - render_region_min.y;
             ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
             Graphics.Render();
-            ImGui::Image((ImTextureID)Graphics.texColour, wSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((ImTextureID)Graphics.frame->GetTexColour(), wSize, ImVec2(0, 1), ImVec2(1, 0));
             // ImGui::GetForegroundDrawList()->AddRect(render_region_min + pos, render_region_max + pos, IM_COL32(255, 255, 0, 255));
             ImGui::End();
         }

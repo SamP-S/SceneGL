@@ -104,6 +104,11 @@ class Mesh : public Resource {
             // delete all opengl resources/buffers
         }
 
+        void Render() {
+            GL_Interface::BindVertexArrayObject(this->vao);
+            GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
+        }
+
         std::vector<vec3> GetVertices() { return _vertices; }
         void SetVertices(std::vector<vec3> vertices) { 
             Clear();

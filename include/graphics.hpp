@@ -144,12 +144,9 @@ class GraphicsEngine {
 
             if (ent->GetMesh() < 0 )
                 return; 
+
             resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
-            
-            Mesh* mesh = resourceMeshes.Get(ent->GetMesh());
-            GL_Interface::BindVertexArrayObject(mesh->vao);
-            GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
-            // GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, 6);
+            resourceMeshes.Get(ent->GetMesh())->Render();
         }
 
         void Render() {
@@ -157,7 +154,7 @@ class GraphicsEngine {
             frame->Clear();
             
             GL_Interface::SetViewport(width, height);
-            
+
             // GL_Interface::DisableFeature(FEATURE_DEPTH);
             GL_Interface::DisableFeature(FEATURE_CULL);
             GL_Interface::EnableFeature(FEATURE_DEPTH);

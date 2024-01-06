@@ -116,7 +116,7 @@ class Model : public Resource {
 		std::vector<vec3> tangents;
 		std::vector<vec3> bitangents;
 		std::vector<uint32_t> indices;
-
+		
 		for (int i = 0; i < mesh->mNumVertices; i++) {
 			vertices.push_back(vec3(((vec3*)mesh->mVertices)[i]));
 		

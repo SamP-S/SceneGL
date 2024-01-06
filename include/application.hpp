@@ -40,7 +40,7 @@ class Application {
         ImVec2 render_region_min = ImVec2();
         ImVec2 render_region_max = ImVec2();
         ImVec2 window_pos = ImVec2();
-        EntityId entitySelected = 1;
+        Entity* entitySelected = NULL;
         int new_entity_count = 0;
 
         std::map<char*, float> arMap = {
@@ -86,6 +86,7 @@ class Application {
 
             // Load project folder
             Graphics.LoadModelResources("./default_project/models.txt");
+            entitySelected = Graphics.rootEntity;
 
             // Main loop
             bool done = false;
@@ -250,25 +251,25 @@ class Application {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Entity")) {
-                    if (entitySelected >= 0) {
+                    if (entitySelected != NULL) {
                         if (ImGui::MenuItem("New Empty")) {
                             
                             std::cout << "Entity: Create new entity" << std::endl;
                             std::string new_name = "new_" + std::to_string(new_entity_count);
                             int meshId = resourceMeshes.GetId("empty");
-                            Entity* ent_p = new Entity(new_name, entitySelected, meshId);
-                            EntityId new_ent = resourceEntities.Add(ent_p);
-                            resourceEntities.Get(entitySelected)->AddChild(new_ent);
+                            Entity* newEntity = new Entity(new_name, entitySelected, meshId);
+                            entitySelected->AddChild(newEntity);
                             new_entity_count += 1;
+                            entitySelected = newEntity;
                         }
                         if (ImGui::MenuItem("New Cube")) {
                             std::cout << "Entity: Create new entity" << std::endl;
                             std::string new_name = "cube_" + std::to_string(new_entity_count);
                             int meshId = resourceMeshes.GetId("vertex_cube");
-                            Entity* ent_p = new Entity(new_name, entitySelected, meshId);
-                            EntityId new_ent = resourceEntities.Add(ent_p);
-                            resourceEntities.Get(entitySelected)->AddChild(new_ent);
+                            Entity* newEntity = new Entity(new_name, entitySelected, meshId);
+                            entitySelected->AddChild(newEntity);
                             new_entity_count += 1;
+                            entitySelected = newEntity;
                         }
                     }
                     ImGui::EndMenu();
@@ -331,19 +332,18 @@ class Application {
             ImGui::End();
         }
 
-        void WorldNode(EntityId entId) {
-            Entity* ent = resourceEntities.Get(entId);
+        void WorldNode(Entity* entitiy) {
             ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
-            if (entitySelected == entId)
+            if (entitySelected == entitiy)
                 node_flags |= ImGuiTreeNodeFlags_Selected;
-            if (ent->GetNumChildren() == 0)
+            if (entitiy->GetNumChildren() == 0)
                 node_flags |= ImGuiTreeNodeFlags_Leaf;
-            bool node_open = ImGui::TreeNodeEx(ent->GetName().c_str(), node_flags);
+            bool node_open = ImGui::TreeNodeEx(entitiy->GetName().c_str(), node_flags);
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                entitySelected = entId;
+                entitySelected = entitiy;
             if (node_open) {
-                for (int i = 0; i < ent->GetNumChildren(); i++) {
-                    WorldNode(ent->GetChild(i));
+                for (int i = 0; i < entitiy->GetNumChildren(); i++) {
+                    WorldNode(entitiy->GetChild(i));
                 }
                 ImGui::TreePop();
             }   
@@ -352,8 +352,8 @@ class Application {
         void WorldWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
-            if (Graphics.world >= 0) {
-                WorldNode(Graphics.world);
+            if (Graphics.rootEntity != NULL) {
+                WorldNode(Graphics.rootEntity);
             }
             ImGui::End();
         }
@@ -370,39 +370,45 @@ class Application {
             ImGui::End();
         }
 
+        void TransformPanel(Entity* ent) {
+            ImGui::Text("Transform:");
+            // ImGui::Text("Position:");
+            // position
+            memcpy(&prop_pos, &ent->trans.GetPosition()[0], sizeof(float) * 3);
+            ImGui::Text("Pos");
+            ImGui::SameLine();
+            if (ImGui::InputFloat3("##PosInput", prop_pos)) {
+                ent->trans.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
+            }
+            // rotation
+            memcpy(&prop_rot, &ent->trans.GetRotation()[0], sizeof(float) * 3);
+            ImGui::Text("Rot");
+            ImGui::SameLine();
+            if (ImGui::InputFloat3("##RotInput", prop_rot)) {
+                ent->trans.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
+            }
+            // scale
+            memcpy(&prop_scl, &ent->trans.GetScale()[0], sizeof(float) * 3);
+            ImGui::Text("Scl");
+            ImGui::SameLine();
+            if (ImGui::InputFloat3("##SclInput", prop_scl)) {
+                ent->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
+            }
+        }
+
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
-            if (entitySelected == -1) {
+            if (entitySelected == NULL) {
                 ImGui::Text("Nothing selected");
             } else {
-                Entity* ent = resourceEntities.Get(entitySelected);
+                Entity* ent = entitySelected;
                 ImGui::Text(ent->GetName().c_str());
-                ImGui::Text("Transform:");
-                // ImGui::Text("Position:");
-                // position
-                memcpy(&prop_pos, &ent->trans.GetPosition()[0], sizeof(float) * 3);
-                ImGui::Text("Pos");
-                ImGui::SameLine();
-                if (ImGui::InputFloat3("##PosInput", prop_pos)) {
-                   ent->trans.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
-                }
-                // rotation
-                memcpy(&prop_rot, &ent->trans.GetRotation()[0], sizeof(float) * 3);
-                ImGui::Text("Rot");
-                ImGui::SameLine();
-                if (ImGui::InputFloat3("##RotInput", prop_rot)) {
-                   ent->trans.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
-                }
-                // scale
-                memcpy(&prop_scl, &ent->trans.GetScale()[0], sizeof(float) * 3);
-                ImGui::Text("Scl");
-                ImGui::SameLine();
-                if (ImGui::InputFloat3("##SclInput", prop_scl)) {
-                   ent->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
-                }
+                ImGui::Text("Parent:");
+                ImGui::Text("Select Parent", ((ent->GetParent() == NULL) ? "ROOT": ent->GetParent()->GetName().c_str()));
+                TransformPanel(ent);
                 int meshId = ent->GetMesh();
-                if (ImGui::BeginCombo("Select Mesh", ((meshId < 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
+                if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
                     for (auto it = resourceMeshes.Begin(); it != resourceMeshes.End(); it++) {
                         if (ImGui::Selectable(it->second->GetName().c_str())) {
                            ent->SetMesh(it->first);

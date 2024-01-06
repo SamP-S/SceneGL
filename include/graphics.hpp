@@ -33,7 +33,7 @@ class GraphicsEngine {
         frame_timer ft = frame_timer();
         Frame* frame = NULL;
         int width, height;
-        EntityId world = 0;
+        Entity* rootEntity = 0;
         Camera camera = Camera();
 
         GraphicsEngine(WindowManager* window) {
@@ -60,11 +60,8 @@ class GraphicsEngine {
             resourceMeshes.Add(new Mesh("vertex_quad", quadVertices));
 
             /// TODO: load project shader(s)
-            
-            resourceEntities.Add(new Entity("scene", NULL, 0));
-            resourceEntities.Add(new Entity("cube", resourceEntities.GetId("scene"), resourceMeshes.GetId("vertex_cube")));
-            resourceEntities.Get("scene")->AddChild(resourceEntities.GetId("cube"));
-            world = resourceEntities.GetId("scene");
+            rootEntity = new Entity("scene", NULL, 0);
+            rootEntity->AddChild(new Entity("cube", rootEntity, resourceMeshes.GetId("vertex_cube")));
 
             resourceShaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
@@ -135,18 +132,18 @@ class GraphicsEngine {
             return 1;
         }
 
-        void RenderObject(int entityId, mat4 root_trans = mat4()) {
-            Entity* ent = resourceEntities.Get(entityId);
-            mat4 model = root_trans *  ent->trans.GetTransform();
-            for (int i = 0; i < ent->GetNumChildren(); i++) {
-                RenderObject(ent->GetChild(i), model);
+        void RenderObject(Entity* entity, mat4 root_trans = mat4()) {
+            mat4 model = root_trans *  entity->trans.GetTransform();
+            for (int i = 0; i < entity->GetNumChildren(); i++) {
+                RenderObject(entity->GetChild(i), model);
             }
 
-            if (ent->GetMesh() < 0 )
+            // ensure mesh not empty
+            if (entity->GetMesh() == 0 )
                 return; 
 
             resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
-            resourceMeshes.Get(ent->GetMesh())->Render();
+            resourceMeshes.Get(entity->GetMesh())->Render();
         }
 
         void Render() {
@@ -173,7 +170,7 @@ class GraphicsEngine {
             resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
             resourceShaders.Get("base")->SetInt("iFrame", ft.GetFrameCount());
 
-            RenderObject(world);
+            RenderObject(rootEntity);
 
             frame->Unbind();
             

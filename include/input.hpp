@@ -38,10 +38,6 @@ class Input {
             }
         }
 
-        // static void MouseButtonEvent(int button, int state) {
-        //     _mouseButtonStates[button] = state;
-        // }
-
         static int GetKeyState(const char* key) {
             int scancode = SDL_GetScancodeFromName(key);
             return _keyStates[scancode];
@@ -59,15 +55,6 @@ class Input {
             return _mouseY;
         }
 
-        // static int GetMouseButtonState(const char* button) {
-        //     return _mouseButtonStates[SDL_GetMouseState(NULL, NULL)]
-        // }
-
-        // static int GetMouseButtonState(int button) {
-        //     return _mouseButtonStates[button];
-        // }
-
-
     private:
         static int _keyStates[SDL_NUM_SCANCODES];
         static int _mouseButtonStates[NUM_MOUSE_BUTTONS];
@@ -76,6 +63,6 @@ class Input {
 };
 
 int Input::_keyStates[SDL_NUM_SCANCODES] = {KEY_UP};
-int Input::_mouseButtonStates[NUM_MOUSE_BUTTONS] = {BUTTON_UP};
+int Input::_mouseButtonStates[NUM_MOUSE_BUTTONS] = {BUTTON_UP, BUTTON_UP, BUTTON_UP, BUTTON_UP, BUTTON_UP, BUTTON_UP, BUTTON_UP, BUTTON_UP};
 int Input::_mouseX = 0;
 int Input::_mouseY = 0;

@@ -40,7 +40,7 @@ class Application {
         ImVec2 render_region_min = ImVec2();
         ImVec2 render_region_max = ImVec2();
         ImVec2 window_pos = ImVec2();
-        EntityId worldSelected = 1;
+        EntityId entitySelected = 1;
         int new_entity_count = 0;
 
         std::map<char*, float> arMap = {
@@ -250,11 +250,26 @@ class Application {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Entity")) {
-                    if (ImGui::MenuItem("New Empty")) {
-                        std::cout << "Entity: Create new entity" << std::endl;
-                        std::string new_name = "new_" + std::to_string(new_entity_count);
-                        EntityId new_ent = resourceEntities.Add(new Entity(new_name, 0));
-                        resourceEntities.Get(Graphics.world)->AddChild(new_ent);
+                    if (entitySelected >= 0) {
+                        if (ImGui::MenuItem("New Empty")) {
+                            
+                            std::cout << "Entity: Create new entity" << std::endl;
+                            std::string new_name = "new_" + std::to_string(new_entity_count);
+                            int meshId = resourceMeshes.GetId("empty");
+                            Entity* ent_p = new Entity(new_name, entitySelected, meshId);
+                            EntityId new_ent = resourceEntities.Add(ent_p);
+                            resourceEntities.Get(entitySelected)->AddChild(new_ent);
+                            new_entity_count += 1;
+                        }
+                        if (ImGui::MenuItem("New Cube")) {
+                            std::cout << "Entity: Create new entity" << std::endl;
+                            std::string new_name = "cube_" + std::to_string(new_entity_count);
+                            int meshId = resourceMeshes.GetId("vertex_cube");
+                            Entity* ent_p = new Entity(new_name, entitySelected, meshId);
+                            EntityId new_ent = resourceEntities.Add(ent_p);
+                            resourceEntities.Get(entitySelected)->AddChild(new_ent);
+                            new_entity_count += 1;
+                        }
                     }
                     ImGui::EndMenu();
                 }
@@ -319,13 +334,13 @@ class Application {
         void WorldNode(EntityId entId) {
             Entity* ent = resourceEntities.Get(entId);
             ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
-            if (worldSelected == entId)
+            if (entitySelected == entId)
                 node_flags |= ImGuiTreeNodeFlags_Selected;
             if (ent->GetNumChildren() == 0)
                 node_flags |= ImGuiTreeNodeFlags_Leaf;
             bool node_open = ImGui::TreeNodeEx(ent->GetName().c_str(), node_flags);
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                worldSelected = entId;
+                entitySelected = entId;
             if (node_open) {
                 for (int i = 0; i < ent->GetNumChildren(); i++) {
                     WorldNode(ent->GetChild(i));
@@ -358,10 +373,10 @@ class Application {
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
-            if (worldSelected == -1) {
+            if (entitySelected == -1) {
                 ImGui::Text("Nothing selected");
             } else {
-                Entity* ent = resourceEntities.Get(worldSelected);
+                Entity* ent = resourceEntities.Get(entitySelected);
                 ImGui::Text(ent->GetName().c_str());
                 ImGui::Text("Transform:");
                 // ImGui::Text("Position:");

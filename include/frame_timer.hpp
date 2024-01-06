@@ -5,6 +5,7 @@ class frame_timer {
         std::chrono::time_point<std::chrono::system_clock> _startTime;
         std::chrono::time_point<std::chrono::system_clock> _endTime;
         std::chrono::time_point<std::chrono::system_clock> _lastFrameTime;
+        int _frameCount = 0;
         bool _running = true;
 
     public: 
@@ -24,9 +25,14 @@ class frame_timer {
         }
         
         void Frame() {
+            _frameCount += 1;
             if (_running) {
                 _lastFrameTime = std::chrono::system_clock::now();
             }
+        }
+
+        int GetFrameCount() {
+            return _frameCount;
         }
 
         double GetFrameElapsed(bool isMilli = false) {

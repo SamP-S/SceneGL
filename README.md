@@ -1,19 +1,73 @@
-Demo Graphics Engine
-C++ | SDL2 | OpenGL
+# SceneGL - Sam Pearson-Smith
+### C++ | SDL2 | OpenGL
 
-Athor: Sam Pearson-Smith
-Start Date: 17/02/21
+## Summary
+A simple OpenGL rendering engine for experimenting with graphics and game engine features.
 
-This is a basic graphics engine to learn about the rendering pipeline. It likely will not have any main usage outside of demo projects but I would like to add as many features as possible:
--Draw Triangles
--Draw Complex Mesh
--Flat Shade Colouring
--Texture Mapping
--Parallax Textures
--Phong Shading
--Guord Shading
--Shadow Mapping
--Dynamic Lighting
--Point, Directional, Targeted(Conical) Lighting
--On the fly shader writing and compilation
--etc...
+Goals:
+    ## Tasks
+
+    ### Graphics
+    - [x] Implement OpenGL rasterization
+    - [x] Create graphics layer interface to abstract OpenGL implementation
+    - [ ] Implement raycasting/raytracing rendering
+    - [ ] Implement radiosity lighting
+    - [ ] Support camera movement
+    - [ ] Wireframe rendering
+    - [ ] Draw physics
+
+    ### Physics
+    - [ ] Implement AABB collision detection
+    - [ ] Implement collision reponse/fixing
+    - [ ] Implement raycasting support
+
+    ### Entity/Components
+    - [x] Implement entities
+    - [ ] Implement components
+    - [ ] Implement entity-component engine
+    - [x] Implement scene tree
+    - [ ] Support empty enities
+
+    ### Resources
+    - [x] Implement general resource manager
+    - [ ] Support audio files
+    - [ ] Support image files
+    - [ ] Support text files
+    - [ ] Support 3D model files
+    - [ ] Support animation files
+    - [ ] 
+
+    ### Networking
+    - [ ] Implement networking socket support
+
+    ### Scripting
+    - [ ] Implement Lua scripting support
+
+    ### OS Support
+    - [x] Support Linux
+    - [ ] Support Windows
+
+
+## Compilation
+Run compile script:
+```
+./compile.sh clean
+```
+
+Or use CMake/Make directly:
+```
+cmake -S . -B build
+cmake --build build
+```
+
+## Usage
+Run executable:
+```
+./build/graphics
+```
+
+## License
+License
+
+This project is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+

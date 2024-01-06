@@ -8,14 +8,13 @@
 // Create asset manager that loads meta as XML/JSON for all resources
 // Only currently used/cached assets should be in the resource manager at any given time
 
-template <typename T>
+template <typename T, typename = std::enable_if_t<std::is_base_of_v<Resource, T>>>
 class ResourceManager {
     
     private:
         std::map<int, T*> _resourceMap = {};
 
     public:
-        static int idIterator;
 
         ResourceManager() {}
 
@@ -26,12 +25,12 @@ class ResourceManager {
         }
 
         int Add(T* item) {
-            int id = idIterator++;
+            int id = ((Resource*)item)->GetId();
             _resourceMap.insert({id, item});
             return id;
         }
 
-        bool Remove(int id) {
+        bool Remove(ResourceId id) {
             try {
                 T* itemPtr = _resourceMap.at(id);
                 delete itemPtr;
@@ -62,7 +61,7 @@ class ResourceManager {
         }
 
         T* At(int idx) {
-            if (idx < 0 || idx >= Size())
+            if (idx < 0 || idx >= _resourceMap.size())
                 return NULL;
             auto it = Begin();
             std::advance(it, idx);
@@ -99,7 +98,3 @@ class ResourceManager {
         }
         
 };
-
-// Set iterator value
-template <typename T>
-int ResourceManager<T>::idIterator = 0;

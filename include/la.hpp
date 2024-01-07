@@ -939,22 +939,19 @@ namespace LA {
     }
 
 
-    #ifdef LA_OPEN_GL
-        using vec2 = vec<2, float>;
-        using vec3 = vec<3, float>;
-        using vec4 = vec<4, float>;
-        using mat2 = mat<2, 2, float>;
-        using mat3 = mat<3, 3, float>;
-        using mat4 = mat<4, 4, float>;
-    #else
-        template<int N>
-        using vecf = vec<N, float>;
-        template<int N>
-        using vecd = vec<N, double>;
-        template<int N, int M>
-        using matf = mat<N, M, float>;
-        template<int N, int M>
-        using matd = mat<N, M, double>;
-    #endif
-
+    using vec2 = vec<2, float>;
+    using vec3 = vec<3, float>;
+    using vec4 = vec<4, float>;
+    using mat2 = mat<2, 2, float>;
+    using mat3 = mat<3, 3, float>;
+    using mat4 = mat<4, 4, float>;
+    template<int N>
+    using vecf = vec<N, float>;
+    template<int N>
+    using vecd = vec<N, double>;
+    template<int N, int M>
+    using matf = mat<N, M, float>;
+    template<int N, int M>
+    using matd = mat<N, M, double>;
+    
 }

@@ -170,3 +170,5 @@ namespace LA {
     }
 
 }
+
+using namespace LA;

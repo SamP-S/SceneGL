@@ -19,9 +19,7 @@ class ResourceManager {
         ResourceManager() {}
 
         ~ResourceManager() {
-            for (int i = 0; i < _resourceMap.size(); i++) {
-                delete _resourceMap.at(i);
-            }
+            Clear();
         }
 
         int Add(T* item) {

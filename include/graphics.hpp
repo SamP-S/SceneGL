@@ -23,6 +23,7 @@
 #include "camera.hpp"
 #include "model.hpp"
 #include "frame.hpp"
+#include "mesh_renderer.hpp"
 
 
 class GraphicsEngine {
@@ -60,8 +61,11 @@ class GraphicsEngine {
             resourceMeshes.Add(new Mesh("vertex_quad", quadVertices));
 
             /// TODO: load project shader(s)
-            rootEntity = new Entity("scene", NULL, 0);
-            rootEntity->AddChild(new Entity("cube", rootEntity, resourceMeshes.GetId("vertex_cube")));
+            rootEntity = new Entity("scene", NULL);
+            Entity* cube = new Entity("cube", rootEntity);
+            rootEntity->AddChild(cube);
+            Component* c = new MeshRenderer(cube, resourceMeshes.GetId("vertex_cube"));
+            cube->AddComponent(c);
 
             resourceShaders.Get("base")->Use();
             camera.SetProjection(45.0f, float(width), (float)height, 0.1f, 100.0f);
@@ -139,11 +143,12 @@ class GraphicsEngine {
             }
 
             // ensure mesh not empty
-            if (entity->GetMesh() == 0 )
+            MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+            if (renderer == nullptr || renderer->GetMeshId() == 0 )
                 return; 
 
             resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
-            resourceMeshes.Get(entity->GetMesh())->Render();
+            renderer->Render();
         }
 
         void Render() {

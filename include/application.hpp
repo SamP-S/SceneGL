@@ -8,13 +8,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <map>
-#include "texture.hpp"
 #include <tinyfiledialogs.h>
 
+#include "texture.hpp"
+#include "mesh_renderer.hpp"
 #include "graphics.hpp"
 #include "input.hpp"
 #include "entity.hpp"
-
+#include "la_extended.hpp"
 
 class Application {
     private:
@@ -253,23 +254,34 @@ class Application {
                 if (ImGui::BeginMenu("Entity")) {
                     if (entitySelected != NULL) {
                         if (ImGui::MenuItem("New Empty")) {
-                            
+                            // debug
                             std::cout << "Entity: Create new entity" << std::endl;
+                            // create empty
                             std::string new_name = "new_" + std::to_string(new_entity_count);
                             int meshId = resourceMeshes.GetId("empty");
-                            Entity* newEntity = new Entity(new_name, entitySelected, meshId);
+                            Entity* newEntity = new Entity(new_name, entitySelected);
                             entitySelected->AddChild(newEntity);
                             new_entity_count += 1;
                             entitySelected = newEntity;
+
+                            // build components
+                            Component* c = (Component*)new MeshRenderer(newEntity, meshId);
+                            newEntity->AddComponent(c);
                         }
                         if (ImGui::MenuItem("New Cube")) {
+                            // debug
                             std::cout << "Entity: Create new entity" << std::endl;
+                            // create entity
                             std::string new_name = "cube_" + std::to_string(new_entity_count);
-                            int meshId = resourceMeshes.GetId("vertex_cube");
-                            Entity* newEntity = new Entity(new_name, entitySelected, meshId);
+                            Entity* newEntity = new Entity(new_name, entitySelected);
                             entitySelected->AddChild(newEntity);
                             new_entity_count += 1;
                             entitySelected = newEntity;
+
+                            // build components
+                            int meshId = resourceMeshes.GetId("vertex_cube");
+                            Component* c = new MeshRenderer(newEntity, meshId);
+                            newEntity->AddComponent(c);
                         }
                     }
                     ImGui::EndMenu();
@@ -371,6 +383,9 @@ class Application {
         }
 
         void TransformPanel(Entity* ent) {
+            if (ent == nullptr)
+                return;
+            ImGui::Separator();
             ImGui::Text("Transform:");
             // ImGui::Text("Position:");
             // position
@@ -396,6 +411,26 @@ class Application {
             }
         }
 
+        void MeshRendererPanel(Entity* ent) {
+            if (ent == nullptr)
+                return;
+            MeshRenderer* renderer = ent->GetComponent<MeshRenderer>();
+            if (renderer == nullptr) {
+                return;
+            }
+            ImGui::Separator();
+            ImGui::Text("MeshRenderer");
+            int meshId = renderer->GetMeshId();
+            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
+                for (auto it = resourceMeshes.Begin(); it != resourceMeshes.End(); it++) {
+                    if (ImGui::Selectable(it->second->GetName().c_str())) {
+                    renderer->SetMeshId(it->first);
+                    }
+                }
+                ImGui::EndCombo();
+            }
+        }
+
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
@@ -407,16 +442,7 @@ class Application {
                 ImGui::Text("Parent:");
                 ImGui::Text("Select Parent", ((ent->GetParent() == NULL) ? "ROOT": ent->GetParent()->GetName().c_str()));
                 TransformPanel(ent);
-                int meshId = ent->GetMesh();
-                if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
-                    for (auto it = resourceMeshes.Begin(); it != resourceMeshes.End(); it++) {
-                        if (ImGui::Selectable(it->second->GetName().c_str())) {
-                           ent->SetMesh(it->first);
-                        }
-                    }
-                    ImGui::EndCombo();
-                }
-
+                MeshRendererPanel(ent);
             }
             ImGui::End();
         }

@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
+#include "component.hpp"
 #include "resource_manager.hpp"
 #include "resource.hpp"
 #include "transform.hpp"
@@ -18,11 +20,6 @@ class Entity {
             _name(name),
             _parent(parent) {
                 _entityId = Entity::_nextId++;
-            };
-
-        Entity(std::string name, Entity* parent, int meshId) :
-            Entity(name, parent) {
-                _meshId = meshId;
             };
 
         std::string GetName() {
@@ -84,13 +81,44 @@ class Entity {
             _parent = parent;
         }
 
-        int GetMesh() {
-            return _meshId;
+        template<typename T>
+        T* GetComponent() {
+            for (auto component : _components) {
+                if (dynamic_cast<T*>(component) != nullptr) {
+                    return dynamic_cast<T*>(component);
+                }
+            }
+            return nullptr;
         }
 
-        void SetMesh(int meshId) {
-            std::cout << "SetMesh: " << meshId << std::endl;
-            this->_meshId = meshId;
+        template<typename T>
+        std::vector<T*> GetComponents() {
+            std::vector<T*> results  = std::vector<T*>();
+            for (auto component : _components) {
+                if (dynamic_cast<T*>(component) != nullptr) {
+                    results.push_back(dynamic_cast<T*>(component));
+                }
+            }
+            return results;
+        }
+
+        void AddComponent(Component* component) {
+            if (component == nullptr) {
+                std::cout << "WARNING (Entity): Trying to add NULL component." << std::endl;
+                return;
+            }
+            _components.push_back(component);
+        }
+
+        void RemoveComponent(Component* key) {
+            if (key == nullptr) {
+                std::cout << "WARNING (Entity): Trying to remove NULL component." << std::endl;
+                return;
+            }
+            auto it = std::find(_components.begin(), _components.end(), key);
+            if (it != _components.end()) {
+                _components.erase(it);
+            }
         }
 
     private:
@@ -110,11 +138,12 @@ class Entity {
 
         std::vector<Entity*> _children = std::vector<Entity*>();
         Entity* _parent = NULL;
-        int _meshId = 0;
         std::string _name = "";
-        EntityId _entityId = 0;
 
+        EntityId _entityId = 0;
         static EntityId _nextId;
+
+        std::vector<Component*> _components = std::vector<Component*>();
         
 };
 

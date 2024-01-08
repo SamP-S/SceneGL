@@ -17,6 +17,7 @@
 #include "entity.hpp"
 #include "camera.hpp"
 #include "la_extended.hpp"
+#include "camera_gui.hpp"
 
 class Application {
     private:
@@ -44,6 +45,7 @@ class Application {
         ImVec2 window_pos = ImVec2();
         Entity* entitySelected = NULL;
         int new_entity_count = 0;
+        void* method_addr = NULL;
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -68,6 +70,7 @@ class Application {
     public:
 
         Application() {
+            method_addr = (void*)&CameraGui::InternalDraw;
 
             // Setup Dear ImGui context
             IMGUI_CHECKVERSION();
@@ -471,8 +474,8 @@ class Application {
             } else {
                 Entity* ent = entitySelected;
                 ImGui::Text(ent->GetName().c_str());
-                ImGui::Text("Parent:");
-                ImGui::Text("Select Parent", ((ent->GetParent() == NULL) ? "ROOT": ent->GetParent()->GetName().c_str()));
+                Entity* p = ent->GetParent();
+                ImGui::Text(("Parent: " + ((p == nullptr) ? "ROOT" : p->GetName())).c_str());
                 TransformPanel(ent);
                 MeshRendererPanel(ent);
                 CameraPanel(ent);

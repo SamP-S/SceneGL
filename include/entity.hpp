@@ -81,6 +81,10 @@ class Entity {
             _parent = parent;
         }
 
+        int GetNumComponents() {
+            return _components.size();
+        }
+
         template<typename T>
         T* GetComponent() {
             for (auto component : _components) {

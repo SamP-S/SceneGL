@@ -15,6 +15,7 @@
 #include "graphics.hpp"
 #include "input.hpp"
 #include "entity.hpp"
+#include "camera.hpp"
 #include "la_extended.hpp"
 
 class Application {
@@ -31,7 +32,7 @@ class Application {
         bool show_world_window = true;
         bool show_properties_window = true;
         bool show_demo_window = false;
-        bool show_camera_window = true;
+        bool show_viewport_window = true;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         float prop_pos[3] = {0.0f, 0.0f, 0.0f};
@@ -214,8 +215,8 @@ class Application {
                 if (show_properties_window) {
                     PropertiesWindow();
                 }
-                if (show_camera_window) {
-                    CameraWindow();
+                if (show_viewport_window) {
+                    ViewportWindow();
                 }
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
@@ -286,11 +287,24 @@ class Application {
                     }
                     ImGui::EndMenu();
                 }
+                if (ImGui::BeginMenu("Component")) {
+                    if (ImGui::MenuItem("Add Camera") && entitySelected != nullptr) {
+                        Component* c = new Camera(entitySelected);
+                        entitySelected->AddComponent(c);
+                        std::cout << "DEBUG: Add camera component." << std::endl;
+                    }
+                    if (ImGui::MenuItem("Add MeshRenderer") && entitySelected != nullptr) {
+                        Component* c = new MeshRenderer(entitySelected);
+                        entitySelected->AddComponent(c);
+                        std::cout << "DEBUG: Add MeshRenderer component." << std::endl;
+                    }
+                    ImGui::EndMenu();
+                }
                 if (ImGui::BeginMenu("Window")) {
                     ImGui::MenuItem("Render Display", NULL, &show_render_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
                     ImGui::MenuItem("World Tree", NULL, &show_world_window);
-                    ImGui::MenuItem("Workspace Camera", NULL, &show_camera_window);
+                    ImGui::MenuItem("Viewport Properties", NULL, &show_viewport_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }
@@ -370,15 +384,18 @@ class Application {
             ImGui::End();
         }
 
-        void CameraWindow() {
+        void ViewportWindow() {
             ImGuiWindowFlags cameraWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("Camera Properties", &show_camera_window, cameraWindowFlags);
-            float mouseSens = 0.5f;
-            float speed = 0.05f;
-            float FOV = 45.0f;
-            ImGui::SliderFloat("Mouse Sensitivity", &Graphics.camera.mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None);
-            ImGui::SliderFloat("Movement Speed", &Graphics.camera.speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None);
-            ImGui::SliderFloat("FOV", &Graphics.camera.FOV, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
+            ImGui::Begin("Viewport Properties", &show_viewport_window, cameraWindowFlags);
+            float mouseSens = Graphics.camera.GetLookSensitivity();
+            float speed = Graphics.camera.GetMovementSpeed();
+            float fov = Graphics.camera.GetFov();
+            if (ImGui::SliderFloat("Mouse Sensitivity", &mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None))
+                Graphics.camera.SetLookSensitivity(mouseSens);
+            if (ImGui::SliderFloat("Movement Speed", &speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None))
+                Graphics.camera.SetMovementSpeed(speed);
+            if(ImGui::SliderFloat("FOV", &fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat))
+                Graphics.camera.SetFov(fov);
             ImGui::End();
         }
 
@@ -431,6 +448,21 @@ class Application {
             }
         }
 
+        void CameraPanel(Entity* ent) {
+            if (ent == nullptr)
+                return;
+            Camera* camera = ent->GetComponent<Camera>();
+            if (camera == nullptr) {
+                return;
+            }
+            ImGui::Separator();
+            ImGui::Text("Camera");
+            float fov = camera->GetFov();
+            if (ImGui::SliderFloat("FOV", &fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat)) {
+                camera->SetFov(fov);
+            }
+        }
+
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
@@ -443,6 +475,7 @@ class Application {
                 ImGui::Text("Select Parent", ((ent->GetParent() == NULL) ? "ROOT": ent->GetParent()->GetName().c_str()));
                 TransformPanel(ent);
                 MeshRendererPanel(ent);
+                CameraPanel(ent);
             }
             ImGui::End();
         }

@@ -7,3 +7,6 @@
 [submodule "dependencies/imgui"]
 	path = dependencies/imgui
 	url = https://github.com/SamP-S/libimgui
+[submodule "dependencies/la"]
+	path = dependencies/la
+	url = git@github.com:SamP-S/LA.git

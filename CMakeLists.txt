@@ -9,8 +9,6 @@ set(CMAKE_BUILD_TYPE            Debug)
 # set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
-# set(LIBTFD_DIR "./libtinyfiledialogs")
-
 find_package(Git REQUIRED)
 if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${GIT_EXECUTABLE}
@@ -21,8 +19,11 @@ endif()
 add_subdirectory("./dependencies/tinyfiledialogs")
 add_subdirectory("./dependencies/stb")
 add_subdirectory("./dependencies/imgui")
+add_subdirectory("./dependencies/la")
 
-add_executable(graphics "./src/main.cpp")
+file(GLOB_RECURSE SRC_FILES "./src/*.cpp")
+
+add_executable(graphics ${SRC_FILES})
 
 find_package(assimp REQUIRED)
 target_include_directories(graphics PUBLIC ${ASSIMP_INCLUDE_DIRS})
@@ -35,5 +36,6 @@ target_include_directories(graphics PUBLIC "./include")
 target_link_libraries(graphics PUBLIC tinyfiledialogs)
 target_link_libraries(graphics PUBLIC stb_image)
 target_link_libraries(graphics PUBLIC imgui)
+target_link_libraries(graphics PUBLIC la)
 target_link_libraries(graphics PUBLIC ${CMAKE_DL_LIBS})
 target_link_libraries(graphics PUBLIC assimp)

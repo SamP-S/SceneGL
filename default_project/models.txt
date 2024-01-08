@@ -1,1 +1,0 @@
-chinese_house=models/chinese_house/scene.gltf

@@ -10,3 +10,5 @@ bin/
 build/
 test/
 models/
+
+test_project/

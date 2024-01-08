@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include "gl_interface.hpp"
-#include "resource.hpp"
+#include "resource.h"
 #include "resource_manager.hpp"
 
 /*

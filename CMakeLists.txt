@@ -16,12 +16,13 @@ if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endif()
 
-add_subdirectory("./dependencies/tinyfiledialogs")
-add_subdirectory("./dependencies/stb")
-add_subdirectory("./dependencies/imgui")
-add_subdirectory("./dependencies/la")
+add_subdirectory("dependencies/tinyfiledialogs")
+add_subdirectory("dependencies/stb")
+add_subdirectory("dependencies/imgui")
+add_subdirectory("dependencies/la")
 
-file(GLOB_RECURSE SRC_FILES "./src/*.cpp")
+file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+message(STATUS "SRC_FILES: ${SRC_FILES}")
 
 add_executable(graphics ${SRC_FILES})
 
@@ -32,7 +33,7 @@ message(STATUS "ASSIMP included at ${ASSIMP_INCLUDE_DIRS}")
 message(STATUS "ASSIMP libraries are ${ASSIMP_LIBRARIES}")
 
 target_compile_definitions(graphics PUBLIC LA_OPEN_GL)
-target_include_directories(graphics PUBLIC "./include")
+target_include_directories(graphics PUBLIC "include")
 target_link_libraries(graphics PUBLIC tinyfiledialogs)
 target_link_libraries(graphics PUBLIC stb_image)
 target_link_libraries(graphics PUBLIC imgui)

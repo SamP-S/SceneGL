@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include "component.h"
-#include "resource.hpp"
+#include "resource.h"
 #include "resource_manager.hpp"
 #include "transform.hpp"
 

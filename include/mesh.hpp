@@ -7,7 +7,7 @@
 #include "la_extended.h"
 using namespace LA;
 #include "gl_interface.hpp"
-#include "resource.hpp"
+#include "resource.h"
 #include "resource_manager.hpp"
 
 // might need to add sub mesh support for future more complex meshes

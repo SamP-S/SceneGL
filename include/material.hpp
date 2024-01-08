@@ -4,7 +4,7 @@
 #include <map>
 #include <iostream>
 
-#include "resource.hpp"
+#include "resource.h"
 
 typedef enum {
     kTypeInvalid = 0,

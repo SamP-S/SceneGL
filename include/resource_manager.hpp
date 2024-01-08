@@ -34,7 +34,7 @@ class ResourceManager {
                 delete itemPtr;
                 return _resourceMap.erase(id); 
             } catch (std::out_of_range err) {
-                std::cout << "Error: ResourceManager::Remove " << id << " out of range" << std::endl;
+                std::cout << "Error: ResourceManager::Remove " << id << " not in map" << std::endl;
                 return false;
             }
         }

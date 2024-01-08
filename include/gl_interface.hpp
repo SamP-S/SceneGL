@@ -10,7 +10,7 @@
 #include <GL/glew.h>
 #include <SDL_opengl.h>
 
-#include "la.hpp"
+#include "la_extended.h"
 using namespace LA;
 
 #define SHADER_INPUT_POSITION   "iPosition"

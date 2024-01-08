@@ -2,13 +2,13 @@
 
 #include <iostream>
 
-#include "component.hpp"
+#include "component.h"
 #include "mesh.hpp"
 #include "entity.hpp"
 
 class MeshRenderer : public Component {
     public:
-        MeshRenderer(Entity* entity, ResourceId id=0) :
+        MeshRenderer(Entity& entity, ResourceId id=0) :
             Component(entity),
             _meshId(id) {}
 

@@ -19,11 +19,13 @@
 #include "texture.hpp"
 #include "mesh.hpp"
 #include "entity.hpp"
-#include "la_extended.hpp"
+#include "la_extended.h"
+using namespace LA;
 #include "camera.hpp"
 #include "model.hpp"
 #include "frame.hpp"
 #include "mesh_renderer.hpp"
+#include "first_person.hpp"
 
 
 class GraphicsEngine {
@@ -35,8 +37,9 @@ class GraphicsEngine {
         Frame* frame = NULL;
         int width, height;
         Entity* rootEntity = 0;
-        // fix
-        Camera camera = Camera(NULL);
+
+        FirstPersonController* fpc;
+        Camera* camera;
 
         GraphicsEngine(WindowManager* window) {
             AttachWindow(window);
@@ -65,11 +68,14 @@ class GraphicsEngine {
             rootEntity = new Entity("scene", NULL);
             Entity* cube = new Entity("cube", rootEntity);
             rootEntity->AddChild(cube);
-            Component* c = new MeshRenderer(cube, resourceMeshes.GetId("vertex_cube"));
+            Component* c = new MeshRenderer(*cube, resourceMeshes.GetId("vertex_cube"));
             cube->AddComponent(c);
 
+            camera = new Camera(*rootEntity);
+            fpc = new FirstPersonController(*rootEntity);
+
             resourceShaders.Get("base")->Use();
-            camera.SetProjection(float(width), (float)height);
+            camera->SetResolution(width, height);
         }
 
         ~GraphicsEngine() {
@@ -124,21 +130,25 @@ class GraphicsEngine {
         }
         
         // function to reset our viewport after a window resize
-        int SetViewport(int _width, int _height) {
+        void SetViewport(int _width, int _height) {
+            // protect against divide by 0 and no resoltuion
+            if (_width == 0) {
+                std::cout << "WARNING (Graphics): Trying to set width 0" << std::endl;
+                _width = 1;
+            }
+                
+            if (_height == 0) {
+                std::cout << "WARNING (Graphics): Trying to set height 0" << std::endl;
+                _height = 1;
+            }
+                
             this->width = _width;
             this->height = _height;
-
-            /* Protect against a divide by zero */
-            if (height == 0 ) {
-                height = 1;
-            }
             float ratio = width / height;
-
-            return 1;
         }
 
         void RenderObject(Entity* entity, mat4 root_trans = mat4()) {
-            mat4 model = root_trans *  entity->trans.GetTransform();
+            mat4 model = root_trans *  entity->transform.GetTransform();
             for (int i = 0; i < entity->GetNumChildren(); i++) {
                 RenderObject(entity->GetChild(i), model);
             }
@@ -166,10 +176,11 @@ class GraphicsEngine {
 
             resourceShaders.Get("base")->Use();
 
-            camera.SetProjection(float(width), (float)height);
-            camera.Update();
-            resourceShaders.Get("base")->SetMat4("iView", &camera.view[0][0]);
-            resourceShaders.Get("base")->SetMat4("iProjection", &camera.proj[0][0]);
+            camera->SetResolution(width, height);
+            fpc->Update();
+
+            resourceShaders.Get("base")->SetMat4("iView", &fpc->view[0][0]);
+            resourceShaders.Get("base")->SetMat4("iProjection", &camera->proj[0][0]);
 
             resourceShaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             resourceShaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());

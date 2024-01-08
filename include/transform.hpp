@@ -1,6 +1,7 @@
 #pragma once
 
-#include "la_extended.hpp"
+#include "la_extended.h"
+using namespace LA;
 
 class Transform {
 

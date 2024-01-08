@@ -10,7 +10,8 @@
 
 #include "resource.hpp"
 #include "mesh.hpp"
-#include "la.hpp"
+#include "la_extended.h"
+using namespace LA;
 #include "transform.hpp"
 #include "texture.hpp"
 

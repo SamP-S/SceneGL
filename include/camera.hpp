@@ -1,40 +1,29 @@
 #pragma once
 
+#include "la_extended.h"
+using namespace LA;
 #include "transform.hpp"
-#include "la_extended.hpp"
-#include "component.hpp"
-#include "input.hpp"
-
-#define MODE_STOP 0
-#define MOVE_LEFT 1
-#define MOVE_RIGHT 2
-#define MOVE_UP 3
-#define MOVE_DOWN 4
-#define MOVE_FORWARD 5
-#define MOVE_BACKWARD 6
+#include "component.h"
 
 class Camera : public Component {
 
     private:
-        float _sens = 5.0f;
-        float _speed = 5.0f;
         float _fov = 45.0f;
-
         float _near = 0.1f;
         float _far = 100.0f;
+        unsigned int _width = 800;
+        unsigned int _height = 600;
+
+        void UpdateProjection()
+        {
+            proj = Perspective(_fov, (float)_width / (float)_height, _near, _far);
+        }
     
     public:
-        Transform trans = Transform();
 
-        mat4 view = mat4();
         mat4 proj = mat4();
 
-        bool active = false;
-
-        int x = 0;
-        int y = 0;
-
-        Camera(void* entity) :
+        Camera(Entity& entity) :
             Component(entity) {}
 
         ~Camera() {}
@@ -46,99 +35,46 @@ class Camera : public Component {
         float GetFov() {
             return _fov;
         }
-
         void SetFov(float fov) {
             _fov = fov;
+            UpdateProjection();
         }
 
-        float GetLookSensitivity() {
-            return _sens;
+        float GetNear() {
+            return _near;
         }
-        void SetLookSensitivity(float sens) {
-            _sens = sens;
-        }
-
-        float GetMovementSpeed() {
-            return _speed;
-        }
-        void SetMovementSpeed(float speed) {
-            _speed = speed;
+        void SetNear(float near) {
+            _near = near;
+            UpdateProjection();
         }
 
-        void SetProjection(float window_width, float window_height)
-        {
-            proj = Perspective(_fov, window_width / window_height, _near, _far);
+        float GetFar() {
+            return _far;
+        }
+        void SetFar(float far) {
+            _far = far;
+            UpdateProjection();
         }
 
-        void RotateCamera(int dx, int dy)
-        {
-            float dxf = 0.1f * _sens * float(dx);
-            float dyf = 0.1f * _sens * float(dy);
-            trans.Rotate(dyf, dxf, 0.0f);
+        int GetWidth() {
+            return _width;
+        }
+        void SetWidth(int width) {
+            _width = width;
+            UpdateProjection();
         }
 
-        void Move(int dir)
-        {
-            vec3 translate = vec3();
-            vec3 right = trans.GetRight();
-            right.y = 0.0f;
-            right = Normalise(right);
-            vec3 forward = trans.GetForward();
-            forward.y = 0.0f;
-            forward = Normalise(forward);
-            switch (dir) {
-                case MOVE_LEFT:
-                    translate = right * -_speed * 0.01;
-                    break;
-                case MOVE_RIGHT:
-                    translate = right * _speed * 0.01;
-                    break;
-                case MOVE_UP:
-                    translate = vec3({0.0f, 1.0f, 0.0f}) * _speed * 0.01;
-                    break;
-                case MOVE_DOWN:
-                    translate = vec3({0.0f, 1.0f, 0.0f}) * -_speed * 0.01;
-                    break;
-                case MOVE_FORWARD:
-                    translate = forward * -_speed * 0.01;
-                    break;
-                case MOVE_BACKWARD:
-                    translate = forward * _speed * 0.01;
-                    break;
-            };
-            trans.Translate(translate);
+        int GetHeight() {
+            return _height;
+        }
+        void SetHeight(int height) {
+            _height = height;
+            UpdateProjection();
         }
 
-        void Update()
-        {
-            if (Input::GetMouseButtonState(1)) {
-                if (Input::GetKeyState("w"))
-                    Move(MOVE_FORWARD);
-                if (Input::GetKeyState("s"))
-                    Move(MOVE_BACKWARD);
-                if (Input::GetKeyState("a"))
-                    Move(MOVE_LEFT);
-                if (Input::GetKeyState("d"))
-                    Move(MOVE_RIGHT);
-                if (Input::GetKeyState("left ctrl"))
-                    Move(MOVE_DOWN);
-                if (Input::GetKeyState("space"))
-                    Move(MOVE_UP);
-
-                if (!active) {
-                    active = true;
-                } else {
-                    int dx = Input::GetMouseX() - x;
-                    int dy = Input::GetMouseY() - y;
-                    RotateCamera(dx, dy);
-                }
-                x = Input::GetMouseX();
-                y = Input::GetMouseY();
-
-                view = inverse(trans.GetTransform());
-            } else {
-                active = false;
-            }
+        void SetResolution(int width, int height) {
+            _width = width;
+            _height = height;
+            UpdateProjection();
         }
-
 };

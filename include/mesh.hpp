@@ -4,12 +4,11 @@
 #include <iostream>
 #include <string>
 
-#include "la.hpp"
+#include "la_extended.h"
+using namespace LA;
 #include "gl_interface.hpp"
 #include "resource.hpp"
 #include "resource_manager.hpp"
-
-using namespace LA;
 
 // might need to add sub mesh support for future more complex meshes
 // each sub-mesh can have its own material but ONLY 1 material

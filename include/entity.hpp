@@ -4,9 +4,9 @@
 #include <string>
 #include <algorithm>
 
-#include "component.hpp"
-#include "resource_manager.hpp"
+#include "component.h"
 #include "resource.hpp"
+#include "resource_manager.hpp"
 #include "transform.hpp"
 
 typedef int EntityId;
@@ -14,7 +14,7 @@ typedef int EntityId;
 class Entity {
       
     public:
-        Transform trans = Transform();
+        Transform transform = Transform();
 
         Entity(std::string name, Entity* parent) :
             _name(name),

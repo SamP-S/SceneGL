@@ -16,8 +16,8 @@
 #include "input.hpp"
 #include "entity.hpp"
 #include "camera.hpp"
-#include "la_extended.hpp"
-#include "camera_gui.hpp"
+#include "la_extended.h"
+using namespace LA;
 
 class Application {
     private:
@@ -33,7 +33,7 @@ class Application {
         bool show_world_window = true;
         bool show_properties_window = true;
         bool show_demo_window = false;
-        bool show_viewport_window = true;
+        bool show_firstperson_window = true;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         float prop_pos[3] = {0.0f, 0.0f, 0.0f};
@@ -45,7 +45,6 @@ class Application {
         ImVec2 window_pos = ImVec2();
         Entity* entitySelected = NULL;
         int new_entity_count = 0;
-        void* method_addr = NULL;
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -70,7 +69,6 @@ class Application {
     public:
 
         Application() {
-            method_addr = (void*)&CameraGui::InternalDraw;
 
             // Setup Dear ImGui context
             IMGUI_CHECKVERSION();
@@ -218,8 +216,8 @@ class Application {
                 if (show_properties_window) {
                     PropertiesWindow();
                 }
-                if (show_viewport_window) {
-                    ViewportWindow();
+                if (show_firstperson_window) {
+                    FirstPersonWindow();
                 }
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
@@ -269,7 +267,7 @@ class Application {
                             entitySelected = newEntity;
 
                             // build components
-                            Component* c = (Component*)new MeshRenderer(newEntity, meshId);
+                            Component* c = (Component*)new MeshRenderer(*newEntity, meshId);
                             newEntity->AddComponent(c);
                         }
                         if (ImGui::MenuItem("New Cube")) {
@@ -284,7 +282,7 @@ class Application {
 
                             // build components
                             int meshId = resourceMeshes.GetId("vertex_cube");
-                            Component* c = new MeshRenderer(newEntity, meshId);
+                            Component* c = new MeshRenderer(*newEntity, meshId);
                             newEntity->AddComponent(c);
                         }
                     }
@@ -292,12 +290,12 @@ class Application {
                 }
                 if (ImGui::BeginMenu("Component")) {
                     if (ImGui::MenuItem("Add Camera") && entitySelected != nullptr) {
-                        Component* c = new Camera(entitySelected);
+                        Component* c = new Camera(*entitySelected);
                         entitySelected->AddComponent(c);
                         std::cout << "DEBUG: Add camera component." << std::endl;
                     }
                     if (ImGui::MenuItem("Add MeshRenderer") && entitySelected != nullptr) {
-                        Component* c = new MeshRenderer(entitySelected);
+                        Component* c = new MeshRenderer(*entitySelected);
                         entitySelected->AddComponent(c);
                         std::cout << "DEBUG: Add MeshRenderer component." << std::endl;
                     }
@@ -307,7 +305,7 @@ class Application {
                     ImGui::MenuItem("Render Display", NULL, &show_render_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
                     ImGui::MenuItem("World Tree", NULL, &show_world_window);
-                    ImGui::MenuItem("Viewport Properties", NULL, &show_viewport_window);
+                    ImGui::MenuItem("Viewport Properties", NULL, &show_firstperson_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }
@@ -387,18 +385,15 @@ class Application {
             ImGui::End();
         }
 
-        void ViewportWindow() {
+        void FirstPersonWindow() {
             ImGuiWindowFlags cameraWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("Viewport Properties", &show_viewport_window, cameraWindowFlags);
-            float mouseSens = Graphics.camera.GetLookSensitivity();
-            float speed = Graphics.camera.GetMovementSpeed();
-            float fov = Graphics.camera.GetFov();
+            ImGui::Begin("Viewport Properties", &show_firstperson_window, cameraWindowFlags);
+            float mouseSens = Graphics.fpc->GetLookSensitivity();
+            float speed = Graphics.fpc->GetMovementSpeed();
             if (ImGui::SliderFloat("Mouse Sensitivity", &mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None))
-                Graphics.camera.SetLookSensitivity(mouseSens);
+                Graphics.fpc->SetLookSensitivity(mouseSens);
             if (ImGui::SliderFloat("Movement Speed", &speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None))
-                Graphics.camera.SetMovementSpeed(speed);
-            if(ImGui::SliderFloat("FOV", &fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat))
-                Graphics.camera.SetFov(fov);
+                Graphics.fpc->SetMovementSpeed(speed);
             ImGui::End();
         }
 
@@ -409,25 +404,25 @@ class Application {
             ImGui::Text("Transform:");
             // ImGui::Text("Position:");
             // position
-            memcpy(&prop_pos, &ent->trans.GetPosition()[0], sizeof(float) * 3);
+            memcpy(&prop_pos, &ent->transform.GetPosition()[0], sizeof(float) * 3);
             ImGui::Text("Pos");
             ImGui::SameLine();
             if (ImGui::InputFloat3("##PosInput", prop_pos)) {
-                ent->trans.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
+                ent->transform.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
             }
             // rotation
-            memcpy(&prop_rot, &ent->trans.GetRotation()[0], sizeof(float) * 3);
+            memcpy(&prop_rot, &ent->transform.GetRotation()[0], sizeof(float) * 3);
             ImGui::Text("Rot");
             ImGui::SameLine();
             if (ImGui::InputFloat3("##RotInput", prop_rot)) {
-                ent->trans.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
+                ent->transform.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
             }
             // scale
-            memcpy(&prop_scl, &ent->trans.GetScale()[0], sizeof(float) * 3);
+            memcpy(&prop_scl, &ent->transform.GetScale()[0], sizeof(float) * 3);
             ImGui::Text("Scl");
             ImGui::SameLine();
             if (ImGui::InputFloat3("##SclInput", prop_scl)) {
-                ent->trans.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
+                ent->transform.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
             }
         }
 

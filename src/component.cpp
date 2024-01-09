@@ -1,5 +1,5 @@
-#include "component.h"
-#include "entity.h"
+#include "component.hpp"
+#include "entity.hpp"
 
 Component::Component(Entity& entity) :
     entity(entity),

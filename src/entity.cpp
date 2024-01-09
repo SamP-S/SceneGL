@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity.h"
+#include "entity.hpp"
 
 
 Entity::Entity(std::string name, Entity* parent) :

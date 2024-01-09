@@ -4,8 +4,8 @@
 #include <string>
 #include <algorithm>
 
-#include "component.h"
-#include "resource.h"
+#include "component.hpppp"
+#include "resource.hpp"
 #include "resource_manager.hpp"
 #include "transform.hpp"
 

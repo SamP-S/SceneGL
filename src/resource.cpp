@@ -1,4 +1,4 @@
-#include "resource.h"
+#include "resource.hpp"
 
 int Resource::_nextId = 1;
 

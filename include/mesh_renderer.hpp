@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "component.h"
+#include "component.hpp"
 #include "mesh.hpp"
-#include "entity.h"
+#include "entity.hpp"
 
 class MeshRenderer : public Component {
     public:

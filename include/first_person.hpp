@@ -3,9 +3,9 @@
 #include "transform.hpp"
 #include "la_extended.h"
 using namespace LA;
-#include "component.h"
+#include "component.hpp"
 #include "input.hpp"
-#include "entity.h"
+#include "entity.hpp"
 
 #define MODE_STOP 0
 #define MOVE_LEFT 1

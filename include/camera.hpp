@@ -3,7 +3,7 @@
 #include "la_extended.h"
 using namespace LA;
 #include "transform.hpp"
-#include "component.h"
+#include "component.hpp"
 
 class Camera : public Component {
 

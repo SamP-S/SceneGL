@@ -2,7 +2,7 @@
 
 #include <string>
 #include "image_interface.hpp"
-#include "resource.h"
+#include "resource.hpp"
 #include "resource_manager.hpp"
 
 enum Tex_Filtering {

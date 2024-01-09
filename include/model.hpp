@@ -8,7 +8,7 @@
 #include <map>
 #include <vector>
 
-#include "resource.h"
+#include "resource.hpp"
 #include "mesh.hpp"
 #include "la_extended.h"
 using namespace LA;

@@ -14,7 +14,7 @@
 #include "mesh_renderer.hpp"
 #include "graphics.hpp"
 #include "input.hpp"
-#include "entity.hpp"
+#include "entity.h"
 #include "camera.hpp"
 #include "la_extended.h"
 using namespace LA;

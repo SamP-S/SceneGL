@@ -5,7 +5,7 @@
 using namespace LA;
 #include "component.h"
 #include "input.hpp"
-#include "entity.hpp"
+#include "entity.h"
 
 #define MODE_STOP 0
 #define MOVE_LEFT 1

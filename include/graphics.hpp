@@ -18,7 +18,7 @@
 #include "shader.hpp"
 #include "texture.hpp"
 #include "mesh.hpp"
-#include "entity.hpp"
+#include "entity.h"
 #include "la_extended.h"
 using namespace LA;
 #include "camera.hpp"

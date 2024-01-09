@@ -4,7 +4,7 @@
 
 #include "component.h"
 #include "mesh.hpp"
-#include "entity.hpp"
+#include "entity.h"
 
 class MeshRenderer : public Component {
     public:

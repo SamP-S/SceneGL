@@ -4,7 +4,7 @@
 #include <string>
 #include <algorithm>
 
-#include "component.hpppp"
+#include "component.hpp"
 #include "resource.hpp"
 #include "resource_manager.hpp"
 #include "transform.hpp"

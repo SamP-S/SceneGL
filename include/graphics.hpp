@@ -36,7 +36,8 @@ class GraphicsEngine {
         frame_timer ft = frame_timer();
         Frame* frame = NULL;
         int width, height;
-        Entity* rootEntity = 0;
+        Entity* rootEntity = NULL;
+        Entity* workspaceCamera = NULL;
 
         FirstPersonController* fpc;
         Camera* camera;
@@ -71,8 +72,9 @@ class GraphicsEngine {
             Component* c = new MeshRenderer(*cube, resourceMeshes.GetId("vertex_cube"));
             cube->AddComponent(c);
 
-            camera = new Camera(*rootEntity);
-            fpc = new FirstPersonController(*rootEntity);
+            workspaceCamera = new Entity("Workspace Camera", NULL);
+            camera = new Camera(*workspaceCamera);
+            fpc = new FirstPersonController(*workspaceCamera);
 
             resourceShaders.Get("base")->Use();
             camera->SetResolution(width, height);
@@ -178,6 +180,8 @@ class GraphicsEngine {
 
             camera->SetResolution(width, height);
             fpc->Update();
+            
+            std::cout << fpc->x << ":" << fpc->y << std::endl;
 
             resourceShaders.Get("base")->SetMat4("iView", &fpc->view[0][0]);
             resourceShaders.Get("base")->SetMat4("iProjection", &camera->proj[0][0]);

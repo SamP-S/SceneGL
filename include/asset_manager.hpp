@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <typeinfo>
 
 #include "filepath.hpp"
 #include "asset_loader.hpp"
@@ -25,17 +26,14 @@ public:
     bool Load(const std::string& path) {
         std::string ext = GetFileExtension(path);
         for (auto loader : loaders) {
-            if (loader->CanLoad(ext)) {
-                return loader->Load(path);
+            ModelLoader* modelLoader = dynamic_cast<ModelLoader*>(loader);
+            if (modelLoader != nullptr && modelLoader->CanLoad(ext)) {
+                return modelLoader->Load(path);
             }
         }
         std::cout << "ERROR (AssetManager): Unsupported file extension: " << ext << std::endl;
         return false;
     }
-
-private:
-    
-    
 
 };
 

@@ -20,8 +20,8 @@ using namespace LA;
 #define SHADER_OUTPUT_FRAG      "oColour"
 
 #define ATTRIB_LOC_POSITION 0
-#define ATTRIB_LOC_UV       1
-#define ATTRIB_LOC_NORMAL   2
+#define ATTRIB_LOC_UV       2
+#define ATTRIB_LOC_NORMAL   1
 #define ATTRIB_LOC_COLOUR   3
 
 // add more types

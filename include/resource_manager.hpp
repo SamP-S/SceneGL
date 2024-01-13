@@ -4,7 +4,7 @@
 #include <string>
 #include <stdexcept>
 
-// Future add handles as additional layer of seperation
+// Future add handles as additional layer of separation
 // Create asset manager that loads meta as XML/JSON for all resources
 // Only currently used/cached assets should be in the resource manager at any given time
 
@@ -28,7 +28,7 @@ class ResourceManager {
             return id;
         }
 
-        bool Remove(ResourceId id) {
+        bool Remove(ObjId id) {
             try {
                 T* itemPtr = _resourceMap.at(id);
                 delete itemPtr;
@@ -77,7 +77,7 @@ class ResourceManager {
                 }
             }
             std::cout << "Error: ResourceManager::GetId " << name << " does not exist" << std::endl;
-            return -1;
+            return 0;
         }
 
         // currently allows for a pointer to be given out and object deleted while pointer is still outside object
@@ -95,4 +95,11 @@ class ResourceManager {
             return Get(GetId(name));
         }
         
+        template<typename... Args>
+        int Create(Args&&... args) {
+            T* item = new T(std::forward<Args>(args)...);
+            int id = ((Resource*)item)->GetId();
+            _resourceMap.insert({id, item});
+            return id;
+        }
 };

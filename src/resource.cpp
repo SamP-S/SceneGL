@@ -1,15 +1,8 @@
 #include "resource.hpp"
 
-int Resource::_nextId = 1;
-
 Resource::Resource(std::string name) :
-    _name(name) {
-    _id = Resource::_nextId++;
-}
-
-ResourceId Resource::GetId() {
-    return _id;
-}
+    Object(),
+    _name(name) {}
 
 std::string Resource::GetName() {
     return _name;

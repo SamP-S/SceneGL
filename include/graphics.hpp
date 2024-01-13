@@ -67,7 +67,7 @@ class GraphicsEngine {
             assetManager.Load("models/presets/cube.gltf");
             assetManager.Load("models/presets/cylinder.gltf");
             assetManager.Load("models/presets/dome.gltf");
-            assetManager.Load("models/presets/ico sphere.gltf");
+            assetManager.Load("models/presets/ico_sphere.gltf");
             assetManager.Load("models/presets/plane.gltf");
             assetManager.Load("models/presets/prism.gltf");
             assetManager.Load("models/presets/sphere.gltf");

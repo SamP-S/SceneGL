@@ -109,14 +109,26 @@ class Shader : public Resource {
             glUniform1f(glGetUniformLocation(id, name.c_str()), value);
         }
 
+        void SetVec2(const std::string& name, vec2 v) const {
+            glUniform2f(glGetUniformLocation(id, name.c_str()), v.x, v.y);
+        }
+
         void SetVec2(const std::string& name, float x, float y) const {
             glUniform2f(glGetUniformLocation(id, name.c_str()), x, y);
+        }
+
+        void SetVec3(const std::string& name, vec3 v) const {
+            glUniform3f(glGetUniformLocation(id, name.c_str()), v.x, v.y, v.z);
         }
 
         void SetVec3(const std::string& name, float x, float y, float z) const {
             glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
         }
 
+        void SetVec4(const std::string& name, vec4 v) const {
+            glUniform4f(glGetUniformLocation(id, name.c_str()), v.x, v.y, v.z, v.w);
+        }
+        
         void SetVec4(const std::string& name, float x, float y, float z, float w) const {
             glUniform4f(glGetUniformLocation(id, name.c_str()), x, y, z, w);
         }

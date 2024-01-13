@@ -80,7 +80,7 @@ private:
 			indices.push_back((uint32_t)indData[i]);
 		}
 
-		resourceMeshes.Create(mesh.name, vertices, indices);
+		resourceMeshes.Create(mesh.name, vertices, normals, indices);
 	}
 }
 

@@ -29,6 +29,9 @@ using namespace LA;
 #include "resource_manager.hpp"
 #include "asset_manager.hpp"
 #include "light_directional.hpp"
+#include "filepath.hpp"
+#include "json.hpp"
+using namespace nlohmann;
 
 
 class GraphicsEngine {
@@ -100,96 +103,55 @@ class GraphicsEngine {
             delete frame;
         }
 
-        bool LoadModelResources(std::string filepath) {
-            std::ifstream inputFile(filepath);
-            std::string inputDir = filepath.substr(0, filepath.find_last_of("/"));
-
-            if (!inputFile.is_open()) {
-                std::cout << "WARNING: Unable to open default model file." << std::endl;
-                return false;
-            }
-
-            std::string line;
-            std::istringstream lineStream;
-            std::string key, value;
-            while (std::getline(inputFile, line)) {
-                if (line.length() == 0 || line[0] == '#') {
-                    continue; // Skip the line if it starts with "#" or has length 0
-                }
-                lineStream = std::istringstream(line);
-                
-                if (std::getline(lineStream, key, '=')) {
-                    if (std::getline(lineStream, value)) {
-                        value = inputDir + "/" + value;
-                        std::cout << "Key: " << key << ", Value: " << value << std::endl;
-                        assetManager.Load(value);
-                    }
-                } else {
-                    std::cout << "WARNING: Default models.txt invalid syntax" << std::endl;
-                }
-            }
-            // inputFile.close();
-            return true;
-        }
-
-        std::string GetFileName(std::string filepath, bool withExtension=false) {
-            std::filesystem::path path(filepath);
-            std::string filename = path.filename().string();
-            if (withExtension)
-                return filename;
-            size_t lastDotIndex = filename.find_last_of(".");
-            if (lastDotIndex != std::string::npos) {
-                return filename.substr(0, lastDotIndex);
-            }
-            return filename;
-        }
-
+        /// TODO: Implement as recursive and implement FromJson & ToJson functions for everything
         bool LoadScene(std::string filepath) {
             std::ifstream inputFile(filepath);
-            
+            if (!inputFile.good()) {
+                std::cout << "WARNING (Graphics): Scene file does not exist: " << filepath << std::endl;
+            }
             if (!inputFile.is_open()) {
-                std::cout << "WARNING: Unable to open scene file." << std::endl;
+                std::cout << "WARNING (Graphics): Can't open file: " << filepath << std::endl;
                 return false;
             }
-            
-            std::string line;
-            int lineCount = 0;
-            while (std::getline(inputFile, line)) {
-                lineCount++;
-                std::cout << "Line " << lineCount << ": " << line << std::endl;
-                // scene file line
-                std::string name;
-                std::vector<float> floats;
 
-                std::istringstream lineStream(line);
-                std::string value;
-
-                if (std::getline(lineStream, name, ',')) {
-                    while (std::getline(lineStream, value, ',')) {
-                        try {
-                            float f = std::stof(value);
-                            floats.push_back(f);
-                        } catch (const std::exception& e) {
-                            std::cout << "WARNING (Graphics): Invalid line format (" << lineCount << ")" << std::endl;
-                            break;
-                        }
+            json jsonFile = json::parse(inputFile);
+            for (const auto& entry : jsonFile) {
+                // parse main structs
+                std::string name = entry["name"];
+                json transform = entry["transform"];
+                json position = transform["position"];
+                json rotation = transform["rotation"];
+                json scale = transform["scale"];
+                json components = entry["components"];
+                // debug output
+                std::cout << "Name: " << name << std::endl;
+                std::cout << "Position: (" << position["x"] << ", " << position["y"] << ", " << position["z"] << ")" << std::endl;
+                std::cout << "Rotation: (" << rotation["x"] << ", " << rotation["y"] << ", " << rotation["z"] << ")" << std::endl;
+                std::cout << "Scale: (" << scale["x"] << ", " << scale["y"] << ", " << scale["z"] << ")" << std::endl;
+                // create entity
+                Entity* ent = new Entity(name, rootEntity);
+                ent->transform.SetPosition(vec3({position["x"], position["y"], position["z"]}));
+                ent->transform.SetRotation(vec3({rotation["x"], rotation["y"], rotation["z"]}));
+                ent->transform.SetScale(vec3({scale["x"], scale["y"], scale["z"]}));
+                rootEntity->AddChild(ent);
+                // create component(s)
+                for (const auto& component : components) {
+                    if (component.find("directionalLight") != component.end()) {
+                        json directionalLight = component["directionalLight"];
+                        std::cout << "Directional Light: (" << directionalLight["r"] << ", " << directionalLight["g"] << ", " << directionalLight["b"] << ")" << std::endl;
+                        Component* c = new DirectionalLight(*ent, vec3({directionalLight["r"], directionalLight["g"], directionalLight["b"]}));
+                        ent->AddComponent(c);
+                    }
+                    else if (component.find("mesh") != component.end()) {
+                        std::cout << "Mesh: " << component["mesh"] << std::endl;
+                        ObjId resId = resourceMeshes.GetId(component["mesh"]);
+                        Component* c = new MeshRenderer(*ent, resId);
+                        ent->AddComponent(c);
                     }
                 }
 
-                if (floats.size() != 9) {
-                    std::cout << "WARNING (Graphics): Invalid line format (" << lineCount << ")" << std::endl;
-                } else {
-                    ObjId resId = resourceMeshes.GetId(name);
-                    Entity* ent = new Entity(name, rootEntity);
-                    ent->transform.SetPosition(vec3({floats.at(0), floats.at(1), floats.at(2)}));
-                    ent->transform.SetRotation(vec3({floats.at(3), floats.at(4), floats.at(5)}));
-                    ent->transform.SetScale(vec3({floats.at(6), floats.at(7), floats.at(8)}));
-                    rootEntity->AddChild(ent);
-                    Component* c = new MeshRenderer(*ent, resId);
-                    ent->AddComponent(c);
-                }
+                std::cout << std::endl; // Separating each object for clarity
             }
-            
             inputFile.close();
             return true;
         }
@@ -258,12 +220,11 @@ class GraphicsEngine {
             fpc->Update();
 
             std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
-            
-            std::cout << fpc->x << ":" << fpc->y << std::endl;
 
+            // vertex uniforms
             resourceShaders.Get("base")->SetMat4("iView", &fpc->view[0][0]);
             resourceShaders.Get("base")->SetMat4("iProjection", &camera->proj[0][0]);
-
+            // fragment uniforms
             resourceShaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
             resourceShaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
             resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());

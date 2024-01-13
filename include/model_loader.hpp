@@ -64,7 +64,7 @@ private:
 			float y = posData[i * 3 + 1];
 			float z = posData[i * 3 + 2];
 			vertices.push_back(vec3({x, y, z}));
-			std::cout << i << "|\t" << x << ": " << y << ":" << z << std::endl;
+			// std::cout << i << "|\t" << x << ": " << y << ":" << z << std::endl;
 		}
 
 		for (size_t i = 0; i < posAccessor.count; i++) {
@@ -72,11 +72,11 @@ private:
 			float y = norData[i * 3 + 1];
 			float z = norData[i * 3 + 2];
 			normals.push_back(vec3({x, y, z}));
-			std::cout<< i << "|\t" << x << ": " << y << ":" << z << std::endl;
+			// std::cout<< i << "|\t" << x << ": " << y << ":" << z << std::endl;
 		}
 
 		for (size_t i = 0; i < indAccessor.count; i++) {
-			std::cout << i << "|\t" << indData[i] << std::endl;
+			// std::cout << i << "|\t" << indData[i] << std::endl;
 			indices.push_back((uint32_t)indData[i]);
 		}
 

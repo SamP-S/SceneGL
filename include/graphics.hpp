@@ -209,10 +209,10 @@ class GraphicsEngine {
             GL_Interface::SetViewport(width, height);
 
             // GL_Interface::DisableFeature(FEATURE_DEPTH);
-            GL_Interface::DisableFeature(FEATURE_CULL);
+            // GL_Interface::DisableFeature(FEATURE_CULL);
             GL_Interface::EnableFeature(FEATURE_DEPTH);
-            // GL_Interface::EnableFeature(FEATURE_CULL);
-            GL_Interface::SetFrontFace(FRONT_CW);
+            GL_Interface::EnableFeature(FEATURE_CULL);
+            GL_Interface::SetFrontFace(FRONT_CCW);
 
             resourceShaders.Get("base")->Use();
 
@@ -229,6 +229,17 @@ class GraphicsEngine {
             resourceShaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
             resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
             resourceShaders.Get("base")->SetInt("iFrame", ft.GetFrameCount());
+            resourceShaders.Get("base")->SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());
+
+            for (int i = 0; i < dirLights.size(); i++) {
+                if (i >= 4) {
+                    std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
+                    break;
+                }
+                resourceShaders.Get("base")->SetVec3("iDirectionalLights[0].direction", dirLights[i]->transform.GetForward());
+                resourceShaders.Get("base")->SetVec3("iDirectionalLights[0].strength", dirLights[i]->GetStrength());
+                resourceShaders.Get("base")->SetInt("iDirectionalLights[0].enabled", 1);
+            }
 
             RenderObject(rootEntity);
 

@@ -88,7 +88,6 @@ class Application {
             ImGui_ImplOpenGL3_Init(windowManager.glsl_version);
 
             // Load project folder
-            Graphics.LoadModelResources("./default_project/models.txt");
             entitySelected = Graphics.rootEntity;
 
             // Main loop

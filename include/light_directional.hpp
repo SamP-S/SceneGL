@@ -4,19 +4,18 @@
 #include "la.h"
 using namespace LA;
 
-class DirectionLight : public Component {
+class DirectionalLight : public Component {
 private:
-    vec3 _direction;
     vec3 _strength;
 
 public:
-    DirectionLight(Entity& entity) :
+    DirectionalLight(Entity& entity) :
         Component(entity) {}
 
-    ~DirectionLight() {}
+    ~DirectionalLight() {}
 
     std::string ComponentType() {
-        return "DirectionLight";
+        return "DirectionalLight";
     }
     
     float GetStrength() {

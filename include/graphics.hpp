@@ -28,6 +28,7 @@ using namespace LA;
 #include "first_person.hpp"
 #include "resource_manager.hpp"
 #include "asset_manager.hpp"
+#include "light_direction.hpp"
 
 
 class GraphicsEngine {
@@ -255,6 +256,8 @@ class GraphicsEngine {
 
             camera->SetResolution(width, height);
             fpc->Update();
+
+            std::vector<DirectionLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionLight>();
             
             std::cout << fpc->x << ":" << fpc->y << std::endl;
 

@@ -65,6 +65,7 @@ class GraphicsEngine {
 
             // load default shader(s)
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
+            resourceShaders.Add(new Shader("lighting", "shaders/lighting.vs", "shaders/lighting.fs"));
 
             // load default model(s)
             assetManager.Load("models/presets/cone.gltf");
@@ -187,18 +188,17 @@ class GraphicsEngine {
             float ratio = width / height;
         }
 
-        void RenderObject(Entity* entity, mat4 root_trans = mat4()) {
+        void RenderObject(Entity* entity, mat4 root_trans = mat4(), Shader* shader=NULL) {
             mat4 model = root_trans *  entity->transform.GetTransform();
             for (int i = 0; i < entity->GetNumChildren(); i++) {
-                RenderObject(entity->GetChild(i), model);
+                RenderObject(entity->GetChild(i), model, shader);
             }
 
             // ensure mesh not empty
             MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
             if (renderer == nullptr || renderer->GetMeshId() == 0 )
                 return; 
-
-            resourceShaders.Get("base")->SetMat4("iModel", &model[0][0]);
+            shader->SetMat4("iModel", &model[0][0]);
             renderer->Render();
         }
 
@@ -214,34 +214,39 @@ class GraphicsEngine {
             GL_Interface::EnableFeature(FEATURE_CULL);
             GL_Interface::SetFrontFace(FRONT_CCW);
 
-            resourceShaders.Get("base")->Use();
+            std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
+            std::string shaderName = "base";
+            if (dirLights.size() > 0) {
+                shaderName = "lighting";
+            }
+            Shader* shader = resourceShaders.Get(shaderName);
+            shader->Use();
 
             camera->SetResolution(width, height);
             fpc->Update();
 
-            std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
-
             // vertex uniforms
-            resourceShaders.Get("base")->SetMat4("iView", &fpc->view[0][0]);
-            resourceShaders.Get("base")->SetMat4("iProjection", &camera->proj[0][0]);
+            shader->SetMat4("iView", &fpc->view[0][0]);
+            shader->SetMat4("iProjection", &camera->proj[0][0]);
+
             // fragment uniforms
-            resourceShaders.Get("base")->SetVec3("iResolution", window->width, window->height, 1.0f);
-            resourceShaders.Get("base")->SetFloat("iTime", ft.GetTotalElapsed());
-            resourceShaders.Get("base")->SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            resourceShaders.Get("base")->SetInt("iFrame", ft.GetFrameCount());
-            resourceShaders.Get("base")->SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());
+            shader->SetVec3("iResolution", window->width, window->height, 1.0f);
+            shader->SetFloat("iTime", ft.GetTotalElapsed());
+            shader->SetFloat("iTimeDelta", ft.GetFrameElapsed());
+            shader->SetInt("iFrame", ft.GetFrameCount());
+            shader->SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());
 
             for (int i = 0; i < dirLights.size(); i++) {
                 if (i >= 4) {
                     std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
                     break;
                 }
-                resourceShaders.Get("base")->SetVec3("iDirectionalLights[0].direction", dirLights[i]->transform.GetForward());
-                resourceShaders.Get("base")->SetVec3("iDirectionalLights[0].strength", dirLights[i]->GetStrength());
-                resourceShaders.Get("base")->SetInt("iDirectionalLights[0].enabled", 1);
+                shader->SetVec3("iDirectionalLights[0].direction", dirLights[i]->transform.GetForward());
+                shader->SetVec3("iDirectionalLights[0].strength", dirLights[i]->GetStrength());
+                shader->SetInt("iDirectionalLights[0].enabled", 1);
             }
 
-            RenderObject(rootEntity);
+            RenderObject(rootEntity, mat4(), shader);
 
             frame->Unbind();
             

@@ -32,7 +32,7 @@ void main()
 {   
     vec3 norm = normalize(fNormal);
     vec3 viewDir = normalize(iCameraPosition - fPosition);
-    vec3 result = vec3(0.5);
+    vec3 result = vec3(0.0);
     // phase 1: directional lighting
     for (int i = 0; i < DIRECTIONAL_LIGHT_MAX; i++)
         if (iDirectionalLights[i].enabled != 0)
@@ -60,5 +60,5 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 ambient = light.strength * 0.1;
     vec3 diffuse = light.strength * diff;
     vec3 specular = light.strength * spec;
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse);
 }

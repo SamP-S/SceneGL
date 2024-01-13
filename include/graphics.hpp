@@ -75,7 +75,7 @@ class GraphicsEngine {
             /// TODO: load project shader(s)
             rootEntity = new Entity("scene", NULL);
 
-            LoadScene("scene/Default.scene");
+            LoadScene("scene/Preset.scene");
 
             // Entity* cube = new Entity("cube", rootEntity);
             // rootEntity->AddChild(cube);
@@ -85,6 +85,9 @@ class GraphicsEngine {
             workspaceCamera = new Entity("Workspace Camera", NULL);
             camera = new Camera(*workspaceCamera);
             fpc = new FirstPersonController(*workspaceCamera);
+            
+            workspaceCamera->transform.SetPosition(vec3{-8,5,8});
+            workspaceCamera->transform.SetRotation(vec3({PI/2, PI, 0.0f}));
 
             resourceShaders.Get("base")->Use();
             camera->SetResolution(width, height);
@@ -155,7 +158,7 @@ class GraphicsEngine {
                 std::cout << "Line " << lineCount << ": " << line << std::endl;
                 // scene file line
                 std::string name;
-                std::vector<float> floatValues;
+                std::vector<float> floats;
 
                 std::istringstream lineStream(line);
                 std::string value;
@@ -163,8 +166,8 @@ class GraphicsEngine {
                 if (std::getline(lineStream, name, ',')) {
                     while (std::getline(lineStream, value, ',')) {
                         try {
-                            float floatValue = std::stof(value);
-                            floatValues.push_back(floatValue);
+                            float f = std::stof(value);
+                            floats.push_back(f);
                         } catch (const std::exception& e) {
                             std::cout << "WARNING (Graphics): Invalid line format (" << lineCount << ")" << std::endl;
                             break;
@@ -172,11 +175,14 @@ class GraphicsEngine {
                     }
                 }
 
-                if (floatValues.size() != 9) {
+                if (floats.size() != 9) {
                     std::cout << "WARNING (Graphics): Invalid line format (" << lineCount << ")" << std::endl;
                 } else {
                     ObjId resId = resourceMeshes.GetId(name);
                     Entity* ent = new Entity(name, rootEntity);
+                    ent->transform.SetPosition(vec3({floats.at(0), floats.at(1), floats.at(2)}));
+                    ent->transform.SetRotation(vec3({floats.at(3), floats.at(4), floats.at(5)}));
+                    ent->transform.SetScale(vec3({floats.at(6), floats.at(7), floats.at(8)}));
                     rootEntity->AddChild(ent);
                     Component* c = new MeshRenderer(*ent, resId);
                     ent->AddComponent(c);

@@ -1,9 +1,6 @@
 [submodule "dependencies/tinyfiledialogs"]
 	path = dependencies/tinyfiledialogs
 	url = https://github.com/SamP-S/libtinyfiledialogs
-[submodule "dependencies/stb"]
-	path = dependencies/stb
-	url = https://github.com/SamP-S/libstb.git
 [submodule "dependencies/imgui"]
 	path = dependencies/imgui
 	url = https://github.com/SamP-S/libimgui

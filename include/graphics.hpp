@@ -26,6 +26,8 @@ using namespace LA;
 #include "frame.hpp"
 #include "mesh_renderer.hpp"
 #include "first_person.hpp"
+#include "resource_manager.hpp"
+#include "asset_manager.hpp"
 
 
 class GraphicsEngine {
@@ -61,16 +63,25 @@ class GraphicsEngine {
             resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
 
             // load default model(s)
-            resourceMeshes.Add(new Mesh("empty", std::vector<vec3>()));
-            resourceMeshes.Add(new Mesh("vertex_cube", cubeVertices, cubeColours, cubeIndicies));
-            resourceMeshes.Add(new Mesh("vertex_quad", quadVertices));
+            assetManager.Load("models/presets/cone.gltf");
+            assetManager.Load("models/presets/cone.gltf");
+            assetManager.Load("models/presets/cube.gltf");
+            assetManager.Load("models/presets/cylinder.gltf");
+            assetManager.Load("models/presets/dome.gltf");
+            assetManager.Load("models/presets/ico sphere.gltf");
+            assetManager.Load("models/presets/plane.gltf");
+            assetManager.Load("models/presets/prism.gltf");
+            assetManager.Load("models/presets/sphere.gltf");
 
             /// TODO: load project shader(s)
             rootEntity = new Entity("scene", NULL);
-            Entity* cube = new Entity("cube", rootEntity);
-            rootEntity->AddChild(cube);
-            Component* c = new MeshRenderer(*cube, resourceMeshes.GetId("vertex_cube"));
-            cube->AddComponent(c);
+
+            LoadScene("scene/Default.scene");
+
+            // Entity* cube = new Entity("cube", rootEntity);
+            // rootEntity->AddChild(cube);
+            // Component* c = new MeshRenderer(*cube, resourceMeshes.GetId("cube::0::Cube"));
+            // cube->AddComponent(c);
 
             workspaceCamera = new Entity("Workspace Camera", NULL);
             camera = new Camera(*workspaceCamera);
@@ -108,13 +119,72 @@ class GraphicsEngine {
                     if (std::getline(lineStream, value)) {
                         value = inputDir + "/" + value;
                         std::cout << "Key: " << key << ", Value: " << value << std::endl;
-                        resourceModels.Add(new Model(key, value));
+                        assetManager.Load(value);
                     }
                 } else {
                     std::cout << "WARNING: Default models.txt invalid syntax" << std::endl;
                 }
             }
             // inputFile.close();
+            return true;
+        }
+
+        std::string GetFileName(std::string filepath, bool withExtension=false) {
+            std::filesystem::path path(filepath);
+            std::string filename = path.filename().string();
+            if (withExtension)
+                return filename;
+            size_t lastDotIndex = filename.find_last_of(".");
+            if (lastDotIndex != std::string::npos) {
+                return filename.substr(0, lastDotIndex);
+            }
+            return filename;
+        }
+
+        bool LoadScene(std::string filepath) {
+            std::ifstream inputFile(filepath);
+            
+            if (!inputFile.is_open()) {
+                std::cout << "WARNING: Unable to open scene file." << std::endl;
+                return false;
+            }
+            
+            std::string line;
+            int lineCount = 0;
+            while (std::getline(inputFile, line)) {
+                lineCount++;
+                std::cout << "Line " << lineCount << ": " << line << std::endl;
+                // scene file line
+                std::string name;
+                std::vector<float> floatValues;
+
+                std::istringstream lineStream(line);
+                std::string value;
+
+                if (std::getline(lineStream, name, ',')) {
+                    while (std::getline(lineStream, value, ',')) {
+                        try {
+                            float floatValue = std::stof(value);
+                            floatValues.push_back(floatValue);
+                        } catch (const std::exception& e) {
+                            std::cout << "WARNING (Graphics): Invalid line format (" << lineCount << ")" << std::endl;
+                            break;
+                        }
+                    }
+                }
+
+                if (floatValues.size() != 9) {
+                    std::cout << "WARNING (Graphics): Invalid line format (" << lineCount << ")" << std::endl;
+                } else {
+                    ObjId resId = resourceMeshes.GetId(name);
+                    Entity* ent = new Entity(name, rootEntity);
+                    rootEntity->AddChild(ent);
+                    Component* c = new MeshRenderer(*ent, resId);
+                    ent->AddComponent(c);
+                }
+            }
+            
+            inputFile.close();
             return true;
         }
 

@@ -17,7 +17,6 @@ if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
 endif()
 
 add_subdirectory("dependencies/tinyfiledialogs")
-add_subdirectory("dependencies/stb")
 add_subdirectory("dependencies/imgui")
 add_subdirectory("dependencies/la")
 
@@ -26,17 +25,9 @@ message(STATUS "SRC_FILES: ${SRC_FILES}")
 
 add_executable(graphics ${SRC_FILES})
 
-find_package(assimp REQUIRED)
-target_include_directories(graphics PUBLIC ${ASSIMP_INCLUDE_DIRS})
-target_link_libraries(graphics PUBLIC ${ASSIMP_LIBRARIES})
-message(STATUS "ASSIMP included at ${ASSIMP_INCLUDE_DIRS}")
-message(STATUS "ASSIMP libraries are ${ASSIMP_LIBRARIES}")
-
 target_compile_definitions(graphics PUBLIC LA_OPEN_GL)
 target_include_directories(graphics PUBLIC "include")
 target_link_libraries(graphics PUBLIC tinyfiledialogs)
-target_link_libraries(graphics PUBLIC stb_image)
 target_link_libraries(graphics PUBLIC imgui)
 target_link_libraries(graphics PUBLIC la)
 target_link_libraries(graphics PUBLIC ${CMAKE_DL_LIBS})
-target_link_libraries(graphics PUBLIC assimp)

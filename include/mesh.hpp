@@ -63,6 +63,8 @@ class Mesh : public Resource {
         uint32_t vao = 0;
         uint32_t material = 0;
 
+        bool isGenerated = false;
+
     // todo add assimp loaded meshes
         Mesh(std::string name)
             : Resource(name) {
@@ -71,46 +73,43 @@ class Mesh : public Resource {
 
         Mesh(std::string name, std::vector<vec3> vertices)
             : Resource(name) {
-            Clear();
             _vertices = vertices;
             GenerateBuffers();
         }
 
-        Mesh(std::string name, std::vector<vec3> vertices, std::vector<vec4> colours, std::vector<uint32_t> indicies)
+        Mesh(std::string name, std::vector<vec3> vertices, std::vector<uint32_t> indicies)
             : Resource(name) {
-            Clear();
             _vertices = vertices;
-            _colours = colours;
             _indicies = indicies;
             GenerateBuffers();
             std::cout << "Ok: Created array mesh" << std::endl;
         }
 
-        Mesh(   std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<vec3> uvs,
-                std::vector<vec4> colours, std::vector<uint32_t> indicies)
+        Mesh(std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<uint32_t> indicies)
             : Resource(name) {
-            Clear();
             _vertices = vertices;
             _normals = normals;
-            _uvs = uvs;
-            _colours = colours;
             _indicies = indicies;
-            this->material = 0;
             GenerateBuffers();
+            std::cout << "Ok: Created array mesh" << std::endl;
         }
+
 
         ~Mesh() {
             // delete all opengl resources/buffers
         }
 
         void Render() {
+            if (!isGenerated) {
+                std::cout << "ERROR: Attempting to render a mesh with no buffers." << std::endl;
+            }
             GL_Interface::BindVertexArrayObject(this->vao);
+            GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, this->GetVerticesSize());
             GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
         }
 
         std::vector<vec3> GetVertices() { return _vertices; }
         void SetVertices(std::vector<vec3> vertices) { 
-            Clear();
             _vertices = vertices;
         }
         int GetVerticesSize() { return _vertices.size(); }
@@ -159,14 +158,6 @@ class Mesh : public Resource {
         std::vector<vec4> _colours = std::vector<vec4>();
         std::vector<uint32_t> _indicies = std::vector<uint32_t>();
 
-        void Clear() {
-            _vertices.clear();
-            _uvs.clear();
-            _normals.clear();
-            _colours.clear();
-            _indicies.clear();
-        }
-
         /// NO VALIDATION OF CORRECT BUFFER CREATION/FILLING
         void GenerateBuffers() {
             this->vertexBO = GL_Interface::GenVertexBufferObj(&_vertices);
@@ -190,6 +181,7 @@ class Mesh : public Resource {
                 GL_Interface::VertexAttribPtr(ATTRIB_LOC_COLOUR, 4, TYPE_FLOAT);
             }
             GL_Interface::BindElementBufferObj(this->indicieBO);
+            isGenerated = true;
         }
 };
 

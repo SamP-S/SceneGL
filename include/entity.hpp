@@ -40,6 +40,12 @@ class Entity {
         template<typename T>
         std::vector<T*> GetComponents();
 
+        template<typename T>
+        T* GetComponentInChildren();
+
+        template<typename T>
+        std::vector<T*> GetComponentsInChildren();
+
         void AddComponent(Component* component);
         void RemoveComponent(Component* key);
 

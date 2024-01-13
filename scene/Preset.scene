@@ -21,9 +21,45 @@
         "components": [
             {
                 "directionalLight": {
-                    "r": 1.0,
-                    "g": 0.95,
-                    "b": 0.85
+                    "colour": {
+                        "r": 1.0,
+                        "g": 0.95,
+                        "b": 0.85
+                    },
+                    "intensity": 1.0
+                }
+            }
+        ]
+    },
+    {
+        "name": "Point Light",
+        "transform": {
+            "position": {
+                "x": 0.000000,
+                "y": 0.000000,
+                "z": 0.000000
+            },
+            "rotation": {
+                "x": 0.000000,
+                "y": 0.00000,
+                "z": 0.00000
+            },
+            "scale": {
+                "x": 1.000000,
+                "y": 1.000000,
+                "z": 1.000000
+            }
+        },
+        "components": [
+            {
+                "pointLight": {
+                    "colour": {
+                        "r": 0.8,
+                        "g": 0.8,
+                        "b": 1.0
+                    },
+                    "intensity": 0.1,
+                    "range": 5.0
                 }
             }
         ]
@@ -225,6 +261,17 @@
         "components": [
             {
                 "mesh": "Sphere-Mesh"
+            },
+            {
+                "pointLight": {
+                    "colour": {
+                        "r": 0.8,
+                        "g": 0.8,
+                        "b": 1.0
+                    },
+                    "intensity": 1.0,
+                    "range": 5.0
+                }
             }
         ]
     },

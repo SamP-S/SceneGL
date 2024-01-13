@@ -6,12 +6,14 @@ using namespace LA;
 
 class DirectionalLight : public Component {
 private:
-    vec3 _strength;
+    vec3 _colour = vec3({1.0f, 1.0f, 1.0f});
+    float _intensity = 1.0f;
 
 public:
-    DirectionalLight(Entity& entity, vec3 strength=vec3({1.0f, 1.0f, 1.0f})) :
+    DirectionalLight(Entity& entity, vec3 colour=vec3({1.0f, 1.0f, 1.0f}), float intensity=1.0f) :
         Component(entity),
-        _strength(strength) {}
+        _colour(colour),
+        _intensity(intensity) {}
 
     ~DirectionalLight() {}
 
@@ -19,11 +21,18 @@ public:
         return "DirectionalLight";
     }
     
-    vec3 GetStrength() {
-        return _strength;
+    vec3 GetColour() {
+        return _colour;
     }
-    void SetStrength(vec3 strength) {
-        _strength = strength;
+    void SetColour(vec3 colour) {
+        _colour = colour;
+    }
+
+    float GetIntensity() {
+        return _intensity;
+    }
+    void SetIntensity(float intensity) {
+        _intensity = intensity;
     }
 
 };

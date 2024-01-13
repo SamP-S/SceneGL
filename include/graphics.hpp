@@ -29,6 +29,7 @@ using namespace LA;
 #include "resource_manager.hpp"
 #include "asset_manager.hpp"
 #include "light_directional.hpp"
+#include "light_point.hpp"
 #include "filepath.hpp"
 #include "json.hpp"
 using namespace nlohmann;
@@ -139,8 +140,20 @@ class GraphicsEngine {
                 for (const auto& component : components) {
                     if (component.find("directionalLight") != component.end()) {
                         json directionalLight = component["directionalLight"];
-                        std::cout << "Directional Light: (" << directionalLight["r"] << ", " << directionalLight["g"] << ", " << directionalLight["b"] << ")" << std::endl;
-                        Component* c = new DirectionalLight(*ent, vec3({directionalLight["r"], directionalLight["g"], directionalLight["b"]}));
+                        json colour = directionalLight["colour"];
+                        std::cout << "Directional Light: (" << colour["r"] << ", " << colour["g"] << ", " << colour["b"] << ")" << std::endl;
+                        DirectionalLight* c = new DirectionalLight(*ent);
+                        c->SetColour(vec3({colour["r"], colour["g"], colour["b"]}));
+                        c->SetIntensity(directionalLight["intensity"]);
+                        ent->AddComponent(c);
+                    } else if (component.find("pointLight") != component.end()) {
+                        json pointLight = component["pointLight"];
+                        json colour = pointLight["colour"];
+                        std::cout << "Point Light: (" << colour["r"] << ", " << colour["g"] << ", " << colour["b"] << ")" << std::endl;
+                        PointLight* c = new PointLight(*ent);
+                        c->SetColour(vec3({colour["r"], colour["g"], colour["b"]}));
+                        c->SetIntensity(pointLight["intensity"]);
+                        c->SetRange(pointLight["range"]);
                         ent->AddComponent(c);
                     }
                     else if (component.find("mesh") != component.end()) {
@@ -215,8 +228,9 @@ class GraphicsEngine {
             GL_Interface::SetFrontFace(FRONT_CCW);
 
             std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
+            std::vector<PointLight*> pointLights = rootEntity->GetComponentsInChildren<PointLight>();
             std::string shaderName = "base";
-            if (dirLights.size() > 0) {
+            if (dirLights.size() > 0 || pointLights.size() > 0) {
                 shaderName = "lighting";
             }
             Shader* shader = resourceShaders.Get(shaderName);
@@ -241,9 +255,23 @@ class GraphicsEngine {
                     std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
                     break;
                 }
-                shader->SetVec3("iDirectionalLights[0].direction", dirLights[i]->transform.GetForward());
-                shader->SetVec3("iDirectionalLights[0].strength", dirLights[i]->GetStrength());
-                shader->SetInt("iDirectionalLights[0].enabled", 1);
+                std::string index = "[" + std::to_string(i) + "]";
+                shader->SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform.GetForward());
+                shader->SetFloat("iDirectionalLights" + index + ".intensity", dirLights[i]->GetIntensity());
+                shader->SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
+                shader->SetInt("iDirectionalLights" + index + ".enabled", 1);
+            }
+
+            for (int i = 0; i < pointLights.size(); i++) {
+                if (i >= 16) {
+                    std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
+                    break;
+                }
+                std::string index = "[" + std::to_string(i) + "]";
+                shader->SetVec3("iPointLights" + index + ".position", pointLights[i]->transform.GetPosition());
+                shader->SetFloat("iPointLights" + index + ".intensity", pointLights[i]->GetIntensity());
+                shader->SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
+                shader->SetInt("iPointLights" + index + ".enabled", 1);
             }
 
             RenderObject(rootEntity, mat4(), shader);

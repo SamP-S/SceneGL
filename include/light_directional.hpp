@@ -9,8 +9,9 @@ private:
     vec3 _strength;
 
 public:
-    DirectionalLight(Entity& entity) :
-        Component(entity) {}
+    DirectionalLight(Entity& entity, vec3 strength=vec3({1.0f, 1.0f, 1.0f})) :
+        Component(entity),
+        _strength(strength) {}
 
     ~DirectionalLight() {}
 

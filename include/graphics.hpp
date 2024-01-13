@@ -64,7 +64,6 @@ class GraphicsEngine {
 
             // load default model(s)
             assetManager.Load("models/presets/cone.gltf");
-            assetManager.Load("models/presets/cone.gltf");
             assetManager.Load("models/presets/cube.gltf");
             assetManager.Load("models/presets/cylinder.gltf");
             assetManager.Load("models/presets/dome.gltf");

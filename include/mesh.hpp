@@ -14,47 +14,6 @@ using namespace LA;
 // each sub-mesh can have its own material but ONLY 1 material
 // multiple materials for a submesh need multiple sub-meshes
 
-
-const std::vector<vec3> quadVertices = {
-            {-1.0f, -1.0f, 1.0f},
-            {1.0f,   1.0f, 1.0f},
-            {-1.0f,  1.0f, 1.0f},
-            {-1.0f, -1.0f, 1.0f},
-            {1.0f,  -1.0f, 1.0f},
-            {1.0f,   1.0f, 1.0f}
-        };
-
-const std::vector<vec3> cubeVertices = {
-            {-1.0f, -1.0f, -1.0f},  // A = 0
-            {-1.0f, -1.0f,  1.0f},  // B = 1
-            {-1.0f,  1.0f, -1.0f},  // C = 2
-            {-1.0f,  1.0f,  1.0f},  // D = 3
-            { 1.0f, -1.0f, -1.0f},  // E = 4
-            { 1.0f, -1.0f,  1.0f},  // F = 5
-            { 1.0f,  1.0f, -1.0f},  // G = 6
-            { 1.0f,  1.0f,  1.0f}   // H = 7
-        };
-
-const std::vector<uint32_t> cubeIndicies = {
-    0, 4, 6, 0, 6, 2,   // -z
-    5, 1, 3, 5, 3, 7,   // +z
-    0, 1, 5, 0, 5, 4,   // -y
-    2, 6, 7, 2, 7, 3,   // +y
-    0, 2, 3, 0, 3, 1,   // -x
-    4, 5, 7, 4, 7, 6
-};
-
-const std::vector<vec4> cubeColours = {
-    {0.0f, 0.0f, 0.0f, 1.0f},  // Black
-    {0.0f, 0.0f, 1.0f, 1.0f},  // Blue
-    {0.0f, 1.0f, 0.0f, 1.0f},  // Green
-    {0.0f, 1.0f, 1.0f, 1.0f},  // Cyan
-    {1.0f, 0.0f, 0.0f, 1.0f},  // Red
-    {1.0f, 0.0f, 1.0f, 1.0f},  // Magenta
-    {1.0f, 1.0f, 0.0f, 1.0f},  // Orange
-    {1.0f, 1.0f, 1.0f, 1.0f}   // White
-};
-
 class Mesh : public Resource {
 
 

@@ -31,22 +31,56 @@ private:
 
 	for (const tinygltf::Primitive& primitive : mesh.primitives) {
 		int posAttr = 0;
+		int norAttr = 0;
+		int indAttr = 0;
 		try { 
 			posAttr = primitive.attributes.at("POSITION");
+			norAttr = primitive.attributes.at("NORMAL");
+			indAttr = primitive.indices;
 		} catch (const std::exception& e) {
 			std::cout << "ERROR (ModelLoader): Exception caught " << e.what() << std::endl;
 		}
 
 		const tinygltf::Accessor& posAccessor = model.accessors[posAttr];
+		const tinygltf::Accessor& norAccessor = model.accessors[norAttr];
+		const tinygltf::Accessor& indAccessor = model.accessors[indAttr];
+
 		const tinygltf::BufferView& posBufferView = model.bufferViews[posAccessor.bufferView];
+		const tinygltf::BufferView& norBufferView = model.bufferViews[norAccessor.bufferView];
+		const tinygltf::BufferView& indBufferView = model.bufferViews[indAccessor.bufferView];
+
 		const tinygltf::Buffer& posBuffer = model.buffers[posBufferView.buffer];
+		const tinygltf::Buffer& norBuffer = model.buffers[norBufferView.buffer];
+		const tinygltf::Buffer& indBuffer = model.buffers[indBufferView.buffer];
 		
-		const float* posData = reinterpret_cast<const float*>(&posBuffer.data[posAccessor.byteOffset]);
+		const float* posData = reinterpret_cast<const float*>(&posBuffer.data[posBufferView.byteOffset]);
+		const float* norData = reinterpret_cast<const float*>(&norBuffer.data[norBufferView.byteOffset]);
+		const uint16_t* indData = reinterpret_cast<const uint16_t*>(&indBuffer.data[indBufferView.byteOffset]);
+		
+		std::cout << "IND TYPE: " << indAccessor.type << "; COMP: " << indAccessor.componentType << std::endl;
+
 		for (size_t i = 0; i < posAccessor.count; i++) {
-			vertices.push_back(vec3({posData[i * 3], posData[i * 3 + 1], posData[i * 3 + 2]}));
+			float x = posData[i * 3];
+			float y = posData[i * 3 + 1];
+			float z = posData[i * 3 + 2];
+			vertices.push_back(vec3({x, y, z}));
+			std::cout << i << "|\t" << x << ": " << y << ":" << z << std::endl;
 		}
 
-		resourceMeshes.Create(mesh.name, vertices);
+		for (size_t i = 0; i < posAccessor.count; i++) {
+			float x = norData[i * 3];
+			float y = norData[i * 3 + 1];
+			float z = norData[i * 3 + 2];
+			normals.push_back(vec3({x, y, z}));
+			std::cout<< i << "|\t" << x << ": " << y << ":" << z << std::endl;
+		}
+
+		for (size_t i = 0; i < indAccessor.count; i++) {
+			std::cout << i << "|\t" << indData[i] << std::endl;
+			indices.push_back((uint32_t)indData[i]);
+		}
+
+		resourceMeshes.Create(mesh.name, vertices, indices);
 	}
 }
 

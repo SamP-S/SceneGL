@@ -1,7 +1,7 @@
 #pragma once
 
 #include "component.hpp"
-#include "la.h"
+#include "la_extended.h"
 using namespace LA;
 
 class DirectionalLight : public Component {
@@ -18,7 +18,7 @@ public:
         return "DirectionalLight";
     }
     
-    float GetStrength() {
+    vec3 GetStrength() {
         return _strength;
     }
     void SetStrength(vec3 strength) {

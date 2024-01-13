@@ -18,17 +18,18 @@ std::string GetFileExtension(const std::string& filepath) {
 
 std::string GetFileName(const std::string& filepath) {
     // get filename with ext
+    std::string filename;
     size_t lastSlashPos = filepath.find_last_of("/");
     if (lastSlashPos != std::string::npos) {
-        filepath = filepath.substr(lastSlashPos + 1);
+        filename = filepath.substr(lastSlashPos + 1);
     }
     // remove ext
-    size_t dotPos = filepath.find_last_of(".");
+    size_t dotPos = filename.find_last_of(".");
     if (dotPos != std::string::npos) {
-        return filepath.substr(0, dotPos);
+        return filename.substr(0, dotPos);
     }
     // return filename no ext
-    return filepath;
+    return filename;
 }
 
 std::string GetParentFolder(const std::string& filepath) {

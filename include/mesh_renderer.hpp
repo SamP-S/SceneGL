@@ -8,15 +8,15 @@
 
 class MeshRenderer : public Component {
     public:
-        MeshRenderer(Entity& entity, ResourceId id=0) :
+        MeshRenderer(Entity& entity, ObjId id=0) :
             Component(entity),
             _meshId(id) {}
 
-        ResourceId GetMeshId() {
+        ObjId GetMeshId() {
             return _meshId;
         }
 
-        void SetMeshId(ResourceId id) {
+        void SetMeshId(ObjId id) {
             _meshId = id;
         }
 
@@ -37,5 +37,5 @@ class MeshRenderer : public Component {
         }
 
     private:
-        ResourceId _meshId;
+        ObjId _meshId;
 };

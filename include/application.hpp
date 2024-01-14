@@ -18,6 +18,8 @@
 #include "camera.hpp"
 #include "la_extended.h"
 using namespace LA;
+#include "light_directional.hpp"
+#include "light_point.hpp"
 
 class Application {
     private:
@@ -94,54 +96,7 @@ class Application {
             bool done = false;
             while (!done)
             {
-                // Poll and handle events (inputs, window resize, etc.)
-                // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-                // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-                // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-                // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-                SDL_Event event;
-                // SDL_PollEvent returns 1 while there is an event in the queue
-                while (SDL_PollEvent(&event)) {
-                    ImGui_ImplSDL2_ProcessEvent(&event);
-                    if (event.type == SDL_QUIT) {
-                        windowManager.isQuit = true;
-                    }
-                                
-                    if (renderer_focused) {
-                        switch (event.type) {
-                            case SDL_KEYUP:
-                                Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
-                                break;
-                            case SDL_KEYDOWN:
-                                Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
-                                break;
-                            case SDL_MOUSEMOTION:
-                                {
-                                    // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
-                                    // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
-                                    if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
-                                        && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
-                                        int x = event.motion.x - render_region_min.x;
-                                        int y = event.motion.y - render_region_min.y;
-                                        x = ((x >= 0) ? x : 0);
-                                        y = ((y >= 0) ? y : 0);
-                                        x = ((x <= render_region_max.x) ? x : render_region_max.x);
-                                        y = ((y <= render_region_max.y) ? y : render_region_max.y);
-                                        Input::MouseMoved(x, y);
-                                    }
-                                }
-                                break;
-                            case SDL_MOUSEBUTTONDOWN:
-                                Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
-                                break;
-                            case SDL_MOUSEBUTTONUP:
-                                Input::MouseButtonEvent(event.button.button, BUTTON_UP);
-                                break;
-                        }
-                    } else {
-                        Input::ClearStates();
-                    }
-                }
+                HandleEvents();
 
                 // Start the Dear ImGui frame
                 ImGui_ImplOpenGL3_NewFrame();
@@ -173,51 +128,19 @@ class Application {
                 ImVec2 dockspace_size = ImVec2(0, 0);
                 ImGui::DockSpace(dockspace_id, dockspace_size, dockspace_flags);
 
-                static bool resetDocking = true;
-                if (resetDocking) {
-                    ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
-                    ImGui::DockBuilderAddNode(dockspace_id, dockspace_flags | ImGuiDockNodeFlags_DockSpace);
-                    ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
-
-                    // split the dockspace into 2 nodes -- DockBuilderSplitNode takes in the following args in the following order
-                    // window ID to split, direction, fraction (between 0 and 1), 
-                    //          the final two setting let's us choose which id we want (which ever one we DON'T set as NULL, will be returned by the function)
-                    //          out_id_at_dir is the id of the node in the direction we specified earlier, out_id_at_opposite_dir is in the opposite direction
-                    ImGuiID dock_id_right;
-                    ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dock_id_right);
-                    ImGuiID dock_id_left_up;
-                    ImGuiID dock_id_left_down = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.3f, nullptr, &dock_id_left_up);
-                    ImGuiID dock_id_right_up;
-                    ImGuiID dock_id_right_down = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.1f, nullptr, &dock_id_right_up);
-
-                    // dock windows into the docking node we made above
-                    ImGui::DockBuilderDockWindow("Render Window", dock_id_right_up);
-                    ImGui::DockBuilderDockWindow("World Tree", dock_id_left_up);
-                    ImGui::DockBuilderDockWindow("Statistics Monitor", dock_id_right_down);
-                    ImGui::DockBuilderDockWindow("Entity Properties", dock_id_left_down);
-                    ImGui::DockBuilderFinish(dockspace_id);
-                    resetDocking = false;
-                }
-
                 MenuBar();
                 ImGui::End();
 
-                if (show_render_window) {
-                    // std::cout << ImGui::GetWindowPos().x << "#" << ImGui::GetWindowPos().y << std::endl;
+                if (show_render_window)
                     RenderWindow();
-                }
-                if (show_stats_window) {
+                if (show_stats_window) 
                     StatisticsWindow();
-                }
-                if (show_world_window) {
+                if (show_world_window) 
                     WorldWindow();
-                }
-                if (show_properties_window) {
+                if (show_properties_window) 
                     PropertiesWindow();
-                }
-                if (show_firstperson_window) {
+                if (show_firstperson_window)
                     FirstPersonWindow();
-                }
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -241,6 +164,57 @@ class Application {
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplSDL2_Shutdown();
             ImGui::DestroyContext();
+        }
+
+        // Poll and handle events (inputs, window resize, etc.)
+        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
+        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
+        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+        void HandleEvents() {
+           SDL_Event event;
+            // SDL_PollEvent returns 1 while there is an event in the queue
+            while (SDL_PollEvent(&event)) {
+                ImGui_ImplSDL2_ProcessEvent(&event);
+                if (event.type == SDL_QUIT) {
+                    windowManager.isQuit = true;
+                }
+                            
+                if (renderer_focused) {
+                    switch (event.type) {
+                        case SDL_KEYUP:
+                            Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
+                            break;
+                        case SDL_KEYDOWN:
+                            Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
+                            break;
+                        case SDL_MOUSEMOTION:
+                            {
+                                // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
+                                // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
+                                if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
+                                    && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
+                                    int x = event.motion.x - render_region_min.x;
+                                    int y = event.motion.y - render_region_min.y;
+                                    x = ((x >= 0) ? x : 0);
+                                    y = ((y >= 0) ? y : 0);
+                                    x = ((x <= render_region_max.x) ? x : render_region_max.x);
+                                    y = ((y <= render_region_max.y) ? y : render_region_max.y);
+                                    Input::MouseMoved(x, y);
+                                }
+                            }
+                            break;
+                        case SDL_MOUSEBUTTONDOWN:
+                            Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
+                            break;
+                        case SDL_MOUSEBUTTONUP:
+                            Input::MouseButtonEvent(event.button.button, BUTTON_UP);
+                            break;
+                    }
+                } else {
+                    Input::ClearStates();
+                }
+            }
         }
 
         void MenuBar() {
@@ -459,6 +433,48 @@ class Application {
                 camera->SetFov(fov);
             }
         }
+        
+        void DirectionalLightWindow(Entity* ent) {
+            if (ent == nullptr)
+                return;
+            DirectionalLight* dirLight = ent->GetComponent<DirectionalLight>();
+            if (dirLight == nullptr) {
+                return;
+            }
+            ImGui::Separator();
+            ImGui::Text("Directional Light");
+            vec3 colour = dirLight->GetColour();
+            if (ImGui::InputFloat3("Colour", colour.m)) {
+                dirLight->SetColour(colour);    
+            }
+            float intensity = dirLight->GetIntensity();
+            if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
+                dirLight->SetIntensity(intensity);
+            }
+        }
+
+        void PointLightWindow(Entity* ent) {
+            if (ent == nullptr)
+                return;
+            PointLight* pointLight = ent->GetComponent<PointLight>();
+            if (pointLight == nullptr) {
+                return;
+            }
+            ImGui::Separator();
+            ImGui::Text("Point Light");
+            vec3 colour = pointLight->GetColour();
+            if (ImGui::InputFloat3("Colour", colour.m)) {
+                pointLight->SetColour(colour);    
+            }
+            float intensity = pointLight->GetIntensity();
+            if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
+                pointLight->SetIntensity(intensity);
+            }
+            float range = pointLight->GetRange();
+            if (ImGui::SliderFloat("Range", &range, 0.01f, 20.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
+                pointLight->SetRange(range);
+            }
+        }
 
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
@@ -473,6 +489,8 @@ class Application {
                 TransformPanel(ent);
                 MeshRendererPanel(ent);
                 CameraPanel(ent);
+                DirectionalLightWindow(ent);
+                PointLightWindow(ent);
             }
             ImGui::End();
         }

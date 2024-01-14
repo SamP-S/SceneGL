@@ -178,17 +178,7 @@ class GraphicsEngine {
             float ratio = width / height;
         }
 
-        void SetupShader(Shader& shader) {
-            shader.Use();
-            // vertex uniforms
-            shader.SetMat4("iView", &fpc->view[0][0]);
-            shader.SetMat4("iProjection", &camera->proj[0][0]);
-            // fragment uniforms
-            shader.SetVec3("iResolution", window->width, window->height, 1.0f);
-            shader.SetFloat("iTime", ft.GetTotalElapsed());
-            shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            shader.SetInt("iFrame", ft.GetFrameCount());
-            shader.SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());
+        void ShaderDirectionalLights(Shader& shader) {
             // directional lights
             std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
             for (int i = 0; i < dirLights.size(); i++) {
@@ -202,6 +192,9 @@ class GraphicsEngine {
                 shader.SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
                 shader.SetInt("iDirectionalLights" + index + ".enabled", 1);
             }
+        }
+
+        void ShaderPointLights(Shader& shader) {
             // point lights
             std::vector<PointLight*> pointLights = rootEntity->GetComponentsInChildren<PointLight>();
             for (int i = 0; i < pointLights.size(); i++) {
@@ -215,6 +208,21 @@ class GraphicsEngine {
                 shader.SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
                 shader.SetInt("iPointLights" + index + ".enabled", 1);
             }
+        }
+
+        void SetupShader(Shader& shader) {
+            shader.Use();
+            // vertex uniforms
+            shader.SetMat4("iView", &fpc->view[0][0]);
+            shader.SetMat4("iProjection", &camera->proj[0][0]);
+            // fragment uniforms
+            shader.SetVec3("iResolution", window->width, window->height, 1.0f);
+            shader.SetFloat("iTime", ft.GetTotalElapsed());
+            shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
+            shader.SetInt("iFrame", ft.GetFrameCount());
+            shader.SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());       
+            ShaderDirectionalLights(shader);
+            ShaderPointLights(shader);     
         }
 
         /// TODO: Migrate to transform
@@ -284,14 +292,15 @@ class GraphicsEngine {
             GL_Interface::SetViewport(width, height);
             GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
+            for (auto& shaderPair : resourceShaders) {
+                SetupShader(*shaderPair.second);
+            }
+
             Shader* baseShader = resourceShaders.Get("base");
             Shader* lightingShader = resourceShaders.Get("lighting");
 
             camera->SetResolution(width, height);
             fpc->Update();
-
-            SetupShader(*baseShader);
-            SetupShader(*lightingShader);
 
             // draw lit
             GL_Interface::EnableFeature(FEATURE_DEPTH);

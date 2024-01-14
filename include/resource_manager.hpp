@@ -50,18 +50,18 @@ class ResourceManager {
             _resourceMap.clear();
         }
 
-        auto Begin() {
+        auto begin() {
             return _resourceMap.begin();
         }
 
-        auto End() {
+        auto end() {
             return _resourceMap.end();
         }
 
         T* At(int idx) {
             if (idx < 0 || idx >= _resourceMap.size())
                 return NULL;
-            auto it = Begin();
+            auto it = begin();
             std::advance(it, idx);
             return it->second;
         }

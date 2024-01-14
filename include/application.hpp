@@ -412,7 +412,7 @@ class Application {
             ImGui::Text("MeshRenderer");
             int meshId = renderer->GetMeshId();
             if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
-                for (auto it = resourceMeshes.Begin(); it != resourceMeshes.End(); it++) {
+                for (auto it = resourceMeshes.begin(); it != resourceMeshes.end(); it++) {
                     if (ImGui::Selectable(it->second->GetName().c_str())) {
                     renderer->SetMeshId(it->first);
                     }

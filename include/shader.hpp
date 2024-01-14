@@ -154,4 +154,4 @@ class Shader : public Resource {
 
 };
 
-ResourceManager<Shader> resourceShaders = ResourceManager<Shader>();
+extern ResourceManager<Shader> resourceShaders;

@@ -152,4 +152,4 @@ class Mesh : public Resource {
         }
 };
 
-ResourceManager<Mesh> resourceMeshes = ResourceManager<Mesh>();
+extern ResourceManager<Mesh> resourceMeshes;

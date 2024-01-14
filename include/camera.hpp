@@ -28,7 +28,7 @@ class Camera : public Component {
 
         ~Camera() {}
 
-        std::string ComponentType() {
+        std::string Type() {
             return "Camera";
         }
 

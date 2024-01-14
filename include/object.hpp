@@ -18,7 +18,7 @@ class Object {
         Object();
         ObjId GetId();
 
-        virtual std::string ComponentType() = 0;
+        virtual std::string Type() = 0;
         virtual void FromJson(json j) = 0;
         virtual json ToJson() = 0;
         virtual std::string ToString() = 0;

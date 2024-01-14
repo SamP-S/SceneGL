@@ -89,7 +89,7 @@ class Shader : public Resource {
             : Shader(name, GetSourceFromFile(vFilePath), GetSourceFromFile(fFilePath)) {
         }
 
-        std::string ComponentType() {
+        std::string Type() {
             return "Shader";
         }
         void FromJson(json j) {

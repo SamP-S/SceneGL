@@ -17,7 +17,7 @@ public:
 
     ~DirectionalLight() {}
 
-    std::string ComponentType() {
+    std::string Type() {
         return "DirectionalLight";
     }
 

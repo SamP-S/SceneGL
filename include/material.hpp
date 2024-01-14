@@ -24,7 +24,7 @@ class Material : public Resource {
         _metallic(metallic),
         _roughness(roughness) {}
 
-        std::string ComponentType() {
+        std::string Type() {
             return "Material";
         }
         void FromJson(json j) {

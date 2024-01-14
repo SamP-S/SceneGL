@@ -12,7 +12,7 @@ class MeshRenderer : public Component {
             Component(entity),
             _meshId(id) {}
 
-        std::string ComponentType() {
+        std::string Type() {
             return "MeshRenderer";
         }
 

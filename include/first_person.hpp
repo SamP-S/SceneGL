@@ -33,7 +33,7 @@ class FirstPersonController : public Component {
 
         ~FirstPersonController() {}
 
-        std::string ComponentType() {
+        std::string Type() {
             return "FirstPersonController";
         }
 

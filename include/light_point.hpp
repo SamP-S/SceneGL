@@ -19,7 +19,7 @@ public:
 
     ~PointLight() {}
 
-    std::string ComponentType() {
+    std::string Type() {
         return "PointLight";
     }
 

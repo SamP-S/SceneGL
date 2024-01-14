@@ -22,7 +22,7 @@ class Transform : public Component {
             Component(entity),
             _position(position), _rotation(rotation), _scale(scale) {}
 
-        std::string ComponentType() {
+        std::string Type() {
             return "Transform";
         }
 

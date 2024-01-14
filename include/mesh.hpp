@@ -57,7 +57,7 @@ class Mesh : public Resource {
             // delete all opengl resources/buffers
         }
 
-        std::string ComponentType() {
+        std::string Type() {
             return "Mesh";
         }
         void FromJson(json j) {

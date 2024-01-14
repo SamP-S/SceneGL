@@ -5,81 +5,48 @@
 #include <iostream>
 
 #include "resource.hpp"
+#include "resource_manager.hpp"
 
-typedef enum {
-    kTypeInvalid = 0,
-    kTypeFloat   = 1,
-    kTypeDouble  = 2,
-    kTypeString  = 3,
-    kTypeInteger = 4,
-    kTypeBuffer  = 5
-} ePropertyType;
-
-typedef struct {
-    std::string key = "NAME";
-    char* data = NULL;
-    int components = 0;
-    ePropertyType type = kTypeInvalid;
-} MaterialProperty;
-
-
-/*
-    Replace pointer system with static variables and inheritance system with data typed stored semantically in integer variable
-    Easy to template, all data is stored inside material property and can use a string look up system to organise and layout material
-    
-*/
-
-// add validation that map elements dont exist before assigning
 class Material : public Resource {
 
     private:
-        static int id;
-        std::map<std::string, int> _idMap;
-        std::map<int, MaterialProperty> _propertyMap;
+        vec4 _baseColour = vec4(1.0f);
+        float _metallic = 1.0f;
+        float _roughness = 1.0f;
 
     public:
         Material(std::string name)
         : Resource(name) {}
 
-        void Add(std::string key, int* data, int components) {
-            _idMap[key] = id++;
-            _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeInteger};
-            
-            std::cout << key << "\t";
-            for (int k = 0; k < components; k++) {
-                std::cout << " " << *(data + k);
-            }
-            std::cout << std::endl;
+        Material(std::string name, vec4 baseColour, float metallic, float roughness)
+        : Resource(name),
+        _baseColour(baseColour),
+        _metallic(metallic),
+        _roughness(roughness) {}
+
+        std::string ComponentType() {
+            return "Material";
         }
-
-        void Add(std::string key, float* data, int components) {
-            _idMap[key] = id++;
-            _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeFloat};
-
-            std::cout << key << "\t";
-            for (int k = 0; k < components; k++) {
-                std::cout << " " << *(data + k);
-            }
-            std::cout << std::endl;
+        void FromJson(json j) {
+            json colour = j["baseColour"];
+            _baseColour = vec4({colour["r"], colour["g"], colour["b"], colour["a"]});
+            _metallic = j["metallic"];
+            _roughness = j["roughness"];
+            return;
         }
-
-        void Add(std::string key, double* data, int components) {
-            _idMap[key] = id++;
-            _propertyMap[_idMap[key]] = {key, (char*)data, components, kTypeDouble};
-
-            std::cout << key << "\t";
-            for (int k = 0; k < components; k++) {
-                std::cout << " " << *(data + k);
-            }
-            std::cout << std::endl;
+        json ToJson() {
+            json j;
+            j["baseColour"] = {
+                {"r", _baseColour.x}, {"g", _baseColour.y}, 
+                {"b", _baseColour.z}, {"a", _baseColour.w}
+            };
+            j["metallic"] = _metallic;
+            j["roughness"] = _roughness;
+            return j;
         }
-
-        void Add(std::string key, std::string* data) {
-            _idMap[key] = id++;
-            _propertyMap[_idMap[key]] = {key, (char*)data, 1, kTypeString};
-
-            std::cout << key << "\t" << *data << std::endl;
+        std::string ToString() {
+            return "Material";
         }
 };
 
-int Material::id = 0;
+ResourceManager<Material> resourceMaterials = ResourceManager<Material>();

@@ -14,7 +14,7 @@ typedef int EntityId;
 class Entity {
       
     public:
-        Transform transform = Transform();
+        Transform transform = Transform(*this);
 
         Entity(std::string name, Entity* parent);
 
@@ -54,14 +54,14 @@ class Entity {
         bool RemoveChild(int index);
         bool RemoveChild(Entity* key);
 
-        std::vector<Entity*> _children = std::vector<Entity*>();
-        Entity* _parent = NULL;
+        std::vector<Entity*> _children;
+        Entity* _parent = nullptr;
         std::string _name = "";
 
         EntityId _entityId = 0;
         static EntityId _nextId;
 
-        std::vector<Component*> _components = std::vector<Component*>();
+        std::vector<Component*> _components;
         
 };
 

@@ -3,15 +3,50 @@
 #include "la_extended.h"
 using namespace LA;
 
-class Transform {
+#include "component.hpp"
+
+class Entity;
+
+class Transform : public Component {
 
     public:
-        Transform() :
-            _position(LA::vec3()), _rotation(LA::vec3()), _scale(LA::vec3(1.0f)) {};
-        Transform(LA::vec3 position) :
-            _position(position), _rotation(LA::vec3()), _scale(LA::vec3(1.0f)) {};
-        Transform(LA::vec3 position, LA::vec3 rotation, LA::vec3 scale) 
-            :_position(position), _rotation(rotation), _scale(scale) {};
+        Transform(Entity& entity) :
+            Component(entity),
+            _position(LA::vec3()), _rotation(LA::vec3()), _scale(LA::vec3(1.0f)) {}
+
+        Transform(Entity& entity, LA::vec3 position) :
+            Component(entity),
+            _position(position), _rotation(LA::vec3()), _scale(LA::vec3(1.0f)) {}
+
+        Transform(Entity& entity, LA::vec3 position, LA::vec3 rotation, LA::vec3 scale) :
+            Component(entity),
+            _position(position), _rotation(rotation), _scale(scale) {}
+
+        std::string ComponentType() {
+            return "Transform";
+        }
+
+        void FromJson(json j) {
+            json pos = j["position"];
+            json rot = j["rotation"];
+            json scl = j["scale"];
+            _position = vec3({pos["x"], pos["y"], pos["z"]});
+            _rotation = vec3({rot["x"], rot["y"], rot["z"]});
+            _scale = vec3({scl["x"], scl["y"], scl["z"]});
+        }
+
+        json ToJson() {
+            json j;
+            j["position"] = {{"x", _position.x}, {"y", _position.y}, {"z", _position.z}};
+            j["rotation"] = {{"x", _rotation.x}, {"y", _rotation.y}, {"z", _rotation.z}};
+            j["scale"] = {{"x", _scale.x}, {"y", _scale.y}, {"z", _scale.z}};
+            return j;
+        }
+
+        std::string ToString() {
+            std::string s = "Transform";
+            return s;
+        }
 
         // Position
         LA::vec3 GetPosition() { return _position; }

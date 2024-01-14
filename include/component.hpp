@@ -7,8 +7,8 @@
 
 #include "json.hpp"
 using namespace nlohmann;
-#include "transform.hpp"
 
+class Transform;
 class Entity;
 
 class Component {

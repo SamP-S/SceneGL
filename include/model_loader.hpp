@@ -58,7 +58,7 @@ private:
 			const float* norData = reinterpret_cast<const float*>(&norBuffer.data[norBufferView.byteOffset]);
 			const uint16_t* indData = reinterpret_cast<const uint16_t*>(&indBuffer.data[indBufferView.byteOffset]);
 			
-			std::cout << "IND TYPE: " << indAccessor.type << "; COMP: " << indAccessor.componentType << std::endl;
+			// std::cout << "IND TYPE: " << indAccessor.type << "; COMP: " << indAccessor.componentType << std::endl;
 
 			for (size_t i = 0; i < posAccessor.count; i++) {
 				float x = posData[i * 3];

@@ -117,24 +117,13 @@ class GraphicsEngine {
             }
 
             json jsonFile = json::parse(inputFile);
-            for (const auto& entry : jsonFile) {
+            for (const auto& entJson : jsonFile) {
                 // parse main structs
-                std::string name = entry["name"];
-                json transform = entry["transform"];
-                json position = transform["position"];
-                json rotation = transform["rotation"];
-                json scale = transform["scale"];
-                json components = entry["components"];
-                // debug output
-                std::cout << "Name: " << name << std::endl;
-                std::cout << "Position: (" << position["x"] << ", " << position["y"] << ", " << position["z"] << ")" << std::endl;
-                std::cout << "Rotation: (" << rotation["x"] << ", " << rotation["y"] << ", " << rotation["z"] << ")" << std::endl;
-                std::cout << "Scale: (" << scale["x"] << ", " << scale["y"] << ", " << scale["z"] << ")" << std::endl;
+                std::string name = entJson["name"];
+                json components = entJson["components"];
                 // create entity
                 Entity* ent = new Entity(name, rootEntity);
-                ent->transform.SetPosition(vec3({position["x"], position["y"], position["z"]}));
-                ent->transform.SetRotation(vec3({rotation["x"], rotation["y"], rotation["z"]}));
-                ent->transform.SetScale(vec3({scale["x"], scale["y"], scale["z"]}));
+                ent->transform.FromJson(entJson["transform"]);
                 rootEntity->AddChild(ent);
                 // create component(s)
                 for (const auto& component : components) {
@@ -147,9 +136,9 @@ class GraphicsEngine {
                         c->FromJson(component["pointLight"]);
                         ent->AddComponent(c);
                     }
-                    else if (component.find("mesh") != component.end()) {
+                    else if (component.find("meshRenderer") != component.end()) {
                         MeshRenderer* c = new MeshRenderer(*ent);
-                        c->FromJson(component["mesh"]);
+                        c->FromJson(component["meshRenderer"]);
                         ent->AddComponent(c);
                     }
                 }

@@ -87,7 +87,22 @@ class Shader : public Resource {
 
         Shader(std::string name, const char* vFilePath, const char* fFilePath)
             : Shader(name, GetSourceFromFile(vFilePath), GetSourceFromFile(fFilePath)) {
-        } 
+        }
+
+        std::string ComponentType() {
+            return "Shader";
+        }
+        void FromJson(json j) {
+            return;
+        }
+        json ToJson() {
+            json j;
+            return j;
+        }
+        std::string ToString() {
+            return "Shader";
+        }
+
 
         bool Use() {
             return GL_Interface::UseShader(this->id);

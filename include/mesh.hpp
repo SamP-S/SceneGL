@@ -53,9 +53,22 @@ class Mesh : public Resource {
             std::cout << "Ok: Created array mesh" << std::endl;
         }
 
-
         ~Mesh() {
             // delete all opengl resources/buffers
+        }
+
+        std::string ComponentType() {
+            return "Mesh";
+        }
+        void FromJson(json j) {
+            return;
+        }
+        json ToJson() {
+            json j;
+            return j;
+        }
+        std::string ToString() {
+            return "Mesh" + std::to_string(vao);
         }
 
         void Render(bool wireframe=false) {

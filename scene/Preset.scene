@@ -85,7 +85,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Icosphere-Mesh"
                 }
             }
@@ -112,7 +112,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Icosphere-Mesh"
                 }
             }
@@ -139,7 +139,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Cylinder-Mesh"
                 }
             }
@@ -166,7 +166,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Plane-Mesh"
                 }
             }
@@ -193,7 +193,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Cone-Mesh"
                 }
             }
@@ -220,7 +220,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Cube-Mesh"
                 }
             }
@@ -247,7 +247,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Dome-Mesh"
                 }
             }
@@ -274,7 +274,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Sphere-Mesh"
                 }
             },
@@ -312,7 +312,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Dome-Mesh"
                 }
             }
@@ -339,7 +339,7 @@
         },
         "components": [
             {
-                "mesh": {
+                "meshRenderer": {
                     "meshName": "Cube-Mesh"
                 }
             }

@@ -5,22 +5,16 @@
 #include <iostream>
 #include <string>
 
-#include "json.hpp"
-using namespace nlohmann;
+#include "object.hpp"
 
 class Transform;
 class Entity;
 
-class Component {
+class Component : public Object {
 public:
     Entity& entity;
     Transform& transform;
 
     Component(Entity& entity);
     ~Component();
-
-    virtual std::string ComponentType() = 0;
-    virtual void FromJson(json j) = 0;
-    virtual json ToJson() = 0;
-    virtual std::string ToString() = 0;
 };

@@ -274,7 +274,7 @@ class GraphicsEngine {
             if (renderer == nullptr || renderer->GetMeshId() == 0)
                 return; 
             shader->SetMat4("iModel", &model[0][0]);
-            Draw(*renderer);
+            Draw(*renderer, wireframe);
         }
 
         void Render() {

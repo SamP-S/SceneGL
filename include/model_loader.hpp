@@ -80,7 +80,7 @@ private:
 			uint32_t index = static_cast<uint32_t>(indData[i]);
 			indices.push_back(index);
 		}
-		std::cout << vertices.size() << "|" << normals.size() << "|" << indices.size() << std::endl;
+		// std::cout << vertices.size() << "|" << normals.size() << "|" << indices.size() << std::endl;
 		resourceMeshes.Create(mesh.name, vertices, normals, indices);
 	}
 }

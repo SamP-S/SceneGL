@@ -139,27 +139,17 @@ class GraphicsEngine {
                 // create component(s)
                 for (const auto& component : components) {
                     if (component.find("directionalLight") != component.end()) {
-                        json directionalLight = component["directionalLight"];
-                        json colour = directionalLight["colour"];
-                        std::cout << "Directional Light: (" << colour["r"] << ", " << colour["g"] << ", " << colour["b"] << ")" << std::endl;
                         DirectionalLight* c = new DirectionalLight(*ent);
-                        c->SetColour(vec3({colour["r"], colour["g"], colour["b"]}));
-                        c->SetIntensity(directionalLight["intensity"]);
+                        c->FromJson(component["directionalLight"]);
                         ent->AddComponent(c);
                     } else if (component.find("pointLight") != component.end()) {
-                        json pointLight = component["pointLight"];
-                        json colour = pointLight["colour"];
-                        std::cout << "Point Light: (" << colour["r"] << ", " << colour["g"] << ", " << colour["b"] << ")" << std::endl;
                         PointLight* c = new PointLight(*ent);
-                        c->SetColour(vec3({colour["r"], colour["g"], colour["b"]}));
-                        c->SetIntensity(pointLight["intensity"]);
-                        c->SetRange(pointLight["range"]);
+                        c->FromJson(component["pointLight"]);
                         ent->AddComponent(c);
                     }
                     else if (component.find("mesh") != component.end()) {
-                        std::cout << "Mesh: " << component["mesh"] << std::endl;
-                        ObjId resId = resourceMeshes.GetId(component["mesh"]);
-                        Component* c = new MeshRenderer(*ent, resId);
+                        MeshRenderer* c = new MeshRenderer(*ent);
+                        c->FromJson(component["mesh"]);
                         ent->AddComponent(c);
                     }
                 }
@@ -240,6 +230,29 @@ class GraphicsEngine {
             }
         }
 
+        /// TODO: Migrate to transform
+        mat4 GetCoordinateSystem(Entity* entCoord) {
+            if (entCoord == nullptr)
+                return mat4();
+            mat4 result = entCoord->transform.GetTransform();
+            while (true) {
+                if (entCoord->GetParent() != nullptr)
+                    break;
+                entCoord = entCoord->GetParent();
+                result = entCoord->transform.GetTransform() * result;
+            }
+            return result;
+        }
+
+        void RenderSelected(Entity* entity, Shader* shader=NULL, bool wireframe=false) {
+            MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
+            if (renderer == nullptr || renderer->GetMeshId() == 0)
+                return;
+            mat4 model = GetCoordinateSystem(entity);
+            shader->SetMat4("iModel", &model[0][0]);
+            renderer->Render(wireframe);
+        }
+
         void RenderObject(Entity* entity, mat4 root_trans = mat4(), Shader* shader=NULL, bool wireframe=false) {
             mat4 model = root_trans *  entity->transform.GetTransform();
             for (int i = 0; i < entity->GetNumChildren(); i++) {
@@ -278,10 +291,14 @@ class GraphicsEngine {
             RenderObject(rootEntity, mat4(), lightingShader, false);
 
             // draw wireframe
-            GL_Interface::DisableFeature(FEATURE_DEPTH);
-            GL_Interface::DisableFeature(FEATURE_CULL);
+            GL_Interface::EnableFeature(FEATURE_DEPTH);
+            GL_Interface::EnableFeature(FEATURE_CULL);
             baseShader->Use();
             RenderObject(rootEntity, mat4(), baseShader, true);
+
+            // draw selected
+            // baseShader->Use();
+            // RenderSelected()
 
             frame->Unbind();
             

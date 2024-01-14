@@ -42,6 +42,10 @@ using namespace LA;
 #define FRONT_CW        GL_CW
 #define FRONT_CCW       GL_CCW
 
+// Polygon Modes
+#define POLYGON_FILL    GL_FILL
+#define POLYGON_LINE    GL_LINE
+
 class GL_Interface {
 
     public:
@@ -255,6 +259,11 @@ class GL_Interface {
         static void DisableFeature(uint32_t feature) {
             glDisable(feature);
             // std::cout << "glDisable(" << feature << ")" << std::endl;
+            ErrorCheck();
+        }
+
+        static void PolygonMode(uint32_t mode) {
+            glPolygonMode(GL_FRONT_AND_BACK, mode);
             ErrorCheck();
         }
 

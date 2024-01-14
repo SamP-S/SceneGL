@@ -58,13 +58,22 @@ class Mesh : public Resource {
             // delete all opengl resources/buffers
         }
 
-        void Render() {
+        void Render(bool wireframe=false) {
             if (!isGenerated) {
                 std::cout << "ERROR: Attempting to render a mesh with no buffers." << std::endl;
             }
             GL_Interface::BindVertexArrayObject(this->vao);
-            GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, this->GetVerticesSize());
-            GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
+            if (wireframe) {
+                GL_Interface::PolygonMode(POLYGON_LINE);
+                GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, this->GetVerticesSize());
+                GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
+                GL_Interface::PolygonMode(POLYGON_FILL);
+            } else {
+                // GL_Interface::PolygonMode(POLYGON_FILL);
+                GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, this->GetVerticesSize());
+                GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
+            }
+            
         }
 
         std::vector<vec3> GetVertices() { return _vertices; }

@@ -67,7 +67,7 @@ private:
 			// std::cout << i << "|\t" << x << ": " << y << ":" << z << std::endl;
 		}
 
-		for (size_t i = 0; i < posAccessor.count; i++) {
+		for (size_t i = 0; i < norAccessor.count; i++) {
 			float x = norData[i * 3];
 			float y = norData[i * 3 + 1];
 			float z = norData[i * 3 + 2];
@@ -76,10 +76,11 @@ private:
 		}
 
 		for (size_t i = 0; i < indAccessor.count; i++) {
-			// std::cout << i << "|\t" << indData[i] << std::endl;
-			indices.push_back((uint32_t)indData[i]);
+			std::cout << i << "|\t" << indData[i] << std::endl;
+			uint32_t index = static_cast<uint32_t>(indData[i]);
+			indices.push_back(index);
 		}
-
+		std::cout << vertices.size() << "|" << normals.size() << "|" << indices.size() << std::endl;
 		resourceMeshes.Create(mesh.name, vertices, normals, indices);
 	}
 }

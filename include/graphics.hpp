@@ -201,10 +201,49 @@ class GraphicsEngine {
             float ratio = width / height;
         }
 
-        void RenderObject(Entity* entity, mat4 root_trans = mat4(), Shader* shader=NULL) {
+        void SetupShader(Shader& shader) {
+            shader.Use();
+            // vertex uniforms
+            shader.SetMat4("iView", &fpc->view[0][0]);
+            shader.SetMat4("iProjection", &camera->proj[0][0]);
+            // fragment uniforms
+            shader.SetVec3("iResolution", window->width, window->height, 1.0f);
+            shader.SetFloat("iTime", ft.GetTotalElapsed());
+            shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
+            shader.SetInt("iFrame", ft.GetFrameCount());
+            shader.SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());
+            // directional lights
+            std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
+            for (int i = 0; i < dirLights.size(); i++) {
+                if (i >= 4) {
+                    std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
+                    break;
+                }
+                std::string index = "[" + std::to_string(i) + "]";
+                shader.SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform.GetForward());
+                shader.SetFloat("iDirectionalLights" + index + ".intensity", dirLights[i]->GetIntensity());
+                shader.SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
+                shader.SetInt("iDirectionalLights" + index + ".enabled", 1);
+            }
+            // point lights
+            std::vector<PointLight*> pointLights = rootEntity->GetComponentsInChildren<PointLight>();
+            for (int i = 0; i < pointLights.size(); i++) {
+                if (i >= 16) {
+                    std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
+                    break;
+                }
+                std::string index = "[" + std::to_string(i) + "]";
+                shader.SetVec3("iPointLights" + index + ".position", pointLights[i]->transform.GetPosition());
+                shader.SetFloat("iPointLights" + index + ".intensity", pointLights[i]->GetIntensity());
+                shader.SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
+                shader.SetInt("iPointLights" + index + ".enabled", 1);
+            }
+        }
+
+        void RenderObject(Entity* entity, mat4 root_trans = mat4(), Shader* shader=NULL, bool wireframe=false) {
             mat4 model = root_trans *  entity->transform.GetTransform();
             for (int i = 0; i < entity->GetNumChildren(); i++) {
-                RenderObject(entity->GetChild(i), model, shader);
+                RenderObject(entity->GetChild(i), model, shader, wireframe);
             }
 
             // ensure mesh not empty
@@ -212,7 +251,7 @@ class GraphicsEngine {
             if (renderer == nullptr || renderer->GetMeshId() == 0 )
                 return; 
             shader->SetMat4("iModel", &model[0][0]);
-            renderer->Render();
+            renderer->Render(wireframe);
         }
 
         void Render() {
@@ -220,61 +259,29 @@ class GraphicsEngine {
             frame->Clear();
             
             GL_Interface::SetViewport(width, height);
+            GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
-            // GL_Interface::DisableFeature(FEATURE_DEPTH);
-            // GL_Interface::DisableFeature(FEATURE_CULL);
-            GL_Interface::EnableFeature(FEATURE_DEPTH);
-            GL_Interface::EnableFeature(FEATURE_CULL);
-            GL_Interface::SetFrontFace(FRONT_CCW);
-
-            std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
-            std::vector<PointLight*> pointLights = rootEntity->GetComponentsInChildren<PointLight>();
-            std::string shaderName = "base";
-            if (dirLights.size() > 0 || pointLights.size() > 0) {
-                shaderName = "lighting";
-            }
-            Shader* shader = resourceShaders.Get(shaderName);
-            shader->Use();
+            Shader* baseShader = resourceShaders.Get("base");
+            Shader* lightingShader = resourceShaders.Get("lighting");
 
             camera->SetResolution(width, height);
             fpc->Update();
 
-            // vertex uniforms
-            shader->SetMat4("iView", &fpc->view[0][0]);
-            shader->SetMat4("iProjection", &camera->proj[0][0]);
+            SetupShader(*baseShader);
+            SetupShader(*lightingShader);
 
-            // fragment uniforms
-            shader->SetVec3("iResolution", window->width, window->height, 1.0f);
-            shader->SetFloat("iTime", ft.GetTotalElapsed());
-            shader->SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            shader->SetInt("iFrame", ft.GetFrameCount());
-            shader->SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());
+            // draw lit
+            GL_Interface::EnableFeature(FEATURE_DEPTH);
+            GL_Interface::DisableFeature(FEATURE_CULL);
+            GL_Interface::SetFrontFace(FRONT_CCW);
+            lightingShader->Use();
+            RenderObject(rootEntity, mat4(), lightingShader, false);
 
-            for (int i = 0; i < dirLights.size(); i++) {
-                if (i >= 4) {
-                    std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
-                    break;
-                }
-                std::string index = "[" + std::to_string(i) + "]";
-                shader->SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform.GetForward());
-                shader->SetFloat("iDirectionalLights" + index + ".intensity", dirLights[i]->GetIntensity());
-                shader->SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
-                shader->SetInt("iDirectionalLights" + index + ".enabled", 1);
-            }
-
-            for (int i = 0; i < pointLights.size(); i++) {
-                if (i >= 16) {
-                    std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
-                    break;
-                }
-                std::string index = "[" + std::to_string(i) + "]";
-                shader->SetVec3("iPointLights" + index + ".position", pointLights[i]->transform.GetPosition());
-                shader->SetFloat("iPointLights" + index + ".intensity", pointLights[i]->GetIntensity());
-                shader->SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
-                shader->SetInt("iPointLights" + index + ".enabled", 1);
-            }
-
-            RenderObject(rootEntity, mat4(), shader);
+            // draw wireframe
+            GL_Interface::DisableFeature(FEATURE_DEPTH);
+            GL_Interface::DisableFeature(FEATURE_CULL);
+            baseShader->Use();
+            RenderObject(rootEntity, mat4(), baseShader, true);
 
             frame->Unbind();
             

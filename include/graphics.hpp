@@ -272,7 +272,7 @@ class GraphicsEngine {
 
             // draw lit
             GL_Interface::EnableFeature(FEATURE_DEPTH);
-            GL_Interface::DisableFeature(FEATURE_CULL);
+            GL_Interface::EnableFeature(FEATURE_CULL);
             GL_Interface::SetFrontFace(FRONT_CCW);
             lightingShader->Use();
             RenderObject(rootEntity, mat4(), lightingShader, false);

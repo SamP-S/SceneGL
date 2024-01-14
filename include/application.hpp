@@ -28,7 +28,6 @@ class Application {
         GraphicsEngine Graphics = GraphicsEngine(&windowManager);
 
         // Application state
-        bool opt_fullscreen = true;
         bool show_editor_window = true;
         bool show_render_window = true;
         bool show_stats_window = true;
@@ -72,22 +71,7 @@ class Application {
 
         Application() {
 
-            // Setup Dear ImGui context
-            IMGUI_CHECKVERSION();
-            ImGui::CreateContext();
-            ImGuiIO& io = ImGui::GetIO();
-            io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-            io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-            io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-            //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-            // Setup Dear ImGui style
-            ImGui::StyleColorsDark();
-            // ImGui::StyleColorsClassic();
-
-            // Setup Platform/Renderer backends
-            ImGui_ImplSDL2_InitForOpenGL(windowManager.window, windowManager.gl_context);
-            ImGui_ImplOpenGL3_Init(windowManager.glsl_version);
+            Initialise();
 
             // Load project folder
             entitySelected = Graphics.rootEntity;
@@ -107,16 +91,15 @@ class Application {
                 done = windowManager.isQuit;
                 ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
                 const ImGuiViewport* viewport = ImGui::GetMainViewport();
-                if (opt_fullscreen) {
-                    ImGui::SetNextWindowPos(viewport->WorkPos);
-                    ImGui::SetNextWindowSize(viewport->WorkSize);
-                    ImGui::SetNextWindowViewport(viewport->ID);
-                    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-                    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                    window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
-                    window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-                    window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-                }
+
+                ImGui::SetNextWindowPos(viewport->WorkPos);
+                ImGui::SetNextWindowSize(viewport->WorkSize);
+                ImGui::SetNextWindowViewport(viewport->ID);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+                window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
+                window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+                window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
                 ImGui::Begin("CoreWindow", NULL, window_flags);
@@ -148,7 +131,7 @@ class Application {
                 ImGui::Render();
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-                if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+                if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
                     SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
                     SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
                     ImGui::UpdatePlatformWindows();
@@ -159,7 +142,29 @@ class Application {
                 SDL_GL_SwapWindow(windowManager.window);
                 // windowManager.SwapBuffers();
             }
+            Shutdown();
+        }
 
+        void Initialise() {
+            // Setup Dear ImGui context
+            IMGUI_CHECKVERSION();
+            ImGui::CreateContext();
+            ImGuiIO& io = ImGui::GetIO();
+            io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+            io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+            io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+            //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+            // Setup Dear ImGui style
+            ImGui::StyleColorsDark();
+            // ImGui::StyleColorsClassic();
+
+            // Setup Platform/Renderer backends
+            ImGui_ImplSDL2_InitForOpenGL(windowManager.window, windowManager.gl_context);
+            ImGui_ImplOpenGL3_Init(windowManager.glsl_version);
+        }
+
+        void Shutdown() {
             // Cleanup
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplSDL2_Shutdown();
@@ -316,6 +321,7 @@ class Application {
             render_region_max.x += pos.x;
             render_region_max.y += pos.y;
             
+            // ImVec2 res = (ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin()) + ImGui::GetWindowPos() - window_pos;
             float wWidth = render_region_max.x - render_region_min.x;
             float wHeight = render_region_max.y - render_region_min.y;
             ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
@@ -375,27 +381,26 @@ class Application {
                 return;
             ImGui::Separator();
             ImGui::Text("Transform:");
-            // ImGui::Text("Position:");
             // position
-            memcpy(&prop_pos, &ent->transform.GetPosition()[0], sizeof(float) * 3);
             ImGui::Text("Pos");
             ImGui::SameLine();
-            if (ImGui::InputFloat3("##PosInput", prop_pos)) {
-                ent->transform.SetPosition(vec3{prop_pos[0], prop_pos[1], prop_pos[2]});     
+            vec3 position = ent->transform.GetPosition();
+            if (ImGui::InputFloat3("##PosInput", position.m)) {
+                ent->transform.SetPosition(position);     
             }
             // rotation
-            memcpy(&prop_rot, &ent->transform.GetRotation()[0], sizeof(float) * 3);
             ImGui::Text("Rot");
             ImGui::SameLine();
-            if (ImGui::InputFloat3("##RotInput", prop_rot)) {
-                ent->transform.SetRotation(vec3{prop_rot[0], prop_rot[1], prop_rot[2]});     
+            vec3 rotation = ent->transform.GetRotation();
+            if (ImGui::InputFloat3("##RotInput", rotation.m)) {
+                ent->transform.SetRotation(rotation);     
             }
             // scale
-            memcpy(&prop_scl, &ent->transform.GetScale()[0], sizeof(float) * 3);
             ImGui::Text("Scl");
             ImGui::SameLine();
-            if (ImGui::InputFloat3("##SclInput", prop_scl)) {
-                ent->transform.SetScale(vec3{prop_scl[0], prop_scl[1], prop_scl[2]});     
+            vec3 scale = ent->transform.GetScale();
+            if (ImGui::InputFloat3("##SclInput", scale.m)) {
+                ent->transform.SetScale(scale);     
             }
         }
 

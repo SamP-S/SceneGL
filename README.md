@@ -7,35 +7,55 @@ A simple OpenGL rendering engine for experimenting with graphics and game engine
 Goals:
     ## Tasks
 
-    ### Graphics
+    ### Rendering
     - [x] Implement OpenGL rasterization
     - [x] Create graphics layer interface to abstract OpenGL implementation
-    - [ ] Implement raycasting/raytracing rendering
-    - [ ] Implement radiosity lighting
-    - [ ] Support camera movement
+    - [x] Support lighting
+    - [x] Implement Point Lights
+    - [x] Implement Directional Lights
+    - [ ] Implement Spot Lights
+    - [ ] Support materials
+    - [ ] Support textures
     - [ ] Wireframe rendering
-    - [ ] Draw physics
+
+    ### Camera
+    - [x] Support cameras
+    - [x] Support camera movement
+    - [ ] Render all cameras in scene
+    - [ ] Show camera preview
 
     ### Physics
     - [ ] Implement AABB collision detection
     - [ ] Implement collision reponse/fixing
     - [ ] Implement raycasting support
+    - [ ] Draw physics
 
     ### Entity/Components
     - [x] Implement entities
-    - [ ] Implement components
-    - [ ] Implement entity-component engine
+    - [x] Implement components
+    - [x] Implement entity-component engine
     - [x] Implement scene tree
-    - [ ] Support empty enities
+    - [x] Support empty enities
+    - [ ] Pass as references not pointers
+    - [ ] Support build pattern creation
 
     ### Resources
     - [x] Implement general resource manager
+    - [ ] Use integer id handle system
+    - [ ] Force all instance creation through resource manager
+    - [ ] Resource manager built into resource
+
+    ### Assets
+    - [x] Implement asset manager
     - [ ] Support audio files
     - [ ] Support image files
     - [ ] Support text files
-    - [ ] Support 3D model files
+    - [x] Support 3D model files
     - [ ] Support animation files
-    - [ ] 
+
+    ### GUI
+    - [x] Implement ImGui
+    - [ ] Support dynamic gui loading with interfaces
 
     ### Networking
     - [ ] Implement networking socket support
@@ -46,6 +66,10 @@ Goals:
     ### OS Support
     - [x] Support Linux
     - [ ] Support Windows
+
+    ### Experimental
+    - [ ] Implement raycasting/raytracing rendering
+    - [ ] Implement radiosity lighting
 
 
 ## Compilation

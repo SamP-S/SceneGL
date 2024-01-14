@@ -85,7 +85,9 @@
         },
         "components": [
             {
-                "mesh": "Icosphere-Mesh"
+                "mesh": {
+                    "meshName": "Icosphere-Mesh"
+                }
             }
         ]
     },
@@ -110,7 +112,9 @@
         },
         "components": [
             {
-                "mesh": "Icosphere-Mesh"
+                "mesh": {
+                    "meshName": "Icosphere-Mesh"
+                }
             }
         ]
     },
@@ -135,7 +139,9 @@
         },
         "components": [
             {
-                "mesh": "Cylinder-Mesh"
+                "mesh": {
+                    "meshName": "Cylinder-Mesh"
+                }
             }
         ]
     },
@@ -160,7 +166,9 @@
         },
         "components": [
             {
-                "mesh": "Plane-Mesh"
+                "mesh": {
+                    "meshName": "Plane-Mesh"
+                }
             }
         ]
     },
@@ -185,7 +193,9 @@
         },
         "components": [
             {
-                "mesh": "Cone-Mesh"
+                "mesh": {
+                    "meshName": "Cone-Mesh"
+                }
             }
         ]
     },
@@ -210,7 +220,9 @@
         },
         "components": [
             {
-                "mesh": "Cube-Mesh"
+                "mesh": {
+                    "meshName": "Cube-Mesh"
+                }
             }
         ]
     },
@@ -235,7 +247,9 @@
         },
         "components": [
             {
-                "mesh": "Dome-Mesh"
+                "mesh": {
+                    "meshName": "Dome-Mesh"
+                }
             }
         ]
     },
@@ -260,7 +274,9 @@
         },
         "components": [
             {
-                "mesh": "Sphere-Mesh"
+                "mesh": {
+                    "meshName": "Sphere-Mesh"
+                }
             },
             {
                 "pointLight": {
@@ -296,7 +312,9 @@
         },
         "components": [
             {
-                "mesh": "Dome-Mesh"
+                "mesh": {
+                    "meshName": "Dome-Mesh"
+                }
             }
         ]
     },
@@ -321,7 +339,9 @@
         },
         "components": [
             {
-                "mesh": "Cube-Mesh"
+                "mesh": {
+                    "meshName": "Cube-Mesh"
+                }
             }
         ]
     }

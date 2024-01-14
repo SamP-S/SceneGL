@@ -4,34 +4,51 @@
 #include <string>
 #include <algorithm>
 
+#include "object.hpp"
 #include "component.hpp"
 #include "resource.hpp"
 #include "resource_manager.hpp"
 #include "transform.hpp"
 
-typedef int EntityId;
+class Entity : public Object {
+    private:
+        std::vector<Entity*> _children;
+        Entity* _parent = nullptr;
+        std::string _name = "";
+        std::vector<Component*> _components;
 
-class Entity {
-      
     public:
+        // public accessor
         Transform transform = Transform(*this);
 
         Entity(std::string name, Entity* parent);
 
+        // JSON
+        std::string Type();
+        void FromJson(json j);
+        json ToJson();
+        std::string ToString();
+
+        // name
         std::string GetName();
         void SetName(std::string name);
 
+        // children
         void AddChild(Entity* child);
         int GetNumChildren();
         Entity* GetChild(int index);
         Entity* FindChild(std::string key);
         int FindChildIndex(std::string key);
         int FindChildIndex(Entity* key);
+        bool RemoveChild(int index);
+        bool RemoveChild(Entity* key);
 
+        // parent
         bool IsRoot();
         Entity* GetParent();
         void SetParent(Entity* parent);
 
+        //components
         int GetNumComponents();
 
         template<typename T>
@@ -46,22 +63,15 @@ class Entity {
         template<typename T>
         std::vector<T*> GetComponentsInChildren();
 
-        void AddComponent(Component* component);
-        void RemoveComponent(Component* key);
+        template<typename T>
+        T* AddComponent();
 
-    private:
+        template<typename T>
+        T* AddComponent(T* component);
 
-        bool RemoveChild(int index);
-        bool RemoveChild(Entity* key);
+        template<typename T>
+        bool RemoveComponent(T* key);
 
-        std::vector<Entity*> _children;
-        Entity* _parent = nullptr;
-        std::string _name = "";
-
-        EntityId _entityId = 0;
-        static EntityId _nextId;
-
-        std::vector<Component*> _components;
         
 };
 

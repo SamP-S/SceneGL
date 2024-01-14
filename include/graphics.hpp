@@ -118,30 +118,10 @@ class GraphicsEngine {
 
             json jsonFile = json::parse(inputFile);
             for (const auto& entJson : jsonFile) {
-                // parse main structs
-                std::string name = entJson["name"];
-                json components = entJson["components"];
                 // create entity
-                Entity* ent = new Entity(name, rootEntity);
-                ent->transform.FromJson(entJson["transform"]);
+                Entity* ent = new Entity("Default Name", rootEntity);
+                ent->FromJson(entJson);
                 rootEntity->AddChild(ent);
-                // create component(s)
-                for (const auto& component : components) {
-                    if (component.find("directionalLight") != component.end()) {
-                        DirectionalLight* c = new DirectionalLight(*ent);
-                        c->FromJson(component["directionalLight"]);
-                        ent->AddComponent(c);
-                    } else if (component.find("pointLight") != component.end()) {
-                        PointLight* c = new PointLight(*ent);
-                        c->FromJson(component["pointLight"]);
-                        ent->AddComponent(c);
-                    }
-                    else if (component.find("meshRenderer") != component.end()) {
-                        MeshRenderer* c = new MeshRenderer(*ent);
-                        c->FromJson(component["meshRenderer"]);
-                        ent->AddComponent(c);
-                    }
-                }
             }
             inputFile.close();
             return true;

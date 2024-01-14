@@ -1,14 +1,70 @@
 #pragma once
 
 #include "entity.hpp"
-
+#include "light_directional.hpp"
+#include "light_point.hpp"
+#include "mesh_renderer.hpp"
 
 Entity::Entity(std::string name, Entity* parent) :
+    Object(),
     _name(name),
-    _parent(parent) {
-        _entityId = Entity::_nextId++;
-    };
+    _parent(parent) {}
 
+
+// JSON
+/// TODO: Derive parent from JSON
+
+std::string Entity::Type() {
+    return "Entity";
+}
+
+void Entity::FromJson(json j) {
+    // parse entity
+    _name = j["name"];
+    json components = j["components"];
+    transform.FromJson(j["transform"]);
+    // create component(s)
+    for (const auto& component : components) {
+        if (component.find("directionalLight") != component.end()) {
+            DirectionalLight* c = new DirectionalLight(*this);
+            c->FromJson(component["directionalLight"]);
+            AddComponent(c);
+        } else if (component.find("pointLight") != component.end()) {
+            PointLight* c = new PointLight(*this);
+            c->FromJson(component["pointLight"]);
+            AddComponent(c);
+        }
+        else if (component.find("meshRenderer") != component.end()) {
+            MeshRenderer* c = new MeshRenderer(*this);
+            c->FromJson(component["meshRenderer"]);
+            AddComponent(c);
+        }
+    }
+}
+
+json Entity::ToJson() {
+    json j;
+    j["name"] = _name;
+    j["transform"] = transform.ToJson();
+    json components;
+    for (const auto& component : _components) {
+        if (auto directionalLight = dynamic_cast<DirectionalLight*>(component)) {
+            components.push_back(directionalLight->ToJson());
+        } else if (auto pointLight = dynamic_cast<PointLight*>(component)) {
+            components.push_back(pointLight->ToJson());
+        } else if (auto meshRenderer = dynamic_cast<MeshRenderer*>(component)) {
+            components.push_back(meshRenderer->ToJson());
+        }
+    }
+    j["components"] = components;
+    return j;
+}
+
+std::string Entity::ToString() {
+    return "Entity()" + _name;
+}
+
+// name attribute 
 std::string Entity::GetName() {
     return _name;
 }
@@ -17,6 +73,28 @@ void Entity::SetName(std::string name) {
     _name = name;
 }
 
+// components
+int Entity::GetNumComponents() {
+    return _components.size();
+}
+
+// parent attribute
+bool Entity::IsRoot() {
+    return _parent == NULL;
+}
+
+Entity* Entity::GetParent() {
+    return _parent;
+}
+
+void Entity::SetParent(Entity* parent) {
+    if (_parent != NULL) {
+        _parent->RemoveChild(this);
+    }
+    _parent = parent;
+}
+
+// entity tree/children
 void Entity::AddChild(Entity* child) {
     _children.push_back(child);
 }
@@ -53,44 +131,6 @@ int Entity::FindChildIndex(Entity* key) {
     return -1;
 }
 
-bool Entity::IsRoot() {
-    return _parent == NULL;
-}
-
-Entity* Entity::GetParent() {
-    return _parent;
-}
-
-void Entity::SetParent(Entity* parent) {
-    if (_parent != NULL) {
-        _parent->RemoveChild(this);
-    }
-    _parent = parent;
-}
-
-int Entity::GetNumComponents() {
-    return _components.size();
-}
-
-void Entity::AddComponent(Component* component) {
-    if (component == nullptr) {
-        std::cout << "WARNING (Entity): Trying to add NULL component." << std::endl;
-        return;
-    }
-    _components.push_back(component);
-}
-
-void Entity::RemoveComponent(Component* key) {
-    if (key == nullptr) {
-        std::cout << "WARNING (Entity): Trying to remove NULL component." << std::endl;
-        return;
-    }
-    auto it = std::find(_components.begin(), _components.end(), key);
-    if (it != _components.end()) {
-        _components.erase(it);
-    }
-}
-
 bool Entity::RemoveChild(int index) {
     if (index < 0 || index >= GetNumChildren()) {
         std::cout << "WARNING (Entity): Trying to remove child of invalid index." << std::endl;
@@ -103,6 +143,3 @@ bool Entity::RemoveChild(int index) {
 bool Entity::RemoveChild(Entity* key) {
     return RemoveChild(FindChildIndex(key));
 }
-
-
-EntityId Entity::_nextId = 0;

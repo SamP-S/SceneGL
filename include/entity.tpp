@@ -46,3 +46,34 @@ std::vector<T*> Entity::GetComponentsInChildren() {
     }
     return results;
 }
+
+template<typename T>
+T* Entity::AddComponent() {
+    T* c = new T();
+    _components.push_back(c);
+}
+
+template<typename T>
+T* Entity::AddComponent(T* c){ 
+    if (c == nullptr) {
+        std::cout << "WARNING (Entity): Trying to add NULL component." << std::endl;
+        return nullptr;
+    }
+    _components.push_back(c);
+}
+
+template<typename T>
+bool Entity::RemoveComponent(T* key) {
+    if (key == nullptr) {
+        std::cout << "WARNING (Entity): Trying to remove NULL component." << std::endl;
+        return false;
+    }
+    auto it = std::find(_components.begin(), _components.end(), key);
+    if (it == _components.end()) {
+        std::cout << "WARNING (Entity): Trying to remove component not owned by entity." << std::endl;
+        return false;
+    }
+    _components.erase(it);
+    delete key;
+    return true;
+}

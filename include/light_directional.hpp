@@ -20,6 +20,28 @@ public:
     std::string ComponentType() {
         return "DirectionalLight";
     }
+
+    void FromJson(json j) {
+        json colour = j["colour"];
+        _colour = vec3({colour["r"], colour["g"], colour["b"]});
+        _intensity = j["intensity"];
+    }
+
+    json ToJson() {
+        json j;
+        j["colour"] = {{"r", _colour.x}, {"g", _colour.y}, {"b", _colour.z}};
+        j["intensity"] = _intensity;
+        return j;
+    }
+
+    std::string ToString() {
+        std::string s = "DirectionalLight(";
+        s += "r=" + std::to_string(_colour[0]) + ", ";
+        s += "g=" + std::to_string(_colour[1]) + ", ";
+        s += "b=" + std::to_string(_colour[2]) + ", ";
+        s += "intensity=" + std::to_string(_intensity) + ")";
+        return s;
+    }
     
     vec3 GetColour() {
         return _colour;

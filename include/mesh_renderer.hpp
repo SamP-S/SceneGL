@@ -12,6 +12,26 @@ class MeshRenderer : public Component {
             Component(entity),
             _meshId(id) {}
 
+        std::string ComponentType() {
+            return "MeshRenderer";
+        }
+
+        void FromJson(json j) {
+            _meshId = resourceMeshes.GetId(j["meshName"]);
+        }
+
+        json ToJson() {
+            json j;
+            j["meshName"] = resourceMeshes.Get(_meshId)->GetName();
+            return j;
+        }
+
+        std::string ToString() {
+            std::string s = "MeshRenderer(";
+            s += resourceMeshes.Get(_meshId)->GetName() + ")";
+            return s;
+        }
+
         ObjId GetMeshId() {
             return _meshId;
         }
@@ -30,10 +50,6 @@ class MeshRenderer : public Component {
                 mesh->Render(wireframe);
                 return true;
             }
-        }
-
-        std::string ComponentType() {
-            return "MeshRenderer";
         }
 
     private:

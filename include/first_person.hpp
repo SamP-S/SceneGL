@@ -37,6 +37,24 @@ class FirstPersonController : public Component {
             return "FirstPersonController";
         }
 
+        void FromJson(json j) {
+            _sens = j["sensitivity"];
+            _speed = j["speed"];
+        }
+
+        json ToJson() {
+            json j;
+            j["sensitivity"] = _sens;
+            j["speed"] = _speed;
+            return j;
+        }
+
+        std::string ToString() {
+            std::string s = "FirstPersonController(";
+            s += std::to_string(_sens) + ", " + std::to_string(_speed) + ")";
+            return s;
+        }
+
         float GetLookSensitivity() {
             return _sens;
         }

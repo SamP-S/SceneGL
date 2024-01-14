@@ -3,7 +3,10 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <string>
 
+#include "json.hpp"
+using namespace nlohmann;
 #include "transform.hpp"
 
 class Entity;
@@ -17,4 +20,7 @@ public:
     ~Component();
 
     virtual std::string ComponentType() = 0;
+    virtual void FromJson(json j) = 0;
+    virtual json ToJson() = 0;
+    virtual std::string ToString() = 0;
 };

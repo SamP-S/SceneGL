@@ -32,6 +32,28 @@ class Camera : public Component {
             return "Camera";
         }
 
+        void FromJson(json j) {
+            _fov = j["fov"];
+            _near = j["near"];
+            _far = j["far"];
+        }
+ 
+        json ToJson() {
+            json j;
+            j["fov"] = _fov;
+            j["near"] = _near;
+            j["far"] = _far;
+            return j;
+        }
+
+        std::string ToString() {
+            std::string s = "camera(";
+            s += std::to_string(_fov) + ", ";
+            s += std::to_string(_near) + ", ";
+            s += std::to_string(_far) + ")";
+            return s;
+        }
+
         float GetFov() {
             return _fov;
         }

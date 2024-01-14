@@ -37,9 +37,6 @@ class Application {
         bool show_firstperson_window = true;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
-        float prop_pos[3] = {0.0f, 0.0f, 0.0f};
-        float prop_rot[3] = {0.0f, 0.0f, 0.0f};
-        float prop_scl[3] = {0.0f, 0.0f, 0.0f};
         bool renderer_focused = false;
         ImVec2 render_region_min = ImVec2();
         ImVec2 render_region_max = ImVec2();

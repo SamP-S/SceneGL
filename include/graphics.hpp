@@ -142,8 +142,6 @@ class GraphicsEngine {
                         ent->AddComponent(c);
                     }
                 }
-
-                std::cout << std::endl; // Separating each object for clarity
             }
             inputFile.close();
             return true;
@@ -233,13 +231,36 @@ class GraphicsEngine {
             return result;
         }
 
+        void Draw(MeshRenderer& renderer, bool wireframe=false) {
+            ObjId meshId = renderer.GetMeshId();
+            if (meshId != 0) {
+                Mesh* mesh = resourceMeshes.Get(meshId);
+                if (mesh == NULL || !mesh->GetIsGenerated()) {
+                    std::cout << "WARNING (Graphics): Attempting to render a bad mesh." << std::endl;
+                    return;
+                }
+
+                GL_Interface::BindVertexArrayObject(mesh->vao);
+                if (wireframe) {
+                    GL_Interface::PolygonMode(POLYGON_LINE);
+                    GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, mesh->GetVerticesSize());
+                    GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
+                    GL_Interface::PolygonMode(POLYGON_FILL);
+                } else {
+                    GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, mesh->GetVerticesSize());
+                    GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
+                }
+                return;
+            }
+        }
+
         void RenderSelected(Entity* entity, Shader* shader=NULL, bool wireframe=false) {
             MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
             if (renderer == nullptr || renderer->GetMeshId() == 0)
                 return;
             mat4 model = GetCoordinateSystem(entity);
             shader->SetMat4("iModel", &model[0][0]);
-            renderer->Render(wireframe);
+            Draw(*renderer);
         }
 
         void RenderObject(Entity* entity, mat4 root_trans = mat4(), Shader* shader=NULL, bool wireframe=false) {
@@ -250,10 +271,10 @@ class GraphicsEngine {
 
             // ensure mesh not empty
             MeshRenderer* renderer = entity->GetComponent<MeshRenderer>();
-            if (renderer == nullptr || renderer->GetMeshId() == 0 )
+            if (renderer == nullptr || renderer->GetMeshId() == 0)
                 return; 
             shader->SetMat4("iModel", &model[0][0]);
-            renderer->Render(wireframe);
+            Draw(*renderer);
         }
 
         void Render() {

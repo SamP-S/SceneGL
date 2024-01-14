@@ -40,18 +40,6 @@ class MeshRenderer : public Component {
             _meshId = id;
         }
 
-        bool Render(bool wireframe=false) {
-            if (_meshId != 0) {
-                Mesh* mesh = resourceMeshes.Get(_meshId);
-                if (mesh == NULL) {
-                    std::cout << "WARNING: Tried rendering NULL mesh." << std::endl;
-                    return false;;
-                }
-                mesh->Render(wireframe);
-                return true;
-            }
-        }
-
     private:
         ObjId _meshId;
 };

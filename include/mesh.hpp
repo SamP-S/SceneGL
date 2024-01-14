@@ -15,14 +15,14 @@ using namespace LA;
 // multiple materials for a submesh need multiple sub-meshes
 
 class Mesh : public Resource {
-
+    private:
+        bool _isGenerated = false;
 
     public:
         uint32_t vertexBO, normalBO, uvBO, colourBO, indicieBO = -1;
         uint32_t vao = 0;
         uint32_t material = 0;
-
-        bool isGenerated = false;
+        
 
     // todo add assimp loaded meshes
         Mesh(std::string name)
@@ -71,24 +71,6 @@ class Mesh : public Resource {
             return "Mesh" + std::to_string(vao);
         }
 
-        void Render(bool wireframe=false) {
-            if (!isGenerated) {
-                std::cout << "ERROR: Attempting to render a mesh with no buffers." << std::endl;
-            }
-            GL_Interface::BindVertexArrayObject(this->vao);
-            if (wireframe) {
-                GL_Interface::PolygonMode(POLYGON_LINE);
-                GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, this->GetVerticesSize());
-                GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
-                GL_Interface::PolygonMode(POLYGON_FILL);
-            } else {
-                // GL_Interface::PolygonMode(POLYGON_FILL);
-                GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, this->GetVerticesSize());
-                GL_Interface::DrawElements(DRAW_TRIANGLES, this->GetIndiciesSize(), TYPE_UINT);
-            }
-            
-        }
-
         std::vector<vec3> GetVertices() { return _vertices; }
         void SetVertices(std::vector<vec3> vertices) { 
             _vertices = vertices;
@@ -131,6 +113,10 @@ class Mesh : public Resource {
         }
         int GetIndiciesSize() { return _indicies.size(); }
 
+        bool GetIsGenerated() {
+            return _isGenerated;
+        }
+        
     private:
 
         std::vector<vec3> _vertices = std::vector<vec3>();
@@ -162,7 +148,7 @@ class Mesh : public Resource {
                 GL_Interface::VertexAttribPtr(ATTRIB_LOC_COLOUR, 4, TYPE_FLOAT);
             }
             GL_Interface::BindElementBufferObj(this->indicieBO);
-            isGenerated = true;
+            _isGenerated = true;
         }
 };
 

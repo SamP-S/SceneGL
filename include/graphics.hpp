@@ -161,32 +161,38 @@ class GraphicsEngine {
         void ShaderDirectionalLights(Shader& shader) {
             // directional lights
             std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
-            for (int i = 0; i < dirLights.size(); i++) {
-                if (i >= 4) {
+            if (dirLights.size() >= DIRECTIONAL_LIGHT_MAX) {
                     std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
-                    break;
                 }
+            for (int i = 0; i < DIRECTIONAL_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
-                shader.SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform.GetForward());
-                shader.SetFloat("iDirectionalLights" + index + ".intensity", dirLights[i]->GetIntensity());
-                shader.SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
-                shader.SetInt("iDirectionalLights" + index + ".enabled", 1);
+                if (i < dirLights.size()) {
+                    shader.SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform.GetForward());
+                    shader.SetFloat("iDirectionalLights" + index + ".intensity", dirLights[i]->GetIntensity());
+                    shader.SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
+                    shader.SetInt("iDirectionalLights" + index + ".enabled", 1);
+                } else {
+                    shader.SetInt("iDirectionalLights" + index + ".enabled", 0);
+                }
             }
         }
 
         void ShaderPointLights(Shader& shader) {
             // point lights
             std::vector<PointLight*> pointLights = rootEntity->GetComponentsInChildren<PointLight>();
-            for (int i = 0; i < pointLights.size(); i++) {
-                if (i >= 16) {
-                    std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
-                    break;
-                }
+            if (pointLights.size() >= POINT_LIGHT_MAX) {
+                std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
+            }
+            for (int i = 0; i < POINT_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
-                shader.SetVec3("iPointLights" + index + ".position", pointLights[i]->transform.GetPosition());
-                shader.SetFloat("iPointLights" + index + ".intensity", pointLights[i]->GetIntensity());
-                shader.SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
-                shader.SetInt("iPointLights" + index + ".enabled", 1);
+                if (i < pointLights.size()) {
+                    shader.SetVec3("iPointLights" + index + ".position", pointLights[i]->transform.GetPosition());
+                    shader.SetFloat("iPointLights" + index + ".intensity", pointLights[i]->GetIntensity());
+                    shader.SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
+                    shader.SetInt("iPointLights" + index + ".enabled", 1);
+                } else {
+                    shader.SetInt("iPointLights" + index + ".enabled", 0);
+                }
             }
         }
 

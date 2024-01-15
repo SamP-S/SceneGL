@@ -4,6 +4,8 @@
 #include "la_extended.h"
 using namespace LA;
 
+#define POINT_LIGHT_MAX 16
+
 class PointLight : public Component {
 private:
     vec3 _colour = vec3({1.0f, 1.0f, 1.0f});

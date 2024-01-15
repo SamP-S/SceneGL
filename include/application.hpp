@@ -43,6 +43,7 @@ class Application {
         ImVec2 window_pos = ImVec2();
         Entity* entitySelected = NULL;
         int new_entity_count = 0;
+        int componentPanelCount = 0;
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -408,7 +409,11 @@ class Application {
                 return;
             }
             ImGui::Separator();
-            ImGui::Text("MeshRenderer");
+            ImGui::Text("Mesh Renderer");
+            ImGui::SameLine();
+            if (ImGui::Button("X##1")) {
+                ent->RemoveComponent<MeshRenderer>(renderer);
+            }
             int meshId = renderer->GetMeshId();
             if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
                 for (auto it = resourceMeshes.begin(); it != resourceMeshes.end(); it++) {
@@ -429,6 +434,10 @@ class Application {
             }
             ImGui::Separator();
             ImGui::Text("Camera");
+            ImGui::SameLine();
+            if (ImGui::Button("X##2")) {
+                ent->RemoveComponent<Camera>(camera);
+            }
             float fov = camera->GetFov();
             if (ImGui::SliderFloat("FOV", &fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat)) {
                 camera->SetFov(fov);
@@ -444,6 +453,10 @@ class Application {
             }
             ImGui::Separator();
             ImGui::Text("Directional Light");
+            ImGui::SameLine();
+            if (ImGui::Button("X##3")) {
+                ent->RemoveComponent<DirectionalLight>(dirLight);
+            }
             vec3 colour = dirLight->GetColour();
             if (ImGui::InputFloat3("Colour", colour.m)) {
                 dirLight->SetColour(colour);    
@@ -463,6 +476,10 @@ class Application {
             }
             ImGui::Separator();
             ImGui::Text("Point Light");
+            ImGui::SameLine();
+            if (ImGui::Button("X##4")) {
+                ent->RemoveComponent<PointLight>(pointLight);
+            }
             vec3 colour = pointLight->GetColour();
             if (ImGui::InputFloat3("Colour", colour.m)) {
                 pointLight->SetColour(colour);    

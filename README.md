@@ -38,6 +38,7 @@ Goals:
     - [x] Support empty enities
     - [ ] Pass as references not pointers
     - [ ] Support build pattern creation
+    - [ ] Children in JSON
 
     ### Resources
     - [x] Implement general resource manager
@@ -52,6 +53,13 @@ Goals:
     - [ ] Support text files
     - [x] Support 3D model files
     - [ ] Support animation files
+
+    ### Shaders
+    - [ ] Live shader editing
+
+    ### Scene
+    - [ ] Implement scene manager
+    - [ ] Load/save scene to file
 
     ### GUI
     - [x] Implement ImGui

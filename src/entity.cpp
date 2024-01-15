@@ -10,6 +10,14 @@ Entity::Entity(std::string name="Default Name", Entity* parent=nullptr) :
     _name(name),
     _parent(parent) {}
 
+Entity::~Entity() {
+    for (const auto& component : _components) {
+        delete component;
+    }
+    for (const auto& child : _children) {
+        delete child;
+    }
+}
 
 // JSON
 /// TODO: Derive parent from JSON

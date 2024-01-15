@@ -22,6 +22,7 @@ class Entity : public Object {
         Transform transform = Transform(*this);
 
         Entity(std::string name, Entity* parent);
+        ~Entity();
 
         // JSON
         std::string Type();

@@ -31,6 +31,7 @@ using namespace LA;
 #include "light_directional.hpp"
 #include "light_point.hpp"
 #include "filepath.hpp"
+#include "scene.hpp"
 #include "json.hpp"
 using namespace nlohmann;
 
@@ -41,10 +42,10 @@ class GraphicsEngine {
         void* context;
         WindowManager* window;
         frame_timer ft = frame_timer();
-        Frame* frame = NULL;
+        Frame* frame = nullptr;
         int width, height;
-        Entity* rootEntity = NULL;
-        Entity* workspaceCamera = NULL;
+        Scene* scene = nullptr;
+        Entity* workspaceCamera = nullptr;
 
         FirstPersonController* fpc;
         Camera* camera;
@@ -79,21 +80,15 @@ class GraphicsEngine {
             assetManager.Load("models/presets/sphere.gltf");
 
             /// TODO: load project shader(s)
-            rootEntity = new Entity("scene", NULL);
-
-            LoadScene("scene/Preset.json");
-
-            // Entity* cube = new Entity("cube", rootEntity);
-            // rootEntity->AddChild(cube);
-            // Component* c = new MeshRenderer(*cube, resourceMeshes.GetId("cube::0::Cube"));
-            // cube->AddComponent(c);
+            scene = new Scene();
+            scene->FromJson(LoadJson("scene/Preset.json"));
 
             workspaceCamera = new Entity("Workspace Camera", NULL);
-            camera = new Camera(*workspaceCamera);
-            fpc = new FirstPersonController(*workspaceCamera);
+            camera = new Camera(workspaceCamera);
+            fpc = new FirstPersonController(workspaceCamera);
             
-            workspaceCamera->transform.SetPosition(vec3{-8,5,8});
-            workspaceCamera->transform.SetRotation(vec3({PI/2, PI, 0.0f}));
+            workspaceCamera->transform->SetPosition(vec3{-8,5,8});
+            workspaceCamera->transform->SetRotation(vec3({PI/2, PI, 0.0f}));
 
             resourceShaders.Get("base")->Use();
             camera->SetResolution(width, height);
@@ -105,8 +100,7 @@ class GraphicsEngine {
             delete frame;
         }
 
-        /// TODO: Implement as recursive and implement FromJson & ToJson functions for everything
-        bool LoadScene(std::string filepath) {
+        json LoadJson(std::string filepath) {
             std::ifstream inputFile(filepath);
             if (!inputFile.good()) {
                 std::cout << "WARNING (Graphics): Scene file does not exist: " << filepath << std::endl;
@@ -115,16 +109,9 @@ class GraphicsEngine {
                 std::cout << "WARNING (Graphics): Can't open file: " << filepath << std::endl;
                 return false;
             }
-
             json jsonFile = json::parse(inputFile);
-            for (const auto& entJson : jsonFile) {
-                // create entity
-                Entity* ent = new Entity("Default Name", rootEntity);
-                ent->FromJson(entJson);
-                rootEntity->AddChild(ent);
-            }
             inputFile.close();
-            return true;
+            return jsonFile;
         }
 
         bool AttachWindow(WindowManager* window) {
@@ -158,16 +145,15 @@ class GraphicsEngine {
             float ratio = width / height;
         }
 
-        void ShaderDirectionalLights(Shader& shader) {
+        void ShaderDirectionalLights(Shader& shader, const std::vector<DirectionalLight*>& dirLights) {
             // directional lights
-            std::vector<DirectionalLight*> dirLights = rootEntity->GetComponentsInChildren<DirectionalLight>();
             if (dirLights.size() >= DIRECTIONAL_LIGHT_MAX) {
                     std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
                 }
             for (int i = 0; i < DIRECTIONAL_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
                 if (i < dirLights.size()) {
-                    shader.SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform.GetForward());
+                    shader.SetVec3("iDirectionalLights" + index + ".direction", dirLights[i]->transform->GetForward());
                     shader.SetFloat("iDirectionalLights" + index + ".intensity", dirLights[i]->GetIntensity());
                     shader.SetVec3("iDirectionalLights" + index + ".colour", dirLights[i]->GetColour());
                     shader.SetInt("iDirectionalLights" + index + ".enabled", 1);
@@ -177,16 +163,15 @@ class GraphicsEngine {
             }
         }
 
-        void ShaderPointLights(Shader& shader) {
+        void ShaderPointLights(Shader& shader, const std::vector<PointLight*>& pointLights) {
             // point lights
-            std::vector<PointLight*> pointLights = rootEntity->GetComponentsInChildren<PointLight>();
             if (pointLights.size() >= POINT_LIGHT_MAX) {
                 std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
             }
             for (int i = 0; i < POINT_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
                 if (i < pointLights.size()) {
-                    shader.SetVec3("iPointLights" + index + ".position", pointLights[i]->transform.GetPosition());
+                    shader.SetVec3("iPointLights" + index + ".position", pointLights[i]->transform->GetPosition());
                     shader.SetFloat("iPointLights" + index + ".intensity", pointLights[i]->GetIntensity());
                     shader.SetVec3("iPointLights" + index + ".colour", pointLights[i]->GetColour());
                     shader.SetInt("iPointLights" + index + ".enabled", 1);
@@ -196,7 +181,7 @@ class GraphicsEngine {
             }
         }
 
-        void SetupShader(Shader& shader) {
+        void SetupShader(Shader& shader, const std::vector<DirectionalLight*>& dirLights, const std::vector<PointLight*>& pointLights) {
             shader.Use();
             // vertex uniforms
             shader.SetMat4("iView", &fpc->view[0][0]);
@@ -206,21 +191,22 @@ class GraphicsEngine {
             shader.SetFloat("iTime", ft.GetTotalElapsed());
             shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
             shader.SetInt("iFrame", ft.GetFrameCount());
-            shader.SetVec3("iCameraPosition", workspaceCamera->transform.GetPosition());       
-            ShaderDirectionalLights(shader);
-            ShaderPointLights(shader);     
+            shader.SetVec3("iCameraPosition", workspaceCamera->transform->GetPosition()); 
+ 
+            ShaderDirectionalLights(shader, dirLights);
+            ShaderPointLights(shader, pointLights);     
         }
 
         /// TODO: Migrate to transform
         mat4 GetCoordinateSystem(Entity* entCoord) {
             if (entCoord == nullptr)
                 return mat4();
-            mat4 result = entCoord->transform.GetTransform();
+            mat4 result = entCoord->transform->GetTransform();
             while (true) {
                 if (entCoord->GetParent() != nullptr)
                     break;
                 entCoord = entCoord->GetParent();
-                result = entCoord->transform.GetTransform() * result;
+                result = entCoord->transform->GetTransform() * result;
             }
             return result;
         }
@@ -258,7 +244,7 @@ class GraphicsEngine {
         }
 
         void RenderObject(Entity* entity, mat4 root_trans = mat4(), Shader* shader=NULL, bool wireframe=false) {
-            mat4 model = root_trans *  entity->transform.GetTransform();
+            mat4 model = root_trans *  entity->transform->GetTransform();
             for (int i = 0; i < entity->GetNumChildren(); i++) {
                 RenderObject(entity->GetChild(i), model, shader, wireframe);
             }
@@ -278,8 +264,11 @@ class GraphicsEngine {
             GL_Interface::SetViewport(width, height);
             GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
+            std::vector<DirectionalLight*> dirLights = scene->at(0)->GetComponentsInChildren<DirectionalLight>();
+            std::vector<PointLight*> pointLights = scene->at(0)->GetComponentsInChildren<PointLight>();    
+
             for (auto& shaderPair : resourceShaders) {
-                SetupShader(*shaderPair.second);
+                SetupShader(*shaderPair.second, dirLights, pointLights);
             }
 
             Shader* baseShader = resourceShaders.Get("base");
@@ -288,22 +277,26 @@ class GraphicsEngine {
             camera->SetResolution(width, height);
             fpc->Update();
 
-            // draw lit
-            GL_Interface::EnableFeature(FEATURE_DEPTH);
-            GL_Interface::EnableFeature(FEATURE_CULL);
-            GL_Interface::SetFrontFace(FRONT_CCW);
-            lightingShader->Use();
-            RenderObject(rootEntity, mat4(), lightingShader, false);
+            for (auto& ent : *scene) {
+                // draw lit
+                GL_Interface::EnableFeature(FEATURE_DEPTH);
+                GL_Interface::EnableFeature(FEATURE_CULL);
+                GL_Interface::SetFrontFace(FRONT_CCW);
+                lightingShader->Use();
+                RenderObject(ent, mat4(), lightingShader, false);
 
-            // draw wireframe
-            GL_Interface::EnableFeature(FEATURE_DEPTH);
-            GL_Interface::EnableFeature(FEATURE_CULL);
-            baseShader->Use();
-            RenderObject(rootEntity, mat4(), baseShader, true);
+                // draw wireframe
+                GL_Interface::EnableFeature(FEATURE_DEPTH);
+                GL_Interface::EnableFeature(FEATURE_CULL);
+                baseShader->Use();
+                RenderObject(ent, mat4(), baseShader, true);
 
-            // draw selected
-            // baseShader->Use();
-            // RenderSelected()
+                // draw selected
+                // baseShader->Use();
+                // RenderSelected()
+            }
+
+            
 
             frame->Unbind();
             

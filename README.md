@@ -27,6 +27,8 @@ Goals:
     - [x] Support camera movement
     - [ ] Render all cameras in scene
     - [ ] Show camera preview
+    - [ ] Show camera depth preview
+    - [ ] Show camera stencil preview
 
     ### Physics
     - [ ] Implement AABB collision detection

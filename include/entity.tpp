@@ -1,5 +1,3 @@
-#include "component.hpp"
-
 /// TODO: Switch to references instead of pointers
 
 template<typename T>
@@ -67,7 +65,7 @@ std::vector<T*> Entity::GetComponentsInParent() {
     if (IsRoot()) {
         return found;
     }
-    std::vector<T*> parentComponents = p->GetComponentsInParent<T>();
+    std::vector<T*> parentComponents = GetParent()->GetComponentsInParent<T>();
     found.insert(found.end(), parentComponents.begin(), parentComponents.end());
     return found;
 }

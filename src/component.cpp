@@ -1,8 +1,8 @@
 #include "component.hpp"
 #include "entity.hpp"
 
-Component::Component(Entity& entity) :
+Component::Component(Entity* entity) :
     entity(entity),
-    transform(entity.transform) {}
+    transform(entity->transform) {}
 
 Component::~Component() {}

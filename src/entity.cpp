@@ -4,13 +4,16 @@
 #include "light_directional.hpp"
 #include "light_point.hpp"
 #include "mesh_renderer.hpp"
+#include "transform.hpp"
 
 Entity::Entity(std::string name="Default Name", Entity* parent=nullptr) :
     Object(),
+    transform(new Transform(*this)),
     _name(name),
     _parent(parent) {}
 
 Entity::~Entity() {
+    delete transform;
     for (const auto& component : _components) {
         delete component;
     }

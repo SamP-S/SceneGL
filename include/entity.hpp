@@ -5,10 +5,9 @@
 #include <algorithm>
 
 #include "object.hpp"
-#include "component.hpp"
-#include "resource.hpp"
-#include "resource_manager.hpp"
-#include "transform.hpp"
+
+class Component;
+class Transform;
 
 class Entity : public Object {
     private:
@@ -19,7 +18,7 @@ class Entity : public Object {
 
     public:
         // public accessor
-        Transform transform = Transform(*this);
+        Transform* transform;
 
         Entity(std::string name, Entity* parent);
         ~Entity();

@@ -6,16 +6,16 @@
 #include <string>
 
 #include "object.hpp"
+#include "entity.hpp"
 
 class Transform;
-class Entity;
 
 class Component : public Object {
 public:
-    const Entity& entity;
-    Transform& transform;
+    const Entity* entity;
+    Transform* transform;
 
-    Component(Entity& entity);
+    Component(Entity* entity);
     ~Component();
 
     template<typename T>

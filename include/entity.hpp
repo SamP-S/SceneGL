@@ -20,7 +20,7 @@ class Entity : public Object {
         // public accessor
         Transform* transform;
 
-        Entity(std::string name, Entity* parent);
+        Entity(std::string name="Default Entity", Entity* parent=nullptr);
         ~Entity();
 
         // JSON

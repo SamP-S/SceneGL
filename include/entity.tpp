@@ -72,7 +72,7 @@ std::vector<T*> Entity::GetComponentsInParent() {
 
 template<typename T>
 T* Entity::AddComponent() {
-    T* c = new T(*this);
+    T* c = new T(this);
     try {
         _components.push_back(static_cast<Component*>(c));
         return c;

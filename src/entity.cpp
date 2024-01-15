@@ -6,7 +6,7 @@
 #include "mesh_renderer.hpp"
 #include "transform.hpp"
 
-Entity::Entity(std::string name="Default Name", Entity* parent=nullptr) :
+Entity::Entity(std::string name, Entity* parent) :
     Object(),
     transform(new Transform(this)),
     _name(name),

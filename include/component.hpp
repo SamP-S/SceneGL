@@ -18,4 +18,24 @@ public:
     Component(Entity& entity);
     ~Component();
 
+    template<typename T>
+    T* GetComponent();
+
+    template<typename T>
+    T* GetComponentInChildren();
+
+    template<typename T>
+    T* GetComponentInParent();
+
+    template<typename T>
+    std::vector<T*> GetComponents();
+
+    template<typename T>
+    std::vector<T*> GetComponentsInChildren();
+
+    template<typename T>
+    std::vector<T*> GetComponentsInParent();
+
 };
+
+#include "component.tpp"

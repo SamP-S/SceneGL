@@ -501,7 +501,16 @@ class Application {
                 ImGui::Text("Nothing selected");
             } else {
                 Entity* ent = entitySelected;
-                ImGui::Text(ent->GetName().c_str());
+                // entity name
+                ImGui::Text("Name:");
+                std::string name = ent->GetName();
+                char buffer[256];
+                std::strncpy(buffer, name.c_str(), sizeof(buffer));
+                buffer[sizeof(buffer) - 1] = 0; // Ensure null termination
+                if (ImGui::InputText("##NameEntity", buffer, sizeof(buffer))) {
+                    ent->SetName(buffer);
+                }
+                // parent
                 Entity* p = ent->GetParent();
                 ImGui::Text(("Parent: " + ((p == nullptr) ? "ROOT" : p->GetName())).c_str());
                 TransformPanel(ent);

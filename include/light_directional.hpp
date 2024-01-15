@@ -12,7 +12,7 @@ private:
     float _intensity = 1.0f;
 
 public:
-    DirectionalLight(Entity& entity, vec3 colour=vec3({1.0f, 1.0f, 1.0f}), float intensity=1.0f) :
+    DirectionalLight(Entity* entity, vec3 colour=vec3({1.0f, 1.0f, 1.0f}), float intensity=1.0f) :
         Component(entity),
         _colour(colour),
         _intensity(intensity) {}

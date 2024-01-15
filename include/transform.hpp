@@ -10,15 +10,15 @@ class Entity;
 class Transform : public Component {
 
     public:
-        Transform(Entity& entity) :
+        Transform(Entity* entity) :
             Component(entity),
             _position(LA::vec3()), _rotation(LA::vec3()), _scale(LA::vec3(1.0f)) {}
 
-        Transform(Entity& entity, LA::vec3 position) :
+        Transform(Entity* entity, LA::vec3 position) :
             Component(entity),
             _position(position), _rotation(LA::vec3()), _scale(LA::vec3(1.0f)) {}
 
-        Transform(Entity& entity, LA::vec3 position, LA::vec3 rotation, LA::vec3 scale) :
+        Transform(Entity* entity, LA::vec3 position, LA::vec3 rotation, LA::vec3 scale) :
             Component(entity),
             _position(position), _rotation(rotation), _scale(scale) {}
 

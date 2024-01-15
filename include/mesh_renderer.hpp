@@ -8,7 +8,7 @@
 
 class MeshRenderer : public Component {
     public:
-        MeshRenderer(Entity& entity, ObjId id=0) :
+        MeshRenderer(Entity* entity, ObjId id=0) :
             Component(entity),
             _meshId(id) {}
 

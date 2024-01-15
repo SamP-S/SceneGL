@@ -23,7 +23,7 @@ class Camera : public Component {
 
         mat4 proj = mat4();
 
-        Camera(Entity& entity) :
+        Camera(Entity* entity) :
             Component(entity) {}
 
         ~Camera() {}

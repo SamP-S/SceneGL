@@ -13,7 +13,7 @@ private:
     float _range = 10.0f;
 
 public:
-    PointLight(Entity& entity, vec3 colour=vec3({1.0f, 1.0f, 1.0f}), float intensity=1.0f, float range=10.0f) :
+    PointLight(Entity* entity, vec3 colour=vec3({1.0f, 1.0f, 1.0f}), float intensity=1.0f, float range=10.0f) :
         Component(entity),
         _colour(colour),
         _intensity(intensity),

@@ -8,7 +8,7 @@
 
 Entity::Entity(std::string name="Default Name", Entity* parent=nullptr) :
     Object(),
-    transform(new Transform(*this)),
+    transform(new Transform(this)),
     _name(name),
     _parent(parent) {}
 
@@ -33,7 +33,7 @@ void Entity::FromJson(json j) {
     // parse entity
     _name = j["name"];
     json components = j["components"];
-    transform.FromJson(j["transform"]);
+    transform->FromJson(j["transform"]);
     // create component(s)
     for (const auto& component : components) {
         if (component.find("directionalLight") != component.end()) {
@@ -62,7 +62,7 @@ void Entity::FromJson(json j) {
 json Entity::ToJson() {
     json j;
     j["name"] = _name;
-    j["transform"] = transform.ToJson();
+    j["transform"] = transform->ToJson();
     json components;
     for (const auto& component : _components) {
         if (auto directionalLight = dynamic_cast<DirectionalLight*>(component)) {

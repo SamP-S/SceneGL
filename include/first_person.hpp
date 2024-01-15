@@ -28,7 +28,7 @@ class FirstPersonController : public Component {
         int x = 0;
         int y = 0;
 
-        FirstPersonController(Entity& entity) :
+        FirstPersonController(Entity* entity) :
             Component(entity) {}
 
         ~FirstPersonController() {}
@@ -73,16 +73,16 @@ class FirstPersonController : public Component {
         {
             float dxf = 0.1f * _sens * float(dx);
             float dyf = 0.1f * _sens * float(dy);
-            transform.Rotate(dyf, dxf, 0.0f);
+            transform->Rotate(dyf, dxf, 0.0f);
         }
 
         void Move(int dir)
         {
             vec3 translate = vec3();
-            vec3 right = transform.GetRight();
+            vec3 right = transform->GetRight();
             right.y = 0.0f;
             right = Normalise(right);
-            vec3 forward = transform.GetForward();
+            vec3 forward = transform->GetForward();
             forward.y = 0.0f;
             forward = Normalise(forward);
             switch (dir) {
@@ -105,7 +105,7 @@ class FirstPersonController : public Component {
                     translate = forward * _speed * 0.01;
                     break;
             };
-            transform.Translate(translate);
+            transform->Translate(translate);
         } 
 
         void Update()
@@ -133,7 +133,7 @@ class FirstPersonController : public Component {
                 }
                 x = Input::GetMouseX();
                 y = Input::GetMouseY();
-                view = inverse(transform.GetTransform());
+                view = inverse(transform->GetTransform());
 
             } else {
                 active = false;

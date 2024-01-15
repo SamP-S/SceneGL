@@ -356,8 +356,8 @@ class Application {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
             if (Graphics.scene != nullptr) {
-                for (auto ent : Graphics.scene) {
-                    WorldNode(ent);
+                for (auto sceneIt = Graphics.scene->begin(); sceneIt != Graphics.scene->end(); ++sceneIt) {
+                    WorldNode(*sceneIt);
                 }
             }
             ImGui::End();

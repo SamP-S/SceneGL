@@ -18,6 +18,9 @@ Goals:
     - [ ] Support textures
     - [ ] Wireframe rendering
     - [ ] Impl shader loader as asset_loader
+    - [ ] Create renderer interface
+    - [ ] Use opengl calls directly in OpenGL rasterizer
+    - [ ] Remove gl_interface
 
     ### Camera
     - [x] Support cameras

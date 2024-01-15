@@ -5,7 +5,7 @@
 #include "light_point.hpp"
 #include "mesh_renderer.hpp"
 
-Entity::Entity(std::string name, Entity* parent) :
+Entity::Entity(std::string name="Default Name", Entity* parent=nullptr) :
     Object(),
     _name(name),
     _parent(parent) {}
@@ -40,6 +40,12 @@ void Entity::FromJson(json j) {
             c->FromJson(component["meshRenderer"]);
         }
     }
+    json children = j["children"];
+    for (const auto& child : children) {
+        Entity* ent = new Entity();
+        ent->FromJson(child);
+        AddChild(ent);
+    }
 }
 
 json Entity::ToJson() {
@@ -57,6 +63,11 @@ json Entity::ToJson() {
         }
     }
     j["components"] = components;
+    json children;
+    for (const auto& child : _children) {
+        children.push_back(child->ToJson());
+    }
+    j["children"] = children;
     return j;
 }
 

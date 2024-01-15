@@ -29,7 +29,8 @@
                     "intensity": 1.0
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Point Light",
@@ -62,7 +63,8 @@
                     "range": 5.0
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Ico 1",
@@ -89,32 +91,35 @@
                     "meshName": "Icosphere-Mesh"
                 }
             }
-        ]
-    },
-    {
-        "name": "Icosphere-Mesh",
-        "transform": {
-            "position": {
-                "x": 0.000000,
-                "y": 6.093969,
-                "z": 0.000000
-            },
-            "rotation": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 3.000000,
-                "y": 3.000000,
-                "z": 3.000000
-            }
-        },
-        "components": [
+        ],
+        "children": [
             {
-                "meshRenderer": {
-                    "meshName": "Icosphere-Mesh"
-                }
+                "name": "Ico 2",
+                "transform": {
+                    "position": {
+                        "x": 0.000000,
+                        "y": 6.093969,
+                        "z": 0.000000
+                    },
+                    "rotation": {
+                        "x": 0.000000,
+                        "y": 0.000000,
+                        "z": 0.000000
+                    },
+                    "scale": {
+                        "x": 3.000000,
+                        "y": 3.000000,
+                        "z": 3.000000
+                    }
+                },
+                "components": [
+                    {
+                        "meshRenderer": {
+                            "meshName": "Icosphere-Mesh"
+                        }
+                    }
+                ],
+                "children": []
             }
         ]
     },
@@ -143,7 +148,8 @@
                     "meshName": "Cylinder-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Plane-Mesh",
@@ -170,7 +176,8 @@
                     "meshName": "Plane-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Cone-Mesh",
@@ -197,7 +204,8 @@
                     "meshName": "Cone-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Cube-Mesh",
@@ -224,7 +232,8 @@
                     "meshName": "Cube-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Dome-Mesh",
@@ -251,7 +260,8 @@
                     "meshName": "Dome-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Sphere-Mesh",
@@ -289,7 +299,8 @@
                     "range": 5.0
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Dome-Mesh",
@@ -316,7 +327,8 @@
                     "meshName": "Dome-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     },
     {
         "name": "Cube-Mesh",
@@ -343,6 +355,7 @@
                     "meshName": "Cube-Mesh"
                 }
             }
-        ]
+        ],
+        "children": []
     }
 ]

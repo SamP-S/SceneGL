@@ -81,7 +81,7 @@ class GraphicsEngine {
             /// TODO: load project shader(s)
             rootEntity = new Entity("scene", NULL);
 
-            LoadScene("scene/Preset.scene");
+            LoadScene("scene/Preset.json");
 
             // Entity* cube = new Entity("cube", rootEntity);
             // rootEntity->AddChild(cube);

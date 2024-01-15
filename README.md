@@ -17,6 +17,7 @@ Goals:
     - [ ] Support materials
     - [ ] Support textures
     - [ ] Wireframe rendering
+    - [ ] Impl shader loader as asset_loader
 
     ### Camera
     - [x] Support cameras
@@ -38,7 +39,8 @@ Goals:
     - [x] Support empty enities
     - [ ] Pass as references not pointers
     - [ ] Support build pattern creation
-    - [ ] Children in JSON
+    - [x] Children in JSON
+    - [ ] Ensure all components follow single responsibility
 
     ### Resources
     - [x] Implement general resource manager
@@ -60,6 +62,7 @@ Goals:
     ### Scene
     - [ ] Implement scene manager
     - [ ] Load/save scene to file
+    - [ ] Handle entity management
 
     ### GUI
     - [x] Implement ImGui

@@ -99,7 +99,7 @@ int Entity::GetNumComponents() {
 
 // parent attribute
 bool Entity::IsRoot() {
-    return _parent == NULL;
+    return _parent == nullptr;
 }
 
 Entity* Entity::GetParent() {

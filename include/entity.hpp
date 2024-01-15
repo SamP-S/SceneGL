@@ -67,9 +67,6 @@ class Entity : public Object {
         T* AddComponent();
 
         template<typename T>
-        T* AddComponent(T* component);
-
-        template<typename T>
         bool RemoveComponent(T* key);
 
         

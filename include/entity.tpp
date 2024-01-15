@@ -1,3 +1,5 @@
+#include "component.hpp"
+
 /// TODO: Switch to references instead of pointers
 
 template<typename T>
@@ -49,17 +51,15 @@ std::vector<T*> Entity::GetComponentsInChildren() {
 
 template<typename T>
 T* Entity::AddComponent() {
-    T* c = new T();
-    _components.push_back(c);
-}
-
-template<typename T>
-T* Entity::AddComponent(T* c){ 
-    if (c == nullptr) {
-        std::cout << "WARNING (Entity): Trying to add NULL component." << std::endl;
+    T* c = new T(*this);
+    try {
+        _components.push_back(static_cast<Component*>(c));
+        return c;
+    } catch (const std::exception& e) {
+        std::cout << "ERROR (Entity): Can't add component: " << e.what() << std::endl;
+        delete c; // Clean up the allocated memory
         return nullptr;
     }
-    _components.push_back(c);
 }
 
 template<typename T>

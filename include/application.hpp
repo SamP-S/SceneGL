@@ -235,15 +235,16 @@ class Application {
                             std::cout << "Entity: Create new entity" << std::endl;
                             // create empty
                             std::string new_name = "new_" + std::to_string(new_entity_count);
-                            int meshId = resourceMeshes.GetId("empty");
+                            
                             Entity* newEntity = new Entity(new_name, entitySelected);
                             entitySelected->AddChild(newEntity);
                             new_entity_count += 1;
                             entitySelected = newEntity;
 
                             // build components
-                            Component* c = (Component*)new MeshRenderer(*newEntity, meshId);
-                            newEntity->AddComponent(c);
+                            int meshId = resourceMeshes.GetId("empty");
+                            MeshRenderer* mr = newEntity->AddComponent<MeshRenderer>();
+                            mr->SetMeshId(meshId);
                         }
                         if (ImGui::MenuItem("New Cube")) {
                             // debug
@@ -257,21 +258,19 @@ class Application {
 
                             // build components
                             int meshId = resourceMeshes.GetId("vertex_cube");
-                            Component* c = new MeshRenderer(*newEntity, meshId);
-                            newEntity->AddComponent(c);
+                            MeshRenderer* mr = entitySelected->AddComponent<MeshRenderer>();
+                            mr->SetMeshId(meshId);
                         }
                     }
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Component")) {
                     if (ImGui::MenuItem("Add Camera") && entitySelected != nullptr) {
-                        Component* c = new Camera(*entitySelected);
-                        entitySelected->AddComponent(c);
+                        entitySelected->AddComponent<Camera>();
                         std::cout << "DEBUG: Add camera component." << std::endl;
                     }
                     if (ImGui::MenuItem("Add MeshRenderer") && entitySelected != nullptr) {
-                        Component* c = new MeshRenderer(*entitySelected);
-                        entitySelected->AddComponent(c);
+                        entitySelected->AddComponent<MeshRenderer>();
                         std::cout << "DEBUG: Add MeshRenderer component." << std::endl;
                     }
                     ImGui::EndMenu();

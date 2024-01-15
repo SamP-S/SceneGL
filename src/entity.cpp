@@ -26,18 +26,18 @@ void Entity::FromJson(json j) {
     // create component(s)
     for (const auto& component : components) {
         if (component.find("directionalLight") != component.end()) {
-            DirectionalLight* c = new DirectionalLight(*this);
+            DirectionalLight* c = AddComponent<DirectionalLight>();
+            //c->SetParent(*this);
             c->FromJson(component["directionalLight"]);
-            AddComponent(c);
         } else if (component.find("pointLight") != component.end()) {
-            PointLight* c = new PointLight(*this);
+            PointLight* c = AddComponent<PointLight>();
+            //c->SetParent(*this);
             c->FromJson(component["pointLight"]);
-            AddComponent(c);
         }
         else if (component.find("meshRenderer") != component.end()) {
-            MeshRenderer* c = new MeshRenderer(*this);
+            MeshRenderer* c = AddComponent<MeshRenderer>();
+            //c->SetParent(*this);
             c->FromJson(component["meshRenderer"]);
-            AddComponent(c);
         }
     }
 }

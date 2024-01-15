@@ -12,9 +12,10 @@ class Entity;
 
 class Component : public Object {
 public:
-    Entity& entity;
+    const Entity& entity;
     Transform& transform;
 
     Component(Entity& entity);
     ~Component();
+
 };

@@ -50,6 +50,29 @@ std::vector<T*> Entity::GetComponentsInChildren() {
 }
 
 template<typename T>
+T* Entity::GetComponentInParent() {
+    T* found = GetComponent<T>();
+    if (found != nullptr) {
+        return found;
+    }
+    if (IsRoot()) {
+        return nullptr;
+    }
+    return GetParent()->GetComponentInParent<T>();
+}
+
+template<typename T>
+std::vector<T*> Entity::GetComponentsInParent() {
+    std::vector<T*> found = GetComponents<T>();
+    if (IsRoot()) {
+        return found;
+    }
+    std::vector<T*> parentComponents = p->GetComponentsInParent<T>();
+    found.insert(found.end(), parentComponents.begin(), parentComponents.end());
+    return found;
+}
+
+template<typename T>
 T* Entity::AddComponent() {
     T* c = new T(*this);
     try {

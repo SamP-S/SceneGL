@@ -62,7 +62,13 @@ class Entity : public Object {
         T* GetComponentInChildren();
 
         template<typename T>
+        T* GetComponentInParent();
+
+        template<typename T>
         std::vector<T*> GetComponentsInChildren();
+
+        template<typename T>
+        std::vector<T*> GetComponentsInParent();
 
         template<typename T>
         T* AddComponent();

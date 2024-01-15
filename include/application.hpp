@@ -72,7 +72,7 @@ class Application {
             Initialise();
 
             // Load project folder
-            entitySelected = Graphics.rootEntity;
+            entitySelected = nullptr;
 
             // Main loop
             bool done = false;
@@ -355,8 +355,10 @@ class Application {
         void WorldWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
-            if (Graphics.rootEntity != NULL) {
-                WorldNode(Graphics.rootEntity);
+            if (Graphics.scene != nullptr) {
+                for (auto ent : Graphics.scene) {
+                    WorldNode(ent);
+                }
             }
             ImGui::End();
         }
@@ -381,23 +383,23 @@ class Application {
             // position
             ImGui::Text("Pos");
             ImGui::SameLine();
-            vec3 position = ent->transform.GetPosition();
+            vec3 position = ent->transform->GetPosition();
             if (ImGui::InputFloat3("##PosInput", position.m)) {
-                ent->transform.SetPosition(position);     
+                ent->transform->SetPosition(position);     
             }
             // rotation
             ImGui::Text("Rot");
             ImGui::SameLine();
-            vec3 rotation = ent->transform.GetRotation();
+            vec3 rotation = ent->transform->GetRotation();
             if (ImGui::InputFloat3("##RotInput", rotation.m)) {
-                ent->transform.SetRotation(rotation);     
+                ent->transform->SetRotation(rotation);     
             }
             // scale
             ImGui::Text("Scl");
             ImGui::SameLine();
-            vec3 scale = ent->transform.GetScale();
+            vec3 scale = ent->transform->GetScale();
             if (ImGui::InputFloat3("##SclInput", scale.m)) {
-                ent->transform.SetScale(scale);     
+                ent->transform->SetScale(scale);     
             }
         }
 

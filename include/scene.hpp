@@ -47,8 +47,12 @@ public:
         return _entities.end();
     }
 
+    // index operator
     Entity* at(int i) {
-        return operator[](i);
+        if (i < _entities.size()) {
+            return _entities[i];
+        }
+        return nullptr;
     }
 
     int size() {
@@ -61,13 +65,5 @@ public:
     }
     void SetName(std::string name) {
         _name = name;
-    }
-
-    // index operator
-    Entity* operator[](int i) {
-        if (i < _entities.size()) {
-            return _entities[i];
-        }
-        return nullptr;
     }
 };

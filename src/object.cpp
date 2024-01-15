@@ -9,3 +9,11 @@ Object::Object() {
 ObjId Object::GetId() {
     return _id;
 }
+
+ bool Object::operator==(const Object& cmp) const {
+            return _id == cmp._id;
+        }
+
+bool Object::operator!=(const Object& cmp) const {
+    return _id != cmp._id;
+}

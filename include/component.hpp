@@ -11,8 +11,10 @@
 class Transform;
 
 class Component : public Object {
+private:
+    friend class Application;
 public:
-    const Entity* entity;
+    Entity* const entity;
     Transform* transform;
 
     Component(Entity* entity);

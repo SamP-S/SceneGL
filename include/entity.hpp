@@ -16,6 +16,8 @@ class Entity : public Object {
         std::string _name = "";
         std::vector<Component*> _components;
 
+        friend class Application;
+
     public:
         // public accessor
         Transform* transform;

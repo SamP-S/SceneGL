@@ -4,6 +4,8 @@
 #include "light_directional.hpp"
 #include "light_point.hpp"
 #include "mesh_renderer.hpp"
+#include "camera.hpp"
+#include "first_person.hpp"
 #include "transform.hpp"
 
 Entity::Entity(std::string name, Entity* parent) :
@@ -37,18 +39,15 @@ void Entity::FromJson(json j) {
     // create component(s)
     for (const auto& component : components) {
         if (component.find("directionalLight") != component.end()) {
-            DirectionalLight* c = AddComponent<DirectionalLight>();
-            //c->SetParent(*this);
-            c->FromJson(component["directionalLight"]);
+            AddComponent<DirectionalLight>()->FromJson(component["directionalLight"]);
         } else if (component.find("pointLight") != component.end()) {
-            PointLight* c = AddComponent<PointLight>();
-            //c->SetParent(*this);
-            c->FromJson(component["pointLight"]);
-        }
-        else if (component.find("meshRenderer") != component.end()) {
-            MeshRenderer* c = AddComponent<MeshRenderer>();
-            //c->SetParent(*this);
-            c->FromJson(component["meshRenderer"]);
+            AddComponent<PointLight>()->FromJson(component["pointLight"]);
+        } else if (component.find("meshRenderer") != component.end()) {
+            AddComponent<MeshRenderer>()->FromJson(component["meshRenderer"]);
+        } else if (component.find("camera") != component.end()) {
+            AddComponent<Camera>()->FromJson(component["camera"]);
+        } else if (component.find("firstPersonController") != component.end()) {
+            AddComponent<FirstPersonController>()->FromJson(component["firstPersonController"]);
         }
     }
     json children = j["children"];
@@ -63,7 +62,7 @@ json Entity::ToJson() {
     json j;
     j["name"] = _name;
     j["transform"] = transform->ToJson();
-    json components = json::array();;
+    json components = json::array();
     for (const auto& component : _components) {
         if (auto directionalLight = dynamic_cast<DirectionalLight*>(component)) {
             components.push_back(directionalLight->ToJson());

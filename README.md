@@ -55,6 +55,8 @@ Goals:
 
     ### Assets
     - [x] Implement asset manager
+    - [ ] Support loading and saving
+    - [ ] Support json files
     - [ ] Support audio files
     - [ ] Support image files
     - [ ] Support text files
@@ -66,12 +68,18 @@ Goals:
 
     ### Scene
     - [ ] Implement scene manager
-    - [ ] Load/save scene to file
-    - [ ] Handle entity management
+    - [ ] Allow multiple scene preloaded
+    - [ ] Support dynamic scene switching
+    - [x] Load/save scene to file
+    - [x] Handle entity management
 
     ### GUI
     - [x] Implement ImGui
+    - [ ] First person controller as component panel
     - [ ] Support dynamic gui loading with interfaces
+    - [ ] Create resource preview
+    - [ ] Create asset manager
+    - [ ] Create resource viewer(s)
 
     ### Networking
     - [ ] Implement networking socket support

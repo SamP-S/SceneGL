@@ -535,11 +535,31 @@ class Application {
                 // parent
                 Entity* p = ent->GetParent();
                 ImGui::Text(("Parent: " + ((p == nullptr) ? "ROOT" : p->GetName())).c_str());
+                // component display
                 TransformPanel(ent);
                 MeshRendererPanel(ent);
                 CameraPanel(ent);
                 DirectionalLightWindow(ent);
                 PointLightWindow(ent);
+                // add component button/drop-down
+                if (ImGui::Button("Add Component")) {
+                    ImGui::OpenPopup("Add Component");
+                }
+                if (ImGui::BeginPopup("Add Component")) {
+                    if (ImGui::MenuItem("Camera")) {
+                        ent->AddComponent<Camera>();
+                    } else if (ImGui::MenuItem("Directional Light")) {
+                        ent->AddComponent<DirectionalLight>();
+                    } else if (ImGui::MenuItem("Point Light")) {
+                        ent->AddComponent<PointLight>();
+                    } else if (ImGui::MenuItem("Mesh Renderer")) {
+                        ent->AddComponent<MeshRenderer>();
+                    } else if (ImGui::MenuItem("First Person Controller")) {
+                        ent->AddComponent<FirstPersonController>();
+                    }
+                    ImGui::EndPopup();
+                }
+                
             }
             ImGui::End();
         }

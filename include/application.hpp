@@ -227,12 +227,21 @@ class Application {
                         Graphics.LoadScene("scene/Default.json");
                     }
                     if (ImGui::MenuItem("Open")) {
-                        std::string filepath = tinyfd_openFileDialog("Open Scene", "./scene/Preset.json", 0, NULL, NULL, 0);
-                        Graphics.LoadScene(filepath);
+                        const char* filepath = tinyfd_openFileDialog("Open Scene", "./scene/Preset.json", 0, NULL, NULL, 0);
+                        if (filepath == nullptr) {
+                            std::cout << "DEBUG (App): No file selected." << std::endl;
+                        } else {
+                            Graphics.LoadScene(filepath);
+                        }
+                        
                     }
                     if (ImGui::MenuItem("Save As")) {
-                        std::string filepath = tinyfd_saveFileDialog("Save Scene", "./scene/Test.json", 0, NULL, NULL);
-                        Graphics.SaveScene(filepath);
+                        const char* filepath = tinyfd_saveFileDialog("Save Scene", "./scene/Test.json", 0, NULL, NULL);
+                        if (filepath == nullptr) {
+                            std::cout << "DEBUG (App): No file selected." << std::endl;
+                        } else {
+                            Graphics.SaveScene(filepath);
+                        }
                     }
                     ImGui::Separator();
                     if (ImGui::MenuItem("Close")) {

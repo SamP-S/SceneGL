@@ -11,15 +11,18 @@
 #include <tinyfiledialogs.h>
 
 #include "texture.hpp"
-#include "mesh_renderer.hpp"
+
 #include "graphics.hpp"
 #include "input.hpp"
 #include "entity.hpp"
-#include "camera.hpp"
 #include "la_extended.h"
 using namespace LA;
+
 #include "light_directional.hpp"
 #include "light_point.hpp"
+#include "mesh_renderer.hpp"
+#include "camera.hpp"
+#include "first_person.hpp"
 
 class Application {
     private:
@@ -395,46 +398,47 @@ class Application {
             ImGui::End();
         }
 
-        void TransformPanel(Entity* ent) {
-            if (ent == nullptr)
+        void TransformPanel(Transform* t) {
+            if (t == nullptr)
                 return;
             ImGui::Separator();
             ImGui::Text("Transform:");
             // position
             ImGui::Text("Pos");
             ImGui::SameLine();
-            vec3 position = ent->transform->GetPosition();
+            vec3 position = t->GetPosition();
             if (ImGui::InputFloat3("##PosInput", position.m)) {
-                ent->transform->SetPosition(position);     
+                t->SetPosition(position);     
             }
             // rotation
             ImGui::Text("Rot");
             ImGui::SameLine();
-            vec3 rotation = ent->transform->GetRotation();
+            vec3 rotation = t->GetRotation();
             if (ImGui::InputFloat3("##RotInput", rotation.m)) {
-                ent->transform->SetRotation(rotation);     
+                t->SetRotation(rotation);     
             }
             // scale
             ImGui::Text("Scl");
             ImGui::SameLine();
-            vec3 scale = ent->transform->GetScale();
+            vec3 scale = t->GetScale();
             if (ImGui::InputFloat3("##SclInput", scale.m)) {
-                ent->transform->SetScale(scale);     
+                t->SetScale(scale);     
             }
         }
 
-        void MeshRendererPanel(Entity* ent) {
-            if (ent == nullptr)
+        void MeshRendererPanel(Component* c) {
+            if (c == nullptr)
                 return;
-            MeshRenderer* renderer = ent->GetComponent<MeshRenderer>();
+            MeshRenderer* renderer = dynamic_cast<MeshRenderer*>(c);
             if (renderer == nullptr) {
                 return;
             }
+            ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Mesh Renderer");
             ImGui::SameLine();
-            if (ImGui::Button("X##1")) {
-                ent->RemoveComponent<MeshRenderer>(renderer);
+            if (ImGui::Button("X")) {
+                renderer->entity->RemoveComponent<MeshRenderer>(renderer);
             }
             int meshId = renderer->GetMeshId();
             if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
@@ -445,39 +449,45 @@ class Application {
                 }
                 ImGui::EndCombo();
             }
+            ImGui::PopID();
+            componentPanelCount++;
         }
 
-        void CameraPanel(Entity* ent) {
-            if (ent == nullptr)
+        void CameraPanel(Component* c) {
+            if (c == nullptr)
                 return;
-            Camera* camera = ent->GetComponent<Camera>();
+            Camera* camera = dynamic_cast<Camera*>(c);
             if (camera == nullptr) {
                 return;
             }
+            ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Camera");
             ImGui::SameLine();
-            if (ImGui::Button("X##2")) {
-                ent->RemoveComponent<Camera>(camera);
+            if (ImGui::Button("X")) {
+                camera->entity->RemoveComponent<Camera>(camera);
             }
             float fov = camera->GetFov();
             if (ImGui::SliderFloat("FOV", &fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat)) {
                 camera->SetFov(fov);
             }
+            ImGui::PopID();
+            componentPanelCount++;
         }
         
-        void DirectionalLightWindow(Entity* ent) {
-            if (ent == nullptr)
+        void DirectionalLightWindow(Component* c) {
+            if (c == nullptr)
                 return;
-            DirectionalLight* dirLight = ent->GetComponent<DirectionalLight>();
+            DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(c);
             if (dirLight == nullptr) {
                 return;
             }
+            ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Directional Light");
             ImGui::SameLine();
-            if (ImGui::Button("X##3")) {
-                ent->RemoveComponent<DirectionalLight>(dirLight);
+            if (ImGui::Button("X")) {
+                dirLight->entity->RemoveComponent<DirectionalLight>(dirLight);
             }
             vec3 colour = dirLight->GetColour();
             if (ImGui::InputFloat3("Colour", colour.m)) {
@@ -487,20 +497,23 @@ class Application {
             if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
                 dirLight->SetIntensity(intensity);
             }
+            ImGui::PopID();
+            componentPanelCount++;
         }
 
-        void PointLightWindow(Entity* ent) {
-            if (ent == nullptr)
+        void PointLightWindow(Component* c) {
+            if (c == nullptr)
                 return;
-            PointLight* pointLight = ent->GetComponent<PointLight>();
+            PointLight* pointLight = dynamic_cast<PointLight*>(c);
             if (pointLight == nullptr) {
                 return;
             }
+            ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Point Light");
             ImGui::SameLine();
-            if (ImGui::Button("X##4")) {
-                ent->RemoveComponent<PointLight>(pointLight);
+            if (ImGui::Button("X")) {
+                pointLight->entity->RemoveComponent<PointLight>(pointLight);
             }
             vec3 colour = pointLight->GetColour();
             if (ImGui::InputFloat3("Colour", colour.m)) {
@@ -514,6 +527,8 @@ class Application {
             if (ImGui::SliderFloat("Range", &range, 0.01f, 20.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
                 pointLight->SetRange(range);
             }
+            ImGui::PopID();
+            componentPanelCount++;
         }
 
         void PropertiesWindow() {
@@ -535,12 +550,22 @@ class Application {
                 // parent
                 Entity* p = ent->GetParent();
                 ImGui::Text(("Parent: " + ((p == nullptr) ? "ROOT" : p->GetName())).c_str());
-                // component display
-                TransformPanel(ent);
-                MeshRendererPanel(ent);
-                CameraPanel(ent);
-                DirectionalLightWindow(ent);
-                PointLightWindow(ent);
+                // components display
+                componentPanelCount = 0;
+                // transform display
+                TransformPanel(ent->transform);
+                // non-singlton components
+                for (auto* component : ent->_components) {
+                    std::cout << component->Type() << std::endl;
+                    if (component->Type().compare("MeshRenderer") == 0)
+                        MeshRendererPanel(component);
+                    else if (component->Type().compare("Camera") == 0)
+                        CameraPanel(component);
+                    else if (component->Type().compare("DirectionalLight") == 0)
+                        DirectionalLightWindow(component);
+                    else if (component->Type().compare("PointLight") == 0)
+                        PointLightWindow(component);
+                }
                 // add component button/drop-down
                 if (ImGui::Button("Add Component")) {
                     ImGui::OpenPopup("Add Component");

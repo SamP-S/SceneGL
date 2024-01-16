@@ -44,8 +44,8 @@ class FirstPersonController : public Component {
 
         json ToJson() {
             json j;
-            j["sensitivity"] = _sens;
-            j["speed"] = _speed;
+            j["firstPersonController"]["sensitivity"] = _sens;
+            j["firstPersonController"]["speed"] = _speed;
             return j;
         }
 

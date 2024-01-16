@@ -34,9 +34,9 @@ public:
 
     json ToJson() {
         json j;
-        j["colour"] = {{"r", _colour.x}, {"g", _colour.y}, {"b", _colour.z}};
-        j["intensity"] = _intensity;
-        j["range"] = _range;
+        j["pointLight"]["colour"] = {{"r", _colour.x}, {"g", _colour.y}, {"b", _colour.z}};
+        j["pointLight"]["intensity"] = _intensity;
+        j["pointLight"]["range"] = _range;
         return j;
     }
 

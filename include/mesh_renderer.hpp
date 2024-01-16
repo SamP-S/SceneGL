@@ -22,7 +22,7 @@ class MeshRenderer : public Component {
 
         json ToJson() {
             json j;
-            j["meshName"] = resourceMeshes.Get(_meshId)->GetName();
+            j["meshRenderer"]["meshName"] = resourceMeshes.Get(_meshId)->GetName();
             return j;
         }
 

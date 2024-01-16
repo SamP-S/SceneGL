@@ -31,8 +31,8 @@ public:
 
     json ToJson() {
         json j;
-        j["colour"] = {{"r", _colour.x}, {"g", _colour.y}, {"b", _colour.z}};
-        j["intensity"] = _intensity;
+        j["directionalLight"]["colour"] = {{"r", _colour.x}, {"g", _colour.y}, {"b", _colour.z}};
+        j["directionalLight"]["intensity"] = _intensity;
         return j;
     }
 

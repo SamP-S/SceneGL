@@ -40,9 +40,9 @@ class Camera : public Component {
  
         json ToJson() {
             json j;
-            j["fov"] = _fov;
-            j["near"] = _near;
-            j["far"] = _far;
+            j["camera"]["fov"] = _fov;
+            j["camera"]["near"] = _near;
+            j["camera"]["far"] = _far;
             return j;
         }
 

@@ -104,14 +104,41 @@ class GraphicsEngine {
             std::ifstream inputFile(filepath);
             if (!inputFile.good()) {
                 std::cout << "WARNING (Graphics): Scene file does not exist: " << filepath << std::endl;
+                return json();
             }
             if (!inputFile.is_open()) {
                 std::cout << "WARNING (Graphics): Can't open file: " << filepath << std::endl;
-                return false;
+                return json();
             }
             json jsonFile = json::parse(inputFile);
             inputFile.close();
             return jsonFile;
+        }
+
+        bool SaveJson(std::string filepath, json jsonData) {
+            std::ofstream outputFile(filepath);
+            if (!outputFile.is_open()) {
+                std::cout << "WARNING (Graphics): Can't open file: " << filepath << std::endl;
+                return false;
+            }
+            outputFile << jsonData.dump(4); // Write the JSON data to the file with indentation of 4 spaces
+            outputFile.close();
+            return true;
+        }
+
+        void LoadScene(std::string filepath) {
+            if (scene != nullptr)
+                delete scene;
+            scene = new Scene();
+            scene->FromJson(LoadJson(filepath));
+        }
+
+        void SaveScene(std::string filepath) {
+            json j = json();
+            if (scene != nullptr) {
+                j = scene->ToJson();
+            }
+            SaveJson(filepath, j);
         }
 
         bool AttachWindow(WindowManager* window) {

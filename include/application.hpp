@@ -223,10 +223,21 @@ class Application {
         void MenuBar() {
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
-                    ImGui::MenuItem("New");
-                    ImGui::MenuItem("Options");
+                    if (ImGui::MenuItem("New")) {
+                        Graphics.LoadScene("scene/Default.json");
+                    }
+                    if (ImGui::MenuItem("Open")) {
+                        std::string filepath = tinyfd_openFileDialog("Open Scene", "./scene/Preset.json", 0, NULL, NULL, 0);
+                        Graphics.LoadScene(filepath);
+                    }
+                    if (ImGui::MenuItem("Save As")) {
+                        std::string filepath = tinyfd_saveFileDialog("Save Scene", "./scene/Test.json", 0, NULL, NULL);
+                        Graphics.SaveScene(filepath);
+                    }
                     ImGui::Separator();
-                    ImGui::MenuItem("Close", NULL, false, true);
+                    if (ImGui::MenuItem("Close")) {
+                        windowManager.isQuit = true;
+                    }
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Entity")) {

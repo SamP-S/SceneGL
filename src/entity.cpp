@@ -63,7 +63,7 @@ json Entity::ToJson() {
     json j;
     j["name"] = _name;
     j["transform"] = transform->ToJson();
-    json components;
+    json components = json::array();;
     for (const auto& component : _components) {
         if (auto directionalLight = dynamic_cast<DirectionalLight*>(component)) {
             components.push_back(directionalLight->ToJson());
@@ -74,7 +74,7 @@ json Entity::ToJson() {
         }
     }
     j["components"] = components;
-    json children;
+    json children = json::array();;
     for (const auto& child : _children) {
         children.push_back(child->ToJson());
     }

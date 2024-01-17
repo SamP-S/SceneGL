@@ -85,6 +85,10 @@ Goals:
     - [ ] Implement networking socket support
 
     ### Scripting
+    - [ ] Create scripting engine
+    - [ ] Support start and update functions
+    - [ ] Create gizmo rendering
+    - [ ] Implement python scripting support
     - [ ] Implement Lua scripting support
 
     ### OS Support

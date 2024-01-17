@@ -17,27 +17,27 @@
 
 class Shader : public Resource {
     private:
-        ShaderStage* vs = new ShaderStage();
-        ShaderStage* fs = new ShaderStage();
+        ShaderStage* _vs = nullptr;
+        ShaderStage* _fs = nullptr;
         bool _validShader = false;
         uint32_t _id = -1;
 
         bool Compile() {
-            if (vs == nullptr || fs == nullptr) {
+            if (_vs == nullptr || _fs == nullptr) {
                 std::cout << "WARNING (Shader): Can't compile shader with null stage." << std::endl;
                 return false;
             }
 
-            if (vs->GetStage() != SHADER_VERTEX || fs->GetStage() != SHADER_FRAGMENT) {
-                std::cout << "WARNING (Shader): Trying to compile non matching stages." << std::endl;
+            if (_vs->GetStage() != SHADER_VERTEX || _fs->GetStage() != SHADER_FRAGMENT) {
+                std::cout << "WARNING (Shader): Trying to compile non-matching stages." << std::endl;
                 return false;
             }
 
             // shader Program
             try {
-                _id = GL_Interface::CreateShaderProgram(fs->GetSource().c_str(), vs->GetSource().c_str());
+                _id = GL_Interface::CreateShaderProgram(_fs->GetSource().c_str(), _vs->GetSource().c_str());
             } catch (const char* err) {
-                std::cout << "Error: Shader::Compile - Complilation failed";
+                std::cout << "Error: Shader::Compile - Complilation failed:" << std::endl;
                 std::cout << err << std::endl;
                 return false;
             }
@@ -45,8 +45,8 @@ class Shader : public Resource {
         }
 
     public:
-        Shader(std::string name="Default Shader", ShaderStage* vs=nullptr, ShaderStage* fs=nullptr)
-            : Resource(name) {
+        Shader(std::string name="Default Shader", ShaderStage* vs=nullptr, ShaderStage* fs=nullptr) : 
+        Resource(name), _vs(vs), _fs(fs) {
             _validShader = Compile();
         }
 

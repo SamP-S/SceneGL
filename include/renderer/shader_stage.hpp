@@ -17,18 +17,15 @@
 #define SHADER_TESSELLATION_EVALUATION  6
 
 class ShaderStage : public Resource {
-
     private:
-        int _stage = SHADER_INVALID;
         std::string _source;
-
+        int _stage = SHADER_INVALID;
+        
     public:
-
-        ShaderStage(std::string name="Default Shader Stage", const std::string& source="", int stage=SHADER_INVALID)
-            : Resource(name) {
-            _source = source;
-            _stage = stage;
-        }
+        ShaderStage(std::string name="Default Shader Stage", const std::string& source="", int stage=SHADER_INVALID) :
+            Resource(name),
+            _source(source),
+            _stage(stage) {}
 
         // source setters/getters
         std::string GetSource() {

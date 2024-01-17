@@ -49,7 +49,13 @@ class GraphicsEngine {
         Scene* scene = nullptr;
         Entity* sceneCam = nullptr;
 
-        GraphicsEngine() {
+        GraphicsEngine(int width, int height) :
+        _width(width), _height(height) { }
+        ~GraphicsEngine() {
+            delete frame;
+        }
+
+        void Initialise() {
             SetViewport(_width, _height);
             
             // Initialise GLEW
@@ -63,10 +69,6 @@ class GraphicsEngine {
              
             GL_Interface::BindFrameBufferObj(0);
 
-            // load default shader(s)
-            resourceShaders.Add(new Shader("base", "shaders/base.vs", "shaders/base.fs"));
-            resourceShaders.Add(new Shader("lighting", "shaders/lighting.vs", "shaders/lighting.fs"));
-
             // load default model(s)
             assetManager.Load("models/presets/cone.gltf");
             assetManager.Load("models/presets/cube.gltf");
@@ -76,6 +78,13 @@ class GraphicsEngine {
             assetManager.Load("models/presets/plane.gltf");
             assetManager.Load("models/presets/prism.gltf");
             assetManager.Load("models/presets/sphere.gltf");
+            // load default shader(s)
+            assetManager.Load("shaders/base.vert");
+            assetManager.Load("shaders/base.frag");
+            assetManager.Load("shaders/lighting.vert");
+            assetManager.Load("shaders/lighting.frag");
+            resourceShaders.Create("base", resourceShaderStages.Get("base_vert"), resourceShaderStages.Get("base_frag"));
+            resourceShaders.Create("lighting", resourceShaderStages.Get("lighting_vert"), resourceShaderStages.Get("lighting_frag"));
 
             /// TODO: load project shader(s)
             scene = new Scene();
@@ -89,10 +98,6 @@ class GraphicsEngine {
 
             resourceShaders.Get("base")->Use();
             sceneCam->GetComponent<Camera>()->SetResolution(_width, _height);
-        }
-
-        ~GraphicsEngine() {
-            delete frame;
         }
 
         json LoadJson(std::string filepath) {

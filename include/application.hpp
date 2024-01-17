@@ -35,10 +35,11 @@ class Application {
         SDL_GLContext gl_context;
         SDL_Window* window;
         bool isQuit = false;
-        int _width, _height;
+        int _width = WINDOW_WIDTH;
+        int _height = WINDOW_HEIGHT;
 
         // Engines
-        GraphicsEngine Graphics = GraphicsEngine();
+        GraphicsEngine Graphics = GraphicsEngine(_width, _height);
 
         // Application state
         bool show_editor_window = true;
@@ -73,6 +74,7 @@ class Application {
         _height(WINDOW_HEIGHT) {
             
             Initialise_SDL2(_width, _height);
+            Graphics.Initialise();
             Initialise();
 
             // Load project folder

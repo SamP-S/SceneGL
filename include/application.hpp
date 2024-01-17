@@ -10,6 +10,9 @@
 #include <map>
 #include <tinyfiledialogs.h>
 
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
+
 #include "renderer/texture.hpp"
 #include "renderer/graphics.hpp"
 #include "renderer/input.hpp"
@@ -25,9 +28,17 @@ using namespace LA;
 
 class Application {
     private:
-        // bool isRunning = true;
-        WindowManager windowManager = WindowManager(1280, 720);
-        GraphicsEngine Graphics = GraphicsEngine(&windowManager);
+        // SDL properties
+        int gl_major = 3;
+        int gl_minor = 3;
+        const char* glsl_version = "#version 420";
+        SDL_GLContext gl_context;
+        SDL_Window* window;
+        bool isQuit = false;
+        int _width, _height;
+
+        // Engines
+        GraphicsEngine Graphics = GraphicsEngine();
 
         // Application state
         bool show_editor_window = true;
@@ -55,30 +66,20 @@ class Application {
             {"1:1", 1.0f}
         };
 
-        ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
-            float maxAspectRatio = maxSize.x / maxSize.y;
-            ImVec2 wSize = maxSize;
-            if (aspectRatio != 0) {
-                if (aspectRatio >= maxAspectRatio)
-                    wSize.y = wSize.x / aspectRatio;
-                else if (aspectRatio < maxAspectRatio)
-                    wSize.x = wSize.y * aspectRatio;
-            }
-            return wSize;
-        }
-
     public:
 
-        Application() {
-
+        Application() :
+        _width(WINDOW_WIDTH),
+        _height(WINDOW_HEIGHT) {
+            
+            Initialise_SDL2(_width, _height);
             Initialise();
 
             // Load project folder
             entitySelected = nullptr;
 
             // Main loop
-            bool done = false;
-            while (!done)
+            while (!isQuit)
             {
                 HandleEvents();
 
@@ -87,8 +88,6 @@ class Application {
                 ImGui_ImplSDL2_NewFrame();
                 ImGui::NewFrame();
 
-                //windowManager.PollEvents();
-                done = windowManager.isQuit;
                 ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
                 const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
@@ -139,12 +138,47 @@ class Application {
                     SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
                 }
 
-                SDL_GL_SwapWindow(windowManager.window);
-                // windowManager.SwapBuffers();
+                SDL_GL_SwapWindow(window);
             }
             Shutdown();
+            Destroy_SDL2();
         }
 
+        void Initialise_SDL2(int w, int h) {
+            // Initialise SDL subsystems
+            SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
+
+            // GL 3.3 + GLSL 330
+            glsl_version = "#version 330";
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major) != 0)
+                gl_major = 0;
+            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_minor) != 0)
+                gl_minor = 0;
+
+            // Create window with graphics context
+            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+            SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+            window = SDL_CreateWindow("SceneGL + ImGUI + OpenGL4", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, window_flags);
+            gl_context = SDL_GL_CreateContext(window);
+            SDL_GL_MakeCurrent(window, gl_context);
+            SDL_GL_SetSwapInterval(1); // Enable vsync
+            SDL_SetWindowMinimumSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+            // get event
+            SDL_Event Event;
+            SDL_PollEvent(&Event);
+        }
+
+        void Destroy_SDL2() {
+            SDL_GL_DeleteContext(gl_context);
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+        }
+        
         void Initialise() {
             // Setup Dear ImGui context
             IMGUI_CHECKVERSION();
@@ -160,8 +194,8 @@ class Application {
             // ImGui::StyleColorsClassic();
 
             // Setup Platform/Renderer backends
-            ImGui_ImplSDL2_InitForOpenGL(windowManager.window, windowManager.gl_context);
-            ImGui_ImplOpenGL3_Init(windowManager.glsl_version);
+            ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+            ImGui_ImplOpenGL3_Init(glsl_version);
         }
 
         void Shutdown() {
@@ -182,7 +216,7 @@ class Application {
             while (SDL_PollEvent(&event)) {
                 ImGui_ImplSDL2_ProcessEvent(&event);
                 if (event.type == SDL_QUIT) {
-                    windowManager.isQuit = true;
+                    isQuit = true;
                 }
                             
                 if (renderer_focused) {
@@ -222,6 +256,18 @@ class Application {
             }
         }
 
+        ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
+            float maxAspectRatio = maxSize.x / maxSize.y;
+            ImVec2 wSize = maxSize;
+            if (aspectRatio != 0) {
+                if (aspectRatio >= maxAspectRatio)
+                    wSize.y = wSize.x / aspectRatio;
+                else if (aspectRatio < maxAspectRatio)
+                    wSize.x = wSize.y * aspectRatio;
+            }
+            return wSize;
+        }
+
         void MenuBar() {
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
@@ -247,7 +293,7 @@ class Application {
                     }
                     ImGui::Separator();
                     if (ImGui::MenuItem("Close")) {
-                        windowManager.isQuit = true;
+                        isQuit = true;
                     }
                     ImGui::EndMenu();
                 }

@@ -13,43 +13,44 @@
 #include <sstream>
 #include <memory>
 
-#include "renderer/window.hpp"
+#include "ecs/entity.hpp"
+#include "ecs/filepath.hpp"
+#include "ecs/scene.hpp"
+#include "ecs/resource_manager.hpp"
+#include "ecs/asset_manager.hpp"
+
+#include "la_extended.h"
+using namespace LA;
+#include "json.hpp"
+using namespace nlohmann;
+
 #include "renderer/frame_timer.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/texture.hpp"
 #include "renderer/mesh.hpp"
-#include "ecs/entity.hpp"
-#include "la_extended.h"
-using namespace LA;
+
 #include "renderer/camera.hpp"
 #include "renderer/model.hpp"
 #include "renderer/frame.hpp"
 #include "renderer/mesh_renderer.hpp"
-#include "scripting/first_person.hpp"
-#include "ecs/resource_manager.hpp"
-#include "ecs/asset_manager.hpp"
 #include "renderer/light_directional.hpp"
 #include "renderer/light_point.hpp"
-#include "ecs/filepath.hpp"
-#include "ecs/scene.hpp"
-#include "json.hpp"
+#include "scripting/first_person.hpp"
 
-using namespace nlohmann;
+
 
 class GraphicsEngine {
+    private:
+        int _width, _height;
 
     public:
-        void* context;
-        WindowManager* window;
         frame_timer ft = frame_timer();
         Frame* frame = nullptr;
-        int width, height;
         Scene* scene = nullptr;
         Entity* sceneCam = nullptr;
 
-        GraphicsEngine(WindowManager* window) {
-            AttachWindow(window);
-            SetViewport(window->width, window->height);
+        GraphicsEngine() {
+            SetViewport(_width, _height);
             
             // Initialise GLEW
             // Must be done before any opengl call
@@ -57,7 +58,7 @@ class GraphicsEngine {
             glewExperimental = GL_TRUE;
             glewInit();
 
-            frame = new Frame(window->width, window->height);
+            frame = new Frame(_width, _height);
             frame->SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
              
             GL_Interface::BindFrameBufferObj(0);
@@ -87,12 +88,10 @@ class GraphicsEngine {
             sceneCam->transform->SetRotation(vec3({PI/2, PI, 0.0f}));
 
             resourceShaders.Get("base")->Use();
-            sceneCam->GetComponent<Camera>()->SetResolution(width, height);
+            sceneCam->GetComponent<Camera>()->SetResolution(_width, _height);
         }
 
         ~GraphicsEngine() {
-            // delete context; delete makes error even though pointer?!?
-            // delete window; causesd unknown signal error?
             delete frame;
         }
 
@@ -136,35 +135,22 @@ class GraphicsEngine {
             }
             SaveJson(filepath, j);
         }
-
-        bool AttachWindow(WindowManager* window) {
-            if (window == NULL) {
-                return false;
-            }
-            this->window = window;
-            return true;
-        }
-
-        bool DetachWindow() {
-            this->window = NULL;
-            return true;
-        }
         
         // function to reset our viewport after a window resize
-        void SetViewport(int _width, int _height) {
+        void SetViewport(int width, int height) {
             // protect against divide by 0 and no resoltuion
-            if (_width == 0) {
+            if (width == 0) {
                 std::cout << "WARNING (Graphics): Trying to set width 0" << std::endl;
-                _width = 1;
+                width = 1;
             }
                 
-            if (_height == 0) {
+            if (height == 0) {
                 std::cout << "WARNING (Graphics): Trying to set height 0" << std::endl;
-                _height = 1;
+                height = 1;
             }
                 
-            this->width = _width;
-            this->height = _height;
+            _width = width;
+            _height = height;
             float ratio = width / height;
         }
 
@@ -210,7 +196,7 @@ class GraphicsEngine {
             shader.SetMat4("iView", &inverse(sceneCam->transform->GetTransform())[0][0]);
             shader.SetMat4("iProjection", &sceneCam->GetComponent<Camera>()->proj[0][0]);
             // fragment uniforms
-            shader.SetVec3("iResolution", window->width, window->height, 1.0f);
+            shader.SetVec3("iResolution", _width, _height, 1.0f);
             shader.SetFloat("iTime", ft.GetTotalElapsed());
             shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
             shader.SetInt("iFrame", ft.GetFrameCount());
@@ -284,7 +270,7 @@ class GraphicsEngine {
             frame->Bind();
             frame->Clear();
             
-            GL_Interface::SetViewport(width, height);
+            GL_Interface::SetViewport(_width, _height);
             GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
             std::vector<DirectionalLight*> dirLights = scene->at(0)->GetComponentsInChildren<DirectionalLight>();
@@ -297,7 +283,7 @@ class GraphicsEngine {
             Shader* baseShader = resourceShaders.Get("base");
             Shader* lightingShader = resourceShaders.Get("lighting");
 
-            sceneCam->GetComponent<Camera>()->SetResolution(width, height);
+            sceneCam->GetComponent<Camera>()->SetResolution(_width, _height);
             sceneCam->GetComponent<FirstPersonController>()->Update();
 
             for (auto& ent : *scene) {

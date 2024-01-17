@@ -12,30 +12,35 @@
 
 class AssetManager {
 private:
-    std::vector<AssetLoader*> loaders;
-    std::vector<Asset*> assets;
+    std::vector<AssetLoader*> _loaders;
+    std::vector<Asset*> _assets;
 
 public:
     AssetManager() {
-        loaders.push_back(new ModelLoader());
-        loaders.push_back(new ShaderLoader());
+        _loaders.push_back(new ModelLoader());
+        _loaders.push_back(new ShaderLoader());
     }
 
     ~AssetManager() {
-        for (auto loader : loaders) {
+        // clear loaders
+        for (AssetLoader* loader : _loaders) {
             delete loader;
         }
+        _loaders.clear();
+        // clear assets
+        for (Asset* asset : _assets) {
+            delete asset;
+        }
+        _assets.clear();
     }
 
-    bool Load(const std::string& path) {
-        std::string ext = GetFileExtension(path);
-        for (auto loader : loaders) {
-            ModelLoader* modelLoader = dynamic_cast<ModelLoader*>(loader);
-            if (modelLoader != nullptr && modelLoader->CanLoad(ext)) {
-                return modelLoader->Load(path);
+    bool Load(const std::string& filepath) {
+        for (auto loader : _loaders) {
+            if (loader != nullptr && loader->CanLoad(filepath)) {
+                return loader->Load(filepath);
             }
         }
-        std::cout << "ERROR (AssetManager): Unsupported file extension: " << ext << std::endl;
+        std::cout << "ERROR (AssetManager): Unsupported file extension @ " << filepath << std::endl;
         return false;
     }
 

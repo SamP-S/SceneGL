@@ -22,7 +22,6 @@ class FirstPersonController : public Component {
         float _speed = 5.0f;
 
     public:
-        mat4 view = mat4();
 
         bool active = false;
         int x = 0;
@@ -133,8 +132,6 @@ class FirstPersonController : public Component {
                 }
                 x = Input::GetMouseX();
                 y = Input::GetMouseY();
-                view = inverse(transform->GetTransform());
-
             } else {
                 active = false;
             }

@@ -45,10 +45,7 @@ class GraphicsEngine {
         Frame* frame = nullptr;
         int width, height;
         Scene* scene = nullptr;
-        Entity* workspaceCamera = nullptr;
-
-        FirstPersonController* fpc;
-        Camera* camera;
+        Entity* sceneCam = nullptr;
 
         GraphicsEngine(WindowManager* window) {
             AttachWindow(window);
@@ -83,15 +80,14 @@ class GraphicsEngine {
             scene = new Scene();
             scene->FromJson(LoadJson("scene/Preset.json"));
 
-            workspaceCamera = new Entity("Workspace Camera", NULL);
-            camera = new Camera(workspaceCamera);
-            fpc = new FirstPersonController(workspaceCamera);
-            
-            workspaceCamera->transform->SetPosition(vec3{-8,5,8});
-            workspaceCamera->transform->SetRotation(vec3({PI/2, PI, 0.0f}));
+            sceneCam = new Entity("Scene Camera");
+            sceneCam->AddComponent<Camera>();
+            sceneCam->AddComponent<FirstPersonController>();
+            sceneCam->transform->SetPosition(vec3{-8,5,8});
+            sceneCam->transform->SetRotation(vec3({PI/2, PI, 0.0f}));
 
             resourceShaders.Get("base")->Use();
-            camera->SetResolution(width, height);
+            sceneCam->GetComponent<Camera>()->SetResolution(width, height);
         }
 
         ~GraphicsEngine() {
@@ -211,14 +207,14 @@ class GraphicsEngine {
         void SetupShader(Shader& shader, const std::vector<DirectionalLight*>& dirLights, const std::vector<PointLight*>& pointLights) {
             shader.Use();
             // vertex uniforms
-            shader.SetMat4("iView", &fpc->view[0][0]);
-            shader.SetMat4("iProjection", &camera->proj[0][0]);
+            shader.SetMat4("iView", &inverse(sceneCam->transform->GetTransform())[0][0]);
+            shader.SetMat4("iProjection", &sceneCam->GetComponent<Camera>()->proj[0][0]);
             // fragment uniforms
             shader.SetVec3("iResolution", window->width, window->height, 1.0f);
             shader.SetFloat("iTime", ft.GetTotalElapsed());
             shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
             shader.SetInt("iFrame", ft.GetFrameCount());
-            shader.SetVec3("iCameraPosition", workspaceCamera->transform->GetPosition()); 
+            shader.SetVec3("iCameraPosition", sceneCam->transform->GetPosition()); 
  
             ShaderDirectionalLights(shader, dirLights);
             ShaderPointLights(shader, pointLights);     
@@ -301,8 +297,8 @@ class GraphicsEngine {
             Shader* baseShader = resourceShaders.Get("base");
             Shader* lightingShader = resourceShaders.Get("lighting");
 
-            camera->SetResolution(width, height);
-            fpc->Update();
+            sceneCam->GetComponent<Camera>()->SetResolution(width, height);
+            sceneCam->GetComponent<FirstPersonController>()->Update();
 
             for (auto& ent : *scene) {
                 // draw lit

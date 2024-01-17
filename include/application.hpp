@@ -389,12 +389,9 @@ class Application {
         void FirstPersonWindow() {
             ImGuiWindowFlags cameraWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Viewport Properties", &show_firstperson_window, cameraWindowFlags);
-            float mouseSens = Graphics.fpc->GetLookSensitivity();
-            float speed = Graphics.fpc->GetMovementSpeed();
-            if (ImGui::SliderFloat("Mouse Sensitivity", &mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None))
-                Graphics.fpc->SetLookSensitivity(mouseSens);
-            if (ImGui::SliderFloat("Movement Speed", &speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None))
-                Graphics.fpc->SetMovementSpeed(speed);
+            ImGui::PushID(componentPanelCount);
+            FirstPersonPanel(Graphics.sceneCam->GetComponent<FirstPersonController>());
+            ImGui::PopID();
             ImGui::End();
         }
 
@@ -531,6 +528,25 @@ class Application {
             componentPanelCount++;
         }
 
+        void FirstPersonPanel(Component* c) {
+            if (c == nullptr)
+                return;
+            FirstPersonController* fpc = dynamic_cast<FirstPersonController*>(c);
+            if (fpc == nullptr)
+                return;
+            ImGui::Separator();
+            ImGui::Text("First Person Controller");
+            // look sensitivity
+            float mouseSens = fpc->GetLookSensitivity();
+            if (ImGui::SliderFloat("Mouse Sensitivity", &mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None))
+                fpc->SetLookSensitivity(mouseSens);
+            // movement speed
+            float speed = fpc->GetMovementSpeed();
+            if (ImGui::SliderFloat("Movement Speed", &speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None))
+                fpc->SetMovementSpeed(speed);
+            componentPanelCount++;
+        }
+
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
@@ -556,7 +572,6 @@ class Application {
                 TransformPanel(ent->transform);
                 // non-singlton components
                 for (auto* component : ent->_components) {
-                    std::cout << component->Type() << std::endl;
                     if (component->Type().compare("MeshRenderer") == 0)
                         MeshRendererPanel(component);
                     else if (component->Type().compare("Camera") == 0)
@@ -565,6 +580,8 @@ class Application {
                         DirectionalLightWindow(component);
                     else if (component->Type().compare("PointLight") == 0)
                         PointLightWindow(component);
+                    else if (component->Type().compare("FirstPersonController") == 0);
+                        FirstPersonPanel(component);
                 }
                 // add component button/drop-down
                 if (ImGui::Button("Add Component")) {

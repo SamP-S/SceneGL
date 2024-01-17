@@ -125,7 +125,8 @@ public:
 		return _extensions;
 	}
     bool CanLoad(const std::string& filepath) {
-		return (ext.compare(".gltf") == 0);
+		std::string test_ext = GetFileExtension(filepath);
+		return (test_ext.compare(".gltf") == 0);
 	};
 
 };

@@ -4,9 +4,9 @@
 #include <fstream>
 
 bool CheckFileExists(const std::string& path) {
-        std::ifstream file(path);
-        return file.good();
-    }
+    std::ifstream file(path);
+    return file.good();
+}
 
 std::string GetFileExtension(const std::string& filepath) {
     size_t dotPos = filepath.find_last_of(".");

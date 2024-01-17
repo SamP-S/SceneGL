@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,6 +8,7 @@
 #include "ecs/filepath.hpp"
 #include "ecs/asset_loader.hpp"
 #include "renderer/model_loader.hpp"
+#include "renderer/shader_loader.hpp"
 
 class AssetManager {
 private:
@@ -15,6 +18,7 @@ private:
 public:
     AssetManager() {
         loaders.push_back(new ModelLoader());
+        loaders.push_back(new ShaderLoader());
     }
 
     ~AssetManager() {

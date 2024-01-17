@@ -24,7 +24,7 @@ class ShaderStage : public Resource {
 
     public:
 
-        ShaderStage(std::string name, const std::string& source="", int stage=SHADER_INVALID)
+        ShaderStage(std::string name="Default Shader Stage", const std::string& source="", int stage=SHADER_INVALID)
             : Resource(name) {
             _source = source;
             _stage = stage;

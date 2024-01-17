@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "ecs/asset_loader.hpp"
 #include "ecs/filepath.hpp"
 #include "renderer/shader.hpp"
 
@@ -22,7 +23,8 @@
 class ShaderLoader : public AssetLoader {
 private:
     std::vector<std::string> _extensions = {".vert", ".tesc", ".tese", ".geom", ".frag", ".comp"};
-    std::unordered_map<std::string, map> _extToType = {
+    
+    std::unordered_map<std::string, int> _extToType = {
         {".vert", SHADER_VERTEX},
         {".tesc", SHADER_TESSELLATION_CONTROL},
         {".tese", SHADER_TESSELLATION_EVALUATION},
@@ -56,10 +58,21 @@ public:
             strBuffer << f.rdbuf();
             // close file handlers
             f.close();
+            // dump file as string
             std::string source = strBuffer.str();
-            std::string name = GetFileName(path);
-            int shaderType = _extToType.find(ext);
-            resourceShaders.Create(name, source, shaderType);
+            // get name from filepath
+            std::string name = GetFileName(path) + GetFileExtension(path);
+            // replace ".ext" to "_ext"
+            std::replace(name.begin(), name.end(), '.', '_');
+            // look up stage type
+            auto it = _extToType.find(ext);
+            if (it != _extToType.end()) {
+                int stage = it->second;
+                resourceShaderStages.Create(name, source, stage);
+            } else {
+                std::cout << "WARNING (ShaderLoader): Unsupported shader extension @ " << path << std::endl;
+                return false;
+            }
         }
         catch (std::ifstream::failure& e) {
             std::cout << "ERROR (ShaderLoader): " << e.what() << std::endl;

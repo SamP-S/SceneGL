@@ -121,7 +121,7 @@ public:
 		return true;
 	}
 
-	std::vector<std::string> GetExtensions() {
+	std::vector<std::string> GetSupportedExt() {
 		return _extensions;
 	}
     bool CanLoad(const std::string& ext) {

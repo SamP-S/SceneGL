@@ -3,8 +3,8 @@
 #include <string>
 #include <fstream>
 
-bool CheckFileExists(const std::string& path) {
-    std::ifstream file(path);
+bool CheckFileExists(const std::string& filepath) {
+    std::ifstream file(filepath);
     return file.good();
 }
 

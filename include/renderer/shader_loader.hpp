@@ -38,18 +38,18 @@ public:
 	ShaderLoader()
 		: AssetLoader() {}
 
-	bool Load(const std::string& path) {
+	bool Load(const std::string& filepath) {
 		// inspect file extension
-        std::string ext = GetFileExtension(path);
+        std::string ext = GetFileExtension(filepath);
         if (!CanLoad(ext)) {
-            std::cout << "WARNING (ShaderLoader): Trying to open file of unsupported ext @ " << path << std::endl;
+            std::cout << "WARNING (ShaderLoader): Trying to open file of unsupported ext @ " << filepath << std::endl;
             return false;
         }
 
         // open file
-        std::ifstream f(path);
+        std::ifstream f(filepath);
         if (!f.good()) {
-            std::cout << "WARNING (ShaderLoader): Failed to open file successfully @ " << path << std::endl;
+            std::cout << "WARNING (ShaderLoader): Failed to open file successfully @ " << filepath << std::endl;
             return false;
         }
         // load file contents as string
@@ -61,7 +61,7 @@ public:
             // dump file as string
             std::string source = strBuffer.str();
             // get name from filepath
-            std::string name = GetFileName(path) + GetFileExtension(path);
+            std::string name = GetFileName(filepath) + GetFileExtension(filepath);
             // replace ".ext" to "_ext"
             std::replace(name.begin(), name.end(), '.', '_');
             // look up stage type
@@ -70,7 +70,7 @@ public:
                 int stage = it->second;
                 resourceShaderStages.Create(name, source, stage);
             } else {
-                std::cout << "WARNING (ShaderLoader): Unsupported shader extension @ " << path << std::endl;
+                std::cout << "WARNING (ShaderLoader): Unsupported shader extension @ " << filepath << std::endl;
                 return false;
             }
         }
@@ -84,9 +84,10 @@ public:
 	std::vector<std::string> GetSupportedExt() {
 		return _extensions;
 	}
-    bool CanLoad(const std::string& ext) {
+    bool CanLoad(const std::string& filepath) {
+        std::string test_ext = GetFileExtension(filepath);
         for (const auto& ext : _extensions) {
-            if (ext.compare(ext) == 0)
+            if (test_ext.compare(ext) == 0)
                 return true;
         }
 		return false;

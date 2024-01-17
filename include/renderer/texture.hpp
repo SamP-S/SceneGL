@@ -51,7 +51,7 @@ class Texture : public Resource {
         Tex_Filtering mFilteringMin = Tex_Filtering::NEAREST_MIPMAP_LINEAR;
         Tex_Filtering mFilteringMag = Tex_Filtering::LINEAR;
         Tex_Target mTarget = Tex_Target::TEXTURE_2D;
-        std::string path = "";
+        std::string filepath = "";
         std::string type = "";
 
     public:

@@ -99,13 +99,13 @@ public:
 	ModelLoader()
 		: AssetLoader() {}
 
-	bool Load(const std::string& path) {
+	bool Load(const std::string& filepath) {
 		tinygltf::Model model;
 		tinygltf::TinyGLTF loader;
 		std::string err;
 		std::string warn;
 		
-		bool result = loader.LoadASCIIFromFile(&model, &err, &warn, path);
+		bool result = loader.LoadASCIIFromFile(&model, &err, &warn, filepath);
 		if (!result) {
 			std::cout << "WARNING: Failed to load glTF file: " << err << std::endl;
 			return false;
@@ -124,7 +124,7 @@ public:
 	std::vector<std::string> GetSupportedExt() {
 		return _extensions;
 	}
-    bool CanLoad(const std::string& ext) {
+    bool CanLoad(const std::string& filepath) {
 		return (ext.compare(".gltf") == 0);
 	};
 

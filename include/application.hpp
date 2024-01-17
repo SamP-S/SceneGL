@@ -10,19 +10,18 @@
 #include <map>
 #include <tinyfiledialogs.h>
 
-#include "texture.hpp"
-
-#include "graphics.hpp"
-#include "input.hpp"
-#include "entity.hpp"
+#include "renderer/texture.hpp"
+#include "renderer/graphics.hpp"
+#include "renderer/input.hpp"
+#include "ecs/entity.hpp"
 #include "la_extended.h"
 using namespace LA;
 
-#include "light_directional.hpp"
-#include "light_point.hpp"
-#include "mesh_renderer.hpp"
-#include "camera.hpp"
-#include "first_person.hpp"
+#include "renderer/light_directional.hpp"
+#include "renderer/light_point.hpp"
+#include "renderer/mesh_renderer.hpp"
+#include "renderer/camera.hpp"
+#include "scripting/first_person.hpp"
 
 class Application {
     private:

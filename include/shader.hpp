@@ -14,22 +14,19 @@
 #include "resource.hpp"
 #include "resource_manager.hpp"
 
-/*
-    IMPLEMENT
-    glGetShaderiv
-    glGetShaderInfoLog
-    glGetAttribLocation
-
-    Shader needs to be editable and recompilable to allow editing
-    Need to support geometry shader
-    Need to be able to parse the source code and pull the material data structure out
-    
-*/
+#define SHADER_INVALID  0
+#define SHADER_VERTEX   1
+#define SHADER_FRAGMENT 2
+#define SHADER_COMPUTE  3
+#define SHADER_GEOMETRY 4
+#define SHADER_TESSELLATION_CONTROL     5
+#define SHADER_TESSELLATION_EVALUATION  6
 
 class Shader : public Resource {
 
     private:
         bool _validShader = false;
+        int _shaderType = SHADER_INVALID;
 
         bool Compile() {
             const char* vShaderCode = vertexCode.c_str();
@@ -46,29 +43,6 @@ class Shader : public Resource {
             return true;
         }
 
-         static std::string GetSourceFromFile(const char* filePath) {
-            std::string code = "";
-            std::ifstream shaderFile;
-            // ensure ifstream objects can throw exceptions:
-            shaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-            try {
-                // open files
-                shaderFile.open(filePath);
-                std::stringstream shaderStream;
-                // read file's buffer contents into streams
-                shaderStream << shaderFile.rdbuf();
-                // close file handlers
-                shaderFile.close();
-                // convert stream into string
-                code = shaderStream.str();
-                // std::cout << code << std::endl;
-            }
-            catch (std::ifstream::failure& e) {
-                std::cout << e.what() << std::endl;
-                std::cout << "Error::Shader - FILE_NOT_SUCCESFULLY_READ" << std::endl;
-            }
-            return code;
-        }
 
     public:
         unsigned int id;

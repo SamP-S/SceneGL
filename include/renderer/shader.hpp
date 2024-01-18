@@ -35,7 +35,7 @@ class Shader : public Resource {
 
             // shader Program
             try {
-                _id = GL_Interface::CreateShaderProgram(_fs->GetSource().c_str(), _vs->GetSource().c_str());
+                _id = GL_Interface::CreateShaderProgram(_vs->GetSource().c_str(), _fs->GetSource().c_str());
             } catch (const char* err) {
                 std::cout << "Error: Shader::Compile - Complilation failed:" << std::endl;
                 std::cout << err << std::endl;

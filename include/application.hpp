@@ -29,9 +29,9 @@ using namespace LA;
 class Application {
     private:
         // SDL properties
-        int gl_major = 3;
-        int gl_minor = 3;
-        const char* glsl_version = "#version 420";
+        int gl_major = 4;
+        int gl_minor = 6;
+        const char* glsl_version = "#version 420 core";
         SDL_GLContext gl_context;
         SDL_Window* window;
         bool isQuit = false;
@@ -150,8 +150,7 @@ class Application {
             // Initialise SDL subsystems
             SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
 
-            // GL 3.3 + GLSL 330
-            glsl_version = "#version 330";
+            // GL 4.6 + GLSL 420
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major) != 0)
@@ -169,10 +168,6 @@ class Application {
             SDL_GL_MakeCurrent(window, gl_context);
             SDL_GL_SetSwapInterval(1); // Enable vsync
             SDL_SetWindowMinimumSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-            // get event
-            SDL_Event Event;
-            SDL_PollEvent(&Event);
         }
 
         void Destroy_SDL2() {

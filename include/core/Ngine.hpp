@@ -12,12 +12,12 @@
 
 namespace Ngine {
 
-    struct NameComponent {
+    struct CoreComponent {
         std::string name;
 
-        NameComponent() = default;
-        NameComponent(const NameComponent&) = default;
-        NameComponent(const std::string& pName)
+        CoreComponent() = default;
+        CoreComponent(const CoreComponent&) = default;
+        CoreComponent(const std::string& pName)
             : name(pName) {}
     };
 
@@ -99,7 +99,7 @@ namespace Ngine {
             
             template<typename T>
             void RemoveComponent() {
-                static_assert(!std::is_same_v<T, NameComponent>, "Cannot remove NameComponent.");
+                static_assert(!std::is_same_v<T, CoreComponent>, "Cannot remove CoreComponent.");
                 static_assert(!std::is_same_v<T, TransformComponent>, "Cannot remove TransformComponent.");
                 assert(HasComponent<T>() && "We don't have a component of this type to remove.");
                 _scene->_registry.remove<T>(_entityHandle);
@@ -120,7 +120,7 @@ namespace Ngine {
 
     Entity Scene::CreateEntity(const std::string& name=std::string("Name")) {
         Entity entity = {_registry.create(), this};
-        entity.AddComponent<NameComponent>(name);
+        entity.AddComponent<CoreComponent>(name);
         return entity;
     }
 
@@ -129,9 +129,9 @@ namespace Ngine {
     }
 
     Entity Scene::FindEntityByName(const std::string& name) {
-        auto view = _registry.view<NameComponent>();
+        auto view = _registry.view<CoreComponent>();
         for (auto entity : view) {
-            const NameComponent& nc = view.get<NameComponent>(entity);
+            const CoreComponent& nc = view.get<CoreComponent>(entity);
             if (nc.name == name)
                 return Entity{entity, this};
         }
@@ -143,7 +143,7 @@ namespace Ngine {
         return ViewToVector(view);
     }
     std::vector<Entity> Scene::GetEntities() {
-        auto view = _registry.view<NameComponent>();
+        auto view = _registry.view<CoreComponent>();
         return ViewToVector(view);
     }
 

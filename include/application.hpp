@@ -31,7 +31,7 @@ class Application {
         // SDL properties
         int gl_major = 4;
         int gl_minor = 6;
-        const char* glsl_version = "#version 420 core";
+        const char* glsl_version = "#version 460 core";
         SDL_GLContext gl_context;
         SDL_Window* window;
         bool isQuit = false;
@@ -74,8 +74,8 @@ class Application {
         _height(WINDOW_HEIGHT) {
             
             Initialise_SDL2(_width, _height);
-            Graphics.Initialise();
             Initialise();
+            Graphics.Initialise();
 
             // Load project folder
             entitySelected = nullptr;
@@ -150,7 +150,7 @@ class Application {
             // Initialise SDL subsystems
             SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
 
-            // GL 4.6 + GLSL 420
+            // GL 4.6 + GLSL 460
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
             if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major) != 0)

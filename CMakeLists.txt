@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 
 project(SceneGL VERSION 1.0.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD          17)
+set(CMAKE_CXX_STANDARD          20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS        OFF)
 set(CMAKE_BUILD_TYPE            Debug)
@@ -38,3 +38,4 @@ target_link_libraries(graphics PUBLIC ${CMAKE_DL_LIBS})
 
 add_executable(ecs_test "test/ecs_test.cpp")
 target_include_directories(ecs_test PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(ecs_test PUBLIC la)

@@ -14,7 +14,7 @@ namespace Ngine {
     
     class Entity;
 
-    class Scene {
+    class Scene : public Object {
         private:
             entt::registry _registry;
 
@@ -40,7 +40,7 @@ namespace Ngine {
             
     };
 
-    class Entity {
+    class Entity : public Object {
         private:
             entt::entity _entityHandle{entt::null};
             Scene* _scene = nullptr;

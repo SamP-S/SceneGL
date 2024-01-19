@@ -18,6 +18,10 @@ class OpenGLShader : public Shader {
             : Shader(name, vs, fs) {
             Compile();
         }
+
+        ~OpenGLShader() {
+            glDeleteProgram(_programId);
+        }
         
         // validity getter
         bool IsUsable() const override {

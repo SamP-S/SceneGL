@@ -14,6 +14,7 @@ namespace Ngine {
 
     struct CoreComponent {
         std::string name;
+        bool active = true;
 
         CoreComponent() = default;
         CoreComponent(const CoreComponent&) = default;
@@ -22,9 +23,35 @@ namespace Ngine {
     };
 
     struct TransformComponent {
-        LA::vec3 _position;
-        LA::vec3 _rotation;
-        LA::vec3 _scale;
+        LA::vec3 _position  = LA::vec3(0.0f);
+        LA::vec3 _rotation  = LA::vec3(0.0f);
+        LA::vec3 _scale     = LA::vec3(1.0f);
+
+        TransformComponent() = default;
+        TransformComponent(const CoreComponent&) = default;
+        TransformComponent(const LA::vec3& pos)
+            : _position(pos) {}
+
+
+        LA::mat4 GetTransform() {
+            return Transformation(_position, _rotation, _scale);
+        }
+
+        LA::vec3 GetForward() {
+            mat4 total = GetTransform();
+            return vec3({ total[2][0], total[2][1], total[2][2] });
+        }
+
+        LA::vec3 GetRight() {
+            mat4 total = GetTransform();
+            return vec3({ total[0][0], total[0][1], total[0][2] });
+        }
+
+        LA::vec3 GetUp() {
+            mat4 total = GetTransform();
+            return vec3({ total[1][0], total[1][1], total[1][2] });
+        }
+        
     };
     
     class Entity;
@@ -57,13 +84,18 @@ namespace Ngine {
         private:
             entt::entity _entityHandle{entt::null};
             Scene* _scene = nullptr;
-
+            
         public:
+
+            // constructors
             Entity() = default;
             Entity(entt::entity handle, Scene* scene)
-                : _entityHandle(handle), _scene(scene) {}
+                : _entityHandle(handle), _scene(scene) {
+                    
+                }
             Entity(const Entity& other) = default;
 
+            // auto casting
             operator bool() const { return _entityHandle != entt::null; }
             operator entt::entity() const { return _entityHandle; }
 		    operator uint32_t() const { return (uint32_t)_entityHandle; }

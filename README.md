@@ -7,6 +7,12 @@ A simple OpenGL rendering engine for experimenting with graphics and game engine
 Goals:
     ## Tasks
 
+    ### High Level Operation
+    - [ ] Create ISystem for systems to inherit
+    - [ ] Implement each system to initialise, start, update, stop, shutdown
+    - [ ] Create sim abstraction to encapsulate all game/sim runtime systems & scenes
+    - [ ] Create simulation to be able to run given simulation, configured at runtime 
+
     ### Rendering
     - [x] Implement OpenGL rasterization
     - [x] Create graphics layer interface to abstract OpenGL implementation
@@ -32,6 +38,8 @@ Goals:
 
     ### Physics
     - [ ] Implement AABB collision detection
+    - [ ] Implement Sphere collision detection
+    - [ ] Implement RigidBody
     - [ ] Implement collision reponse/fixing
     - [ ] Implement raycasting support
     - [ ] Draw physics
@@ -40,28 +48,36 @@ Goals:
     - [x] Implement entities
     - [x] Implement components
     - [x] Implement entity-component engine
-    - [x] Implement scene tree
+    - [ ] Implement scene tree
     - [x] Support empty enities
-    - [ ] Pass as references not pointers
-    - [ ] Support build pattern creation
+    - [x] Pass as references not pointers
+    - [x] Support build pattern creation
     - [x] Children in JSON
-    - [ ] Ensure all components follow single responsibility
+    - [x] Ensure all components follow single responsibility
+    - [x] Implement using entt
+    - [x] Use smart pointers
+    - [ ] Implement gizmos, render all component types
+    - [ ] 
 
-    ### Resources
-    - [x] Implement general resource manager
-    - [ ] Use integer id handle system
-    - [ ] Force all instance creation through resource manager
-    - [ ] Resource manager built into resource
-
-    ### Assets
+    ### Asset Manager
     - [x] Implement asset manager
+    - [x] Use smart pointers
+    - [x] Implement generic, centralise all assets
+    - [x] Store each asset type in its own array
+
+    ### Asset Loaders
     - [ ] Support loading and saving
     - [ ] Support json files
     - [ ] Support audio files
     - [ ] Support image files
     - [ ] Support text files
+    - [x] Support shader files
     - [x] Support 3D model files
     - [ ] Support animation files
+
+    ### Editor Camera
+    - [x] Implement editor camera
+    - [ ] Inherit from general camera
 
     ### Shaders
     - [ ] Live shader editing
@@ -75,7 +91,6 @@ Goals:
 
     ### GUI
     - [x] Implement ImGui
-    - [ ] First person controller as component panel
     - [ ] Support dynamic gui loading with interfaces
     - [ ] Create resource preview
     - [ ] Create asset manager

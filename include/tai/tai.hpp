@@ -44,8 +44,12 @@ namespace Tai {
             if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
                 uint32_t buf = _assetLibrary.size();
                 _typeToBuffer[s] = buf;
+                // add buffer
                 std::vector<std::shared_ptr<Asset>> newBuffer;
                 _assetLibrary.push_back(newBuffer);
+                // add id look up table
+                std::map<ObjectId, uint32_t> newLut;
+                _idToIndex.push_back(newLut);
             }
         }
 
@@ -78,7 +82,8 @@ namespace Tai {
             std::string s = typeid(T).name();
             uint32_t buf = _typeToBuffer[s];
             std::shared_ptr<T> newAsset = std::make_shared<T>(std::forward<Args>(args)...);
-            _idToIndex[buf][newAsset->id] = _assetLibrary[buf].size();
+            uint32_t idx = _assetLibrary[buf].size();
+            _idToIndex[buf].emplace(newAsset->id, idx);
             _assetLibrary[buf].push_back(newAsset);
             return newAsset;
         }

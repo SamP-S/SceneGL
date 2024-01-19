@@ -88,11 +88,11 @@ private:
 	}
 
 	void ProcessMaterial(const tinygltf::Material& material, const tinygltf::Model& model) {
-		const std::vector<double>& baseD = material.pbrMetallicRoughness.baseColorFactor;
-		vec4 colour = vec4(std::vector<float>(baseD.begin(), baseD.end()));
-		float metallic = material.pbrMetallicRoughness.metallicFactor;
-		float roughness = material.pbrMetallicRoughness.roughnessFactor;
-		assetManager.CreateAsset<Material>(material.name, colour, metallic, roughness);
+		// const std::vector<double>& baseD = material.pbrMetallicRoughness.baseColorFactor;
+		// vec4 colour = vec4(std::vector<float>(baseD.begin(), baseD.end()));
+		// float metallic = material.pbrMetallicRoughness.metallicFactor;
+		// float roughness = material.pbrMetallicRoughness.roughnessFactor;
+		// assetManager.CreateAsset<Material>(material.name, colour, metallic, roughness);
 	}
 
 public:

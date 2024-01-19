@@ -450,10 +450,10 @@ class Application {
             ObjectId meshId = mrc.mesh;
             if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": assetManager.GetAsset<Mesh>(meshId)->name.c_str()))) {
                 for (auto it = assetManager.begin<Mesh>(); it != assetManager.end<Mesh>(); ++it) {
-                    std::cout << "Check it" << std::endl;
-                    // if (ImGui::Selectable(it->name.c_str())) {
-                    //     mrc.mesh = it->id;
-                    // }
+                    auto mesh = *it;
+                    if (ImGui::Selectable(mesh->name.c_str())) {
+                        mrc.mesh = mesh->id;
+                    }
                 }
                 ImGui::EndCombo();
             }

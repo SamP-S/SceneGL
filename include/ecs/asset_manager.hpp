@@ -4,22 +4,24 @@
 #include <vector>
 #include <string>
 #include <typeinfo>
+#include <map>
 
 #include "core/filepath.hpp"
 #include "ecs/asset_loader.hpp"
 #include "renderer/model_loader.hpp"
 #include "renderer/shader_loader.hpp"
 
+
 class AssetManager {
 private:
     std::vector<AssetLoader*> _loaders;
     std::vector<Asset*> _assets;
 
+    std::map<std::string, uint32_t> _extToLoader;
+    std::map<uint32_t, uint32_t> _idToType;
+
 public:
-    AssetManager() {
-        _loaders.push_back(new ModelLoader());
-        _loaders.push_back(new ShaderLoader());
-    }
+    AssetManager() {}
 
     ~AssetManager() {
         // clear loaders
@@ -34,6 +36,10 @@ public:
         _assets.clear();
     }
 
+    void AddLoader(AssetLoader* loader) {
+        _loaders.push_back(loader);
+    }
+
     bool Load(const std::string& filepath) {
         for (auto loader : _loaders) {
             if (loader != nullptr && loader->CanLoad(filepath)) {
@@ -44,6 +50,9 @@ public:
         return false;
     }
 
-};
+    template<typename T>
+    T& GetAsset() {
 
-AssetManager assetManager = AssetManager();
+    }
+
+};

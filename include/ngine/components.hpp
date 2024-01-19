@@ -8,7 +8,7 @@
 // internal libs
 #include "la_extended.h"
 
-struct CoreComponent {
+struct CoreComponent : public Object {
     std::string name;
     bool active = true;
 
@@ -18,7 +18,7 @@ struct CoreComponent {
         : name(pName) {}
 };
 
-struct TransformComponent {
+struct TransformComponent : public Object {
     LA::vec3 position  = LA::vec3(0.0f);
     LA::vec3 rotation  = LA::vec3(0.0f);
     LA::vec3 scale     = LA::vec3(1.0f);
@@ -50,7 +50,7 @@ struct TransformComponent {
     
 };
 
-struct CameraComponent {
+struct CameraComponent : public Object {
     float fov = 45.0f;
     float near = 0.1f;
     float far = 100.0f;
@@ -67,7 +67,7 @@ struct CameraComponent {
 };
 
 #define DIRECTIONAL_LIGHT_MAX 4
-struct DirectionalLightComponent {
+struct DirectionalLightComponent : public Object {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
 
@@ -76,7 +76,7 @@ struct DirectionalLightComponent {
 };
 
 #define POINT_LIGHT_MAX 16
-struct PointLightComponent {
+struct PointLightComponent : public Object {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
     float range = 10.0f;
@@ -85,7 +85,7 @@ struct PointLightComponent {
     PointLightComponent(const PointLightComponent&) = default;
 };
 
-struct MeshRendererComponent {
+struct MeshRendererComponent : public Object {
     uint32_t mesh = 0;
 
     MeshRendererComponent() = default;

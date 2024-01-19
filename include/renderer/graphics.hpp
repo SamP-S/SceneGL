@@ -28,6 +28,8 @@
 #include "renderer/frame.hpp"
 #include "renderer/editor_camera.hpp"
 
+#include "renderer/model_loader.hpp"
+#include "renderer/shader_loader.hpp"
 
 class GraphicsEngine {
     private:
@@ -38,6 +40,7 @@ class GraphicsEngine {
         Frame* frame = nullptr;
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+        AssetManager assetManager = AssetManager();
 
         GraphicsEngine(int width, int height) :
         _width(width), _height(height) { }
@@ -58,6 +61,10 @@ class GraphicsEngine {
             frame->SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
              
             GL_Interface::BindFrameBufferObj(0);
+
+            // add loaders to asset libary
+            assetManager.AddLoader(new ModelLoader());
+            assetManager.AddLoader(new ShaderLoader());
 
             // load default model(s)
             assetManager.Load("models/presets/cone.gltf");

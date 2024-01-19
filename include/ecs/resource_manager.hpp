@@ -23,12 +23,12 @@ class ResourceManager {
         }
 
         int Add(T* item) {
-            int id = ((Resource*)item)->GetId();
+            int id = ((Resource*)item)->id;
             _resourceMap.insert({id, item});
             return id;
         }
 
-        bool Remove(ObjId id) {
+        bool Remove(ObjectId id) {
             try {
                 T* itemPtr = _resourceMap.at(id);
                 delete itemPtr;
@@ -98,7 +98,7 @@ class ResourceManager {
         template<typename... Args>
         int Create(Args&&... args) {
             T* item = new T(std::forward<Args>(args)...);
-            int id = ((Resource*)item)->GetId();
+            int id = ((Resource*)item)->id;
             _resourceMap.insert({id, item});
             return id;
         }

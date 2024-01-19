@@ -41,6 +41,7 @@ class GraphicsEngine {
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
         AssetManager assetManager = AssetManager();
+        LoaderManager loaderManager = LoaderManager();
 
         GraphicsEngine(int width, int height) :
         _width(width), _height(height) { }
@@ -63,23 +64,23 @@ class GraphicsEngine {
             GL_Interface::BindFrameBufferObj(0);
 
             // add loaders to asset libary
-            assetManager.AddLoader(new ModelLoader());
-            assetManager.AddLoader(new ShaderLoader());
+            loaderManager.AddLoader(new ModelLoader());
+            loaderManager.AddLoader(new ShaderLoader());
 
             // load default model(s)
-            assetManager.Load("models/presets/cone.gltf");
-            assetManager.Load("models/presets/cube.gltf");
-            assetManager.Load("models/presets/cylinder.gltf");
-            assetManager.Load("models/presets/dome.gltf");
-            assetManager.Load("models/presets/ico_sphere.gltf");
-            assetManager.Load("models/presets/plane.gltf");
-            assetManager.Load("models/presets/prism.gltf");
-            assetManager.Load("models/presets/sphere.gltf");
+            loaderManager.Load("models/presets/cone.gltf");
+            loaderManager.Load("models/presets/cube.gltf");
+            loaderManager.Load("models/presets/cylinder.gltf");
+            loaderManager.Load("models/presets/dome.gltf");
+            loaderManager.Load("models/presets/ico_sphere.gltf");
+            loaderManager.Load("models/presets/plane.gltf");
+            loaderManager.Load("models/presets/prism.gltf");
+            loaderManager.Load("models/presets/sphere.gltf");
             // load default shader(s)
-            assetManager.Load("shaders/base.vert");
-            assetManager.Load("shaders/base.frag");
-            assetManager.Load("shaders/lighting.vert");
-            assetManager.Load("shaders/lighting.frag");
+            loaderManager.Load("shaders/base.vert");
+            loaderManager.Load("shaders/base.frag");
+            loaderManager.Load("shaders/lighting.vert");
+            loaderManager.Load("shaders/lighting.frag");
             resourceShaders.Create("base", resourceShaderStages.Get("base_vert"), resourceShaderStages.Get("base_frag"));
             resourceShaders.Create("lighting", resourceShaderStages.Get("lighting_vert"), resourceShaderStages.Get("lighting_frag"));
 

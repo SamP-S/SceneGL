@@ -447,9 +447,9 @@ class Application {
                 e.RemoveComponent<MeshRendererComponent>();
             }
             int meshId = mrc.mesh;
-            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
+            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->name.c_str()))) {
                 for (auto it = resourceMeshes.begin(); it != resourceMeshes.end(); it++) {
-                    if (ImGui::Selectable(it->second->GetName().c_str())) {
+                    if (ImGui::Selectable(it->second->name.c_str())) {
                     mrc.mesh = it->first;
                     }
                 }

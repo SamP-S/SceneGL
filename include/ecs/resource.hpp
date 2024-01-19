@@ -6,13 +6,11 @@
 
 
 class Resource : public Object {
+public:
+    std::string name;
 
-    private:
-        std::string _name;
-
-    public:
-        Resource(std::string name);
-        
-        std::string GetName();
-        void SetName(std::string name);
+    Resource() = default;
+    Resource(const Resource&) = default;
+    Resource(const std::string& name)
+        : name(name) {}
 };

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "ecs/filepath.hpp"
+#include "core/filepath.hpp"
 #include "ecs/asset.hpp"
 
 class AssetLoader {

@@ -14,7 +14,7 @@
 #include <memory>
 
 #include "ecs/entity.hpp"
-#include "ecs/filepath.hpp"
+#include "core/filepath.hpp"
 #include "ecs/scene.hpp"
 #include "ecs/resource_manager.hpp"
 #include "ecs/asset_manager.hpp"
@@ -24,7 +24,7 @@ using namespace LA;
 #include "json.hpp"
 using namespace nlohmann;
 
-#include "renderer/frame_timer.hpp"
+#include "core/frame_timer.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/texture.hpp"
 #include "renderer/mesh.hpp"

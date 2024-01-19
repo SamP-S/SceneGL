@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "ecs/asset_loader.hpp"
-#include "ecs/filepath.hpp"
+#include "core/filepath.hpp"
 #include "renderer/shader.hpp"
 
 //  GLSL standard shader file extensions

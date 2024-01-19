@@ -5,7 +5,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "ecs/filepath.hpp"
+#include "core/filepath.hpp"
 #include "ecs/asset_loader.hpp"
 #include "renderer/model_loader.hpp"
 #include "renderer/shader_loader.hpp"

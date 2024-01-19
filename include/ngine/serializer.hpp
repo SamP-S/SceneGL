@@ -7,6 +7,7 @@
 #include <fstream>
 // internal libs
 #include "ngine/ngine.hpp"
+#include "renderer/mesh.hpp"
 // external libs
 #include "json.hpp"
 using namespace nlohmann;
@@ -47,6 +48,10 @@ namespace Ngine {
         
         private:
 
+            LA::vec3 DeserializeColour(json j) {
+                return LA::vec3({j["r"], j["g"], j["b"]});
+            }
+
             LA::vec3 DeserializeVec3(json j) {
                 return LA::vec3({j["x"], j["y"], j["z"]});
             }
@@ -65,19 +70,29 @@ namespace Ngine {
                 // iterate through non-essential components
                 json components = j["components"];
                 for (auto& [key, value] : components.items()) {
+
                     if (value.contains("directionalLight")) {
-                        // not implemented
+                        DirectionalLightComponent& plc = entity.AddComponent<DirectionalLightComponent>();
+                        plc.colour = DeserializeColour(value["directionalLight"]["colour"]);
+                        plc.intensity = value["directionalLight"]["intensity"];
+
                     } else if (value.contains("pointLight")) {
-                        // not implemented
+                        PointLightComponent& plc = entity.AddComponent<PointLightComponent>();
+                        plc.colour = DeserializeColour(value["pointLight"]["colour"]);
+                        plc.intensity = value["pointLight"]["intensity"];
+                        plc.range = value["pointLight"]["range"];
+
                     } else if (value.contains("meshRenderer")) {
-                        // not implemented
+                        MeshRendererComponent& mrc = entity.AddComponent<MeshRendererComponent>();
+                        std::string meshName = value["meshRenderer"]["meshName"];
+                        mrc.mesh = resourceMeshes.GetId(meshName);
+
                     } else if (value.contains("camera")) {
                         CameraComponent& cc = entity.AddComponent<CameraComponent>();
-                        cc.fov = j["camera"]["fov"];
-                        cc.near = j["camera"]["near"];
-                        cc.far = j["camera"]["far"];
-                    } else if (value.contains("firstPersonController")) {
-                        // not implemented
+                        cc.fov = value["camera"]["fov"];
+                        cc.near = value["camera"]["near"];
+                        cc.far = value["camera"]["far"];
+
                     } else {
                         std::cout << "WARNING (JsonSerializer): Trying to deserializer unknown component:" << std::endl;
                         std::cout << value << std::endl;
@@ -90,7 +105,7 @@ namespace Ngine {
                 if (!inputFile.good()) {
                     std::cout << "WARNING (JsonSerializer): Scene file does not exist: " << filepath << std::endl;
                     return json();
-                }
+                } 
                 if (!inputFile.is_open()) {
                     std::cout << "WARNING (JsonSerializer): Can't open file: " << filepath << std::endl;
                     return json();

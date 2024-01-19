@@ -8,7 +8,7 @@
 
 #define GL_VERSION_4_4
 #include <GL/glew.h>
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 
 #include "la_extended.h"
 using namespace LA;

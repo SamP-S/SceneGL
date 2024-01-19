@@ -8,6 +8,5 @@ imgui.ini
 # ingore build directories
 bin/
 build/
-test/
 
 test_project/

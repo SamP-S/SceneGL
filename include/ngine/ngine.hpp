@@ -36,6 +36,7 @@ namespace Ngine {
             template<typename... Components>
             std::vector<Entity> GetEntitiesWith();
             std::vector<Entity> GetEntities();
+            std::size_t GetEntityCount();
             
     };
 
@@ -147,6 +148,11 @@ namespace Ngine {
     std::vector<Entity> Scene::GetEntities() {
         auto view = _registry.view<CoreComponent>();
         return ViewToVector(view);
+    }
+
+    std::size_t Scene::GetEntityCount() {
+        auto view = _registry.view<CoreComponent>();
+        return view.size();
     }
 
 }

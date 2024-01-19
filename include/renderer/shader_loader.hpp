@@ -20,7 +20,7 @@
 // .frag - a fragment shader
 // .comp - a compute shader
 
-class ShaderLoader : public IAssetLoader {
+class ShaderLoader : public Tai::IAssetLoader {
 private:
     std::vector<std::string> _extensions = {".vert", ".tesc", ".tese", ".geom", ".frag", ".comp"};
     
@@ -68,7 +68,7 @@ public:
             auto it = _extToType.find(ext);
             if (it != _extToType.end()) {
                 int stage = it->second;
-                resourceShaderStages.Create(name, source, stage);
+                assetManager.CreateAsset<ShaderStage>(name, source, stage);
             } else {
                 std::cout << "WARNING (ShaderLoader): Unsupported shader extension @ " << filepath << std::endl;
                 return false;

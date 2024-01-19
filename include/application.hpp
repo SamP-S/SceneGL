@@ -15,6 +15,7 @@
 
 #include "ngine/components.hpp"
 #include "ngine/ngine.hpp"
+#include "tai/tai.hpp"
 using namespace Ngine;
 
 #include "renderer/graphics.hpp"
@@ -55,6 +56,8 @@ class Application {
         Entity entitySelected;
         int new_entity_count = 0;
         int componentPanelCount = 0;
+
+        Tai::AssetManager&  assetManager = Tai::AssetManager::Instance();
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},
@@ -297,9 +300,9 @@ class Application {
                             new_entity_count += 1;
 
                             // build components
-                            int meshId = resourceMeshes.GetId("empty");
+                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>("empty");
                             MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                            mrc.mesh = meshId;
+                            mrc.mesh = mesh->id;
                         }
                         if (ImGui::MenuItem("New Cube")) {
                             // debug
@@ -310,9 +313,9 @@ class Application {
                             new_entity_count += 1;
 
                             // build components
-                            int meshId = resourceMeshes.GetId("vertex_cube");
+                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>("vertex_cube");
                             MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                            mrc.mesh = meshId;
+                            mrc.mesh = mesh->id;
                         }
                     }
                     ImGui::EndMenu();
@@ -444,12 +447,13 @@ class Application {
             if (ImGui::Button("X")) {
                 e.RemoveComponent<MeshRendererComponent>();
             }
-            int meshId = mrc.mesh;
-            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->name.c_str()))) {
-                for (auto it = resourceMeshes.begin(); it != resourceMeshes.end(); it++) {
-                    if (ImGui::Selectable(it->second->name.c_str())) {
-                    mrc.mesh = it->first;
-                    }
+            ObjectId meshId = mrc.mesh;
+            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": assetManager.GetAsset<Mesh>(meshId)->name.c_str()))) {
+                for (auto it = assetManager.begin<Mesh>(); it != assetManager.end<Mesh>(); ++it) {
+                    std::cout << "Check it" << std::endl;
+                    // if (ImGui::Selectable(it->name.c_str())) {
+                    //     mrc.mesh = it->id;
+                    // }
                 }
                 ImGui::EndCombo();
             }

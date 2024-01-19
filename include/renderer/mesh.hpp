@@ -13,7 +13,7 @@ using namespace LA;
 // each sub-mesh can have its own material but ONLY 1 material
 // multiple materials for a submesh need multiple sub-meshes
 
-class Mesh : public Asset {
+class Mesh : public Tai::Asset {
     private:
         bool _isGenerated = false;
 

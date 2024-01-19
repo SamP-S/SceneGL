@@ -14,10 +14,10 @@
 #include "renderer/shader_stage.hpp"
 #include "renderer/gl_interface.hpp"
 
-class Shader : public Asset {
+class Shader : public Tai::Asset {
     private:
-        ShaderStage* _vs = nullptr;
-        ShaderStage* _fs = nullptr;
+        std::shared_ptr<ShaderStage> _vs = nullptr;
+        std::shared_ptr<ShaderStage> _fs = nullptr;
         bool _validShader = false;
         uint32_t _id = -1;
 
@@ -44,7 +44,7 @@ class Shader : public Asset {
         }
 
     public:
-        Shader(std::string name="Default Shader", ShaderStage* vs=nullptr, ShaderStage* fs=nullptr) : 
+        Shader(std::string name="Default Shader", std::shared_ptr<ShaderStage> vs=nullptr, std::shared_ptr<ShaderStage> fs=nullptr) : 
         Asset(name), _vs(vs), _fs(fs) {
             _validShader = Compile();
         }
@@ -100,5 +100,3 @@ class Shader : public Asset {
         }
 
 };
-
-extern ResourceManager<Shader> resourceShaders;

@@ -15,7 +15,7 @@
 #define SHADER_TESSELLATION_CONTROL     5
 #define SHADER_TESSELLATION_EVALUATION  6
 
-class ShaderStage : public Asset {
+class ShaderStage : public Tai::Asset {
     private:
         std::string _source;
         int _stage = SHADER_INVALID;

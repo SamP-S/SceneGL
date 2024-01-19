@@ -6,7 +6,7 @@
 
 #include "tai/tai.hpp"
 
-class Material : public Asset {
+class Material : public Tai::Asset {
 
     private:
         vec4 _baseColour = vec4(1.0f);

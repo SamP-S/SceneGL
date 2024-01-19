@@ -20,6 +20,7 @@
 #include "la_extended.h"
 
 #include "core/frame_timer.hpp"
+#include "renderer/shader_stage.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/frame.hpp"
@@ -37,8 +38,8 @@ class GraphicsEngine {
         Frame* frame = nullptr;
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-        AssetManager assetManager = AssetManager();
-        LoaderManager loaderManager = LoaderManager();
+        Tai::AssetManager& assetManager = Tai::AssetManager::Instance();
+        Tai::LoaderManager loaderManager = Tai::LoaderManager();
 
         GraphicsEngine(int width, int height) :
         _width(width), _height(height) { }
@@ -78,8 +79,16 @@ class GraphicsEngine {
             loaderManager.Load("shaders/base.frag");
             loaderManager.Load("shaders/lighting.vert");
             loaderManager.Load("shaders/lighting.frag");
-            resourceShaders.Create("base", resourceShaderStages.Get("base_vert"), resourceShaderStages.Get("base_frag"));
-            resourceShaders.Create("lighting", resourceShaderStages.Get("lighting_vert"), resourceShaderStages.Get("lighting_frag"));
+            assetManager.CreateAsset<Shader>(
+                "base",
+                assetManager.GetAsset<ShaderStage>("base_vert"),
+                assetManager.GetAsset<ShaderStage>("base_frag")
+            );
+            assetManager.CreateAsset<Shader>(
+                "lighting",
+                assetManager.GetAsset<ShaderStage>("lighting_vert"),
+                assetManager.GetAsset<ShaderStage>("lighting_frag")
+            );
 
             LoadScene("scene/Preset.json");    
 
@@ -116,7 +125,7 @@ class GraphicsEngine {
             std::cout << "NOT IMPLEMENTED" << std::endl;
         }
 
-        void ShaderDirectionalLights(Shader& shader) {
+        void ShaderDirectionalLights(std::shared_ptr<Shader> shader) {
             std::vector<Entity> entities = scene->GetEntitiesWith<DirectionalLightComponent>();
             
             // directional lights
@@ -128,17 +137,17 @@ class GraphicsEngine {
                 if (i < entities.size()) {
                     TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
                     DirectionalLightComponent& dlc = entities[i].GetComponent<DirectionalLightComponent>();
-                    shader.SetVec3("iDirectionalLights" + index + ".direction", tc.GetForward());
-                    shader.SetFloat("iDirectionalLights" + index + ".intensity", dlc.intensity);
-                    shader.SetVec3("iDirectionalLights" + index + ".colour", dlc.colour);
-                    shader.SetInt("iDirectionalLights" + index + ".enabled", 1);
+                    shader->SetVec3("iDirectionalLights" + index + ".direction", tc.GetForward());
+                    shader->SetFloat("iDirectionalLights" + index + ".intensity", dlc.intensity);
+                    shader->SetVec3("iDirectionalLights" + index + ".colour", dlc.colour);
+                    shader->SetInt("iDirectionalLights" + index + ".enabled", 1);
                 } else {
-                    shader.SetInt("iDirectionalLights" + index + ".enabled", 0);
+                    shader->SetInt("iDirectionalLights" + index + ".enabled", 0);
                 }
             }
         }
 
-        void ShaderPointLights(Shader& shader) {
+        void ShaderPointLights(std::shared_ptr<Shader> shader) {
             std::vector<Entity> entities = scene->GetEntitiesWith<PointLightComponent>();
 
             // point lights
@@ -150,27 +159,27 @@ class GraphicsEngine {
                 if (i < entities.size()) {
                     TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
                     PointLightComponent& plc = entities[i].GetComponent<PointLightComponent>();
-                    shader.SetVec3("iPointLights" + index + ".position", tc.position);
-                    shader.SetFloat("iPointLights" + index + ".intensity", plc.intensity);
-                    shader.SetVec3("iPointLights" + index + ".colour", plc.colour);
-                    shader.SetInt("iPointLights" + index + ".enabled", 1);
+                    shader->SetVec3("iPointLights" + index + ".position", tc.position);
+                    shader->SetFloat("iPointLights" + index + ".intensity", plc.intensity);
+                    shader->SetVec3("iPointLights" + index + ".colour", plc.colour);
+                    shader->SetInt("iPointLights" + index + ".enabled", 1);
                 } else {
-                    shader.SetInt("iPointLights" + index + ".enabled", 0);
+                    shader->SetInt("iPointLights" + index + ".enabled", 0);
                 }
             }
         }
 
-        void SetupShader(Shader& shader) {
-            shader.Use();
+        void SetupShader(std::shared_ptr<Shader> shader) {
+            shader->Use();
             // vertex uniforms
-            shader.SetMat4("iView", &inverse(editorCamera.transform.GetTransform())[0][0]);
-            shader.SetMat4("iProjection", &(editorCamera.GetProjection())[0][0]);
+            shader->SetMat4("iView", &inverse(editorCamera.transform.GetTransform())[0][0]);
+            shader->SetMat4("iProjection", &(editorCamera.GetProjection())[0][0]);
             // fragment uniforms
-            shader.SetVec3("iResolution", _width, _height, 1.0f);
-            shader.SetFloat("iTime", ft.GetTotalElapsed());
-            shader.SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            shader.SetInt("iFrame", ft.GetFrameCount());
-            shader.SetVec3("iCameraPosition", editorCamera.transform.position); 
+            shader->SetVec3("iResolution", _width, _height, 1.0f);
+            shader->SetFloat("iTime", ft.GetTotalElapsed());
+            shader->SetFloat("iTimeDelta", ft.GetFrameElapsed());
+            shader->SetInt("iFrame", ft.GetFrameCount());
+            shader->SetVec3("iCameraPosition", editorCamera.transform.position); 
  
             ShaderDirectionalLights(shader);
             ShaderPointLights(shader);     
@@ -178,7 +187,7 @@ class GraphicsEngine {
 
         void Draw(MeshRendererComponent& renderer, bool wireframe=false) {
             if (renderer.mesh != 0) {
-                Mesh* mesh = resourceMeshes.Get(renderer.mesh);
+                std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>(renderer.mesh);
                 if (mesh == NULL || !mesh->GetIsGenerated()) {
                     std::cout << "WARNING (Graphics): Attempting to render a bad mesh." << std::endl;
                     return;
@@ -198,7 +207,7 @@ class GraphicsEngine {
             }
         }
 
-        void RenderObject(Entity entity, mat4 root_trans = mat4(), Shader* shader=NULL, bool wireframe=false) {
+        void RenderObject(Entity entity, mat4 root_trans = mat4(), std::shared_ptr<Shader> shader=nullptr, bool wireframe=false) {
             TransformComponent& tc = entity.GetComponent<TransformComponent>();
             mat4 model = root_trans *  tc.GetTransform();
 
@@ -220,12 +229,14 @@ class GraphicsEngine {
             GL_Interface::SetViewport(_width, _height);
             GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
-            for (auto& shaderPair : resourceShaders) {
-                SetupShader(*shaderPair.second);
+            std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<Shader>();
+            for (auto shader : shaders) {
+                auto ptr = std::dynamic_pointer_cast<Shader>(shader);
+                SetupShader(ptr);
             }
 
-            Shader* baseShader = resourceShaders.Get("base");
-            Shader* lightingShader = resourceShaders.Get("lighting");
+            std::shared_ptr<Shader> baseShader = assetManager.GetAsset<Shader>("base");
+            std::shared_ptr<Shader> lightingShader = assetManager.GetAsset<Shader>("lighting");
 
             editorCamera.Update();
 

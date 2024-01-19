@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 
+#include "tai/tai.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"
 #include "la_extended.h"
@@ -20,7 +21,7 @@ using namespace LA;
 #include "tiny_gltf.h"
 
 
-class ModelLoader : public IAssetLoader {
+class ModelLoader : public Tai::IAssetLoader {
 
 private:
     std::vector<std::string> _extensions = {".gltf"};
@@ -82,7 +83,7 @@ private:
 				indices.push_back(index);
 			}
 			// std::cout << vertices.size() << "|" << normals.size() << "|" << indices.size() << std::endl;
-			resourceMeshes.Create(mesh.name, vertices, normals, indices);
+			assetManager.CreateAsset<Mesh>(mesh.name, vertices, normals, indices);
 		}
 	}
 
@@ -91,7 +92,7 @@ private:
 		vec4 colour = vec4(std::vector<float>(baseD.begin(), baseD.end()));
 		float metallic = material.pbrMetallicRoughness.metallicFactor;
 		float roughness = material.pbrMetallicRoughness.roughnessFactor;
-		resourceMaterials.Create(material.name, colour, metallic, roughness);
+		assetManager.CreateAsset<Material>(material.name, colour, metallic, roughness);
 	}
 
 public:

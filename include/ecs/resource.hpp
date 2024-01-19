@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "ecs/object.hpp"
+#include "ngine/object.hpp"
 
 
 class Resource : public Object {

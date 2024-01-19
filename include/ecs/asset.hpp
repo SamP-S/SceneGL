@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-#include "ecs/object.hpp"
+#include "ngine/object.hpp"
 
 
 class Asset : public Object {

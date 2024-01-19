@@ -366,7 +366,7 @@ class Application {
             float wHeight = render_region_max.y - render_region_min.y;
             ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
             Graphics.Render();
-            ImGui::Image((ImTextureID)Graphics.frame->GetTexColour(), wSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((ImTextureID)Graphics.frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
             // ImGui::GetForegroundDrawList()->AddRect(render_region_min + pos, render_region_max + pos, IM_COL32(255, 255, 0, 255));
             ImGui::End();
         }

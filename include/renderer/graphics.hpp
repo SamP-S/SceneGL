@@ -22,9 +22,9 @@
 #include "core/frame_timer.hpp"
 #include "platform/opengl/opengl_shader.hpp"
 #include "platform/opengl/opengl_shader_source.hpp"
+#include "platform/opengl/opengl_frame_buffer.hpp"
 
 #include "renderer/mesh.hpp"
-#include "renderer/frame.hpp"
 #include "renderer/editor_camera.hpp"
 
 #include "renderer/model_loader.hpp"
@@ -36,17 +36,15 @@ class GraphicsEngine {
 
     public:
         frame_timer ft = frame_timer();
-        Frame* frame = nullptr;
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
         Tai::AssetManager& assetManager = Tai::AssetManager::Instance();
         Tai::LoaderManager loaderManager = Tai::LoaderManager();
+        std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
 
         GraphicsEngine(int width, int height) :
         _width(width), _height(height) { }
-        ~GraphicsEngine() {
-            delete frame;
-        }
+        ~GraphicsEngine() {}
 
         void Initialise() {
             SetViewport(_width, _height);
@@ -57,10 +55,8 @@ class GraphicsEngine {
             glewExperimental = GL_TRUE;
             glewInit();
 
-            frame = new Frame(_width, _height);
-            frame->SetClearColour(0.0f, 0.0f, 0.0f, 1.0f);
-             
-            GL_Interface::BindFrameBufferObj(0);
+            frameBuffer = assetManager.CreateAsset<OpenGLFrameBuffer>("FBO", _width, _height);
+            frameBuffer->SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
             // add loaders to asset libary
             loaderManager.AddLoader(new ModelLoader());
@@ -224,12 +220,9 @@ class GraphicsEngine {
         }
 
         void Render() {
-            frame->Bind();
-            frame->Clear();
+            frameBuffer->Bind();
+            frameBuffer->Clear();
             
-            GL_Interface::SetViewport(_width, _height);
-            GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
-
             std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
             for (auto shader : shaders) {
                 auto ptr = std::dynamic_pointer_cast<Shader>(shader);
@@ -257,7 +250,7 @@ class GraphicsEngine {
                 RenderObject(ent, mat4(), baseShader, true);
             }
 
-            frame->Unbind();
+            frameBuffer->Unbind();
             
             ft.Frame();
         }

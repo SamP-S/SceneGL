@@ -64,7 +64,20 @@ namespace Ngine {
                 // iterate through non-essential components
                 json components = j["components"];
                 for (auto& [key, value] : components.items()) {
-                    std::cout << key << std::endl;
+                    if (value.contains("directionalLight")) {
+                        // not implemented
+                    } else if (value.contains("pointLight")) {
+                        // not implemented
+                    } else if (value.contains("meshRenderer")) {
+                        // not implemented
+                    } else if (value.contains("camera")) {
+                        // not implemented
+                    } else if (value.contains("firstPersonController")) {
+                        // not implemented
+                    } else {
+                        std::cout << "WARNING (JsonSerializer): Trying to deserializer unknown component:" << std::endl;
+                        std::cout << value << std::endl;
+                    }
                 }
             }
 

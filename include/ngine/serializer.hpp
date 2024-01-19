@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <fstream>
 // internal libs
 #include "ngine/ngine.hpp"
 // external libs
@@ -20,7 +21,7 @@ namespace Ngine {
             virtual void Serialize(const std::string& filepath) = 0;
             virtual void Deserialize(const std::string& filepath) = 0;
 
-        private:
+        protected:
             std::shared_ptr<Scene> _scene;
     };
 
@@ -62,21 +63,8 @@ namespace Ngine {
                 
                 // iterate through non-essential components
                 json components = j["components"];
-                for (const auto& component : components) {
-                    std::cout << component.key() << std::endl;
-                    // if (component.find("directionalLight") != component.end()) {
-                    //     entity.AddComponent<DirectionalLight>()
-                    // } else if (component.find("pointLight") != component.end()) {
-                    //     AddComponent<PointLight>()->FromJson(component["pointLight"]);
-                    // } else if (component.find("meshRenderer") != component.end()) {
-                    //     AddComponent<MeshRenderer>()->FromJson(component["meshRenderer"]);
-                    // } else if (component.find("camera") != component.end()) {
-                    //     AddComponent<Camera>()->FromJson(component["camera"]);
-                    // } else if (component.find("firstPersonController") != component.end()) {
-                    //     AddComponent<FirstPersonController>()->FromJson(component["firstPersonController"]);
-                    // } else {
-                    //     std::cout << "WARNING (JsonSerializer): Unknown component encountered:" << std::endl << component << std::endl;
-                    // }
+                for (auto& [key, value] : components.items()) {
+                    std::cout << key << std::endl;
                 }
             }
 

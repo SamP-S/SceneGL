@@ -9,24 +9,13 @@
 
 
 class Asset : public Object {
-    private:
-        std::string _path;
-        bool _isGood = false;
-        
     public:
-        Asset(std::string path) :
-        Object(),
-        _path(path) {
-            std::cout << "Loading Asset: " << path << std::endl;
-        }
+        std::string name;
+        std::string path;
 
-        std::string GetPath() {
-            return _path;
-        }
-
-        bool IsGood() {
-            return _isGood;
-        }
-
+        Asset() = default;
+        Asset(const Asset&) = default;
+        Asset(const std::string& name, const std::string& path)
+            : name(name), path(path) {}
 
 };

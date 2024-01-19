@@ -58,8 +58,8 @@ public:
     AssetManager() {}
     ~AssetManager() {}
 
-    template<typename T>
-    std::shared_ptr<T> CreateAsset() {
+    template<typename T, typename... Args>
+    std::shared_ptr<T> CreateAsset(Args&&... args) {
         std::string s = typeid(T).name();
         uint32_t buf = -1;
         // didnt find buffer for T, create new buffer
@@ -72,8 +72,8 @@ public:
         } else {
             buf = _idToIndex[_typeToBuffer[s]];
         }
-        std::shared_ptr<T> newAsset = std::make_shared<Asset>();
-        _idToIndex[buf][newAsset.id] = _assetLibrary[buf].size();
+        std::shared_ptr<T> newAsset = std::make_shared<T>(std::forward<Args>(args)...);
+        _idToIndex[buf][newAsset->id] = _assetLibrary[buf].size();
         _assetLibrary[buf].push_back(newAsset);
         return newAsset;
     }

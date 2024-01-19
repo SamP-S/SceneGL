@@ -1,10 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <vector>
 #include <string>
 
-#include "core/filepath.hpp"
 #include "ecs/asset.hpp"
 
 class AssetLoader {

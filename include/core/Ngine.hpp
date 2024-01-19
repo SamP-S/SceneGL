@@ -28,28 +28,28 @@ namespace Ngine {
         LA::vec3 _scale     = LA::vec3(1.0f);
 
         TransformComponent() = default;
-        TransformComponent(const CoreComponent&) = default;
+        TransformComponent(const TransformComponent&) = default;
         TransformComponent(const LA::vec3& pos)
             : _position(pos) {}
 
 
         LA::mat4 GetTransform() {
-            return Transformation(_position, _rotation, _scale);
+            return LA::Transformation(_position, _rotation, _scale);
         }
 
         LA::vec3 GetForward() {
-            mat4 total = GetTransform();
-            return vec3({ total[2][0], total[2][1], total[2][2] });
+            LA::mat4 total = GetTransform();
+            return LA::vec3({ total[2][0], total[2][1], total[2][2] });
         }
 
         LA::vec3 GetRight() {
-            mat4 total = GetTransform();
-            return vec3({ total[0][0], total[0][1], total[0][2] });
+            LA::mat4 total = GetTransform();
+            return LA::vec3({ total[0][0], total[0][1], total[0][2] });
         }
 
         LA::vec3 GetUp() {
-            mat4 total = GetTransform();
-            return vec3({ total[1][0], total[1][1], total[1][2] });
+            LA::mat4 total = GetTransform();
+            return LA::vec3({ total[1][0], total[1][1], total[1][2] });
         }
         
     };

@@ -6,6 +6,7 @@
 #include "ngine/ngine.hpp"
 // external libs
 #include "json.hpp"
+using namespace nlohmann;
 
 namespace Ngine {
 
@@ -92,7 +93,7 @@ namespace Ngine {
                 return jsonFile;
             }
 
-            bool SaveJson(const std::string filepath&, json jsonData) {
+            bool SaveJson(const std::string& filepath, json jsonData) {
                 std::ofstream outputFile(filepath);
                 if (!outputFile.is_open()) {
                     std::cout << "WARNING (JsonSerializer): Can't open file: " << filepath << std::endl;

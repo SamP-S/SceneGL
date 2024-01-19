@@ -28,6 +28,7 @@ namespace Ngine {
 
             Entity CreateEntity(const std::string&);
             void DestroyEntity(Entity);
+            void Clear();
 
             /// TODO: All of the following are slow conversions from entt::view
             /// Implement using internal registry system to support desired functionality
@@ -117,6 +118,10 @@ namespace Ngine {
 
     void Scene::DestroyEntity(Entity entity) {
         _registry.destroy(entity);
+    }
+
+    void Scene::Clear() {
+        _registry.clear();
     }
 
     Entity Scene::FindEntityByName(const std::string& name) {

@@ -71,7 +71,10 @@ namespace Ngine {
                     } else if (value.contains("meshRenderer")) {
                         // not implemented
                     } else if (value.contains("camera")) {
-                        // not implemented
+                        entity.AddComponent<CameraComponent>();
+                        fov = j["camera"]["fov"];
+                        near = j["camera"]["near"];
+                        far = j["camera"]["far"];
                     } else if (value.contains("firstPersonController")) {
                         // not implemented
                     } else {

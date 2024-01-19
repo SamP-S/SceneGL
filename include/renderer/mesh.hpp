@@ -57,20 +57,6 @@ class Mesh : public Resource {
             // delete all opengl resources/buffers
         }
 
-        std::string Type() {
-            return "Mesh";
-        }
-        void FromJson(json j) {
-            return;
-        }
-        json ToJson() {
-            json j;
-            return j;
-        }
-        std::string ToString() {
-            return "Mesh" + std::to_string(vao);
-        }
-
         std::vector<vec3> GetVertices() { return _vertices; }
         void SetVertices(std::vector<vec3> vertices) { 
             _vertices = vertices;

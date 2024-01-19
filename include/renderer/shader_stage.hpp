@@ -45,23 +45,6 @@ class ShaderStage : public Resource {
             _stage = stage;
         }
 
-        // JSON
-        std::string Type() {
-            return "ShaderStage";
-        }
-
-        void FromJson(json j) {
-            return;
-        }
-
-        json ToJson() {
-            json j;
-            return j;
-        }
-
-        std::string ToString() {
-            return "Shader";
-        }
 };
 
 extern ResourceManager<ShaderStage> resourceShaderStages;

@@ -49,21 +49,6 @@ class Shader : public Resource {
         Resource(name), _vs(vs), _fs(fs) {
             _validShader = Compile();
         }
-
-        // JSON
-        std::string Type() {
-            return "Shader";
-        }
-        void FromJson(json j) {
-            return;
-        }
-        json ToJson() {
-            json j;
-            return j;
-        }
-        std::string ToString() {
-            return "Shader";
-        }
         
         // validity getter
         bool IsValid() {

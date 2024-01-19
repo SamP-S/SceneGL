@@ -17,7 +17,6 @@
 #include "ngine/ngine.hpp"
 using namespace Ngine;
 
-#include "renderer/texture.hpp"
 #include "renderer/graphics.hpp"
 #include "renderer/input.hpp"
 
@@ -48,7 +47,6 @@ class Application {
         bool show_world_window = true;
         bool show_properties_window = true;
         bool show_demo_window = false;
-        int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         bool renderer_focused = false;
         ImVec2 render_region_min = ImVec2();

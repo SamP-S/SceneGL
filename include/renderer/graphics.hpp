@@ -16,14 +16,12 @@
 #include "ngine/ngine.hpp"
 #include "ngine/serializer.hpp"
 
-#include "ecs/resource_manager.hpp"
 #include "ecs/asset_manager.hpp"
 
 #include "la_extended.h"
 
 #include "core/frame_timer.hpp"
 #include "renderer/shader.hpp"
-#include "renderer/texture.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/frame.hpp"
 #include "renderer/editor_camera.hpp"

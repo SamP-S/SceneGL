@@ -460,7 +460,7 @@ class Application {
         }
 
         void CameraPanel(Entity e) {
-            if (e.HasComponent<CameraComponent>())
+            if (!e.HasComponent<CameraComponent>())
                 return;
             CameraComponent& cc = e.GetComponent<CameraComponent>();
 
@@ -477,7 +477,7 @@ class Application {
         }
         
         void DirectionalLightWindow(Entity e) {
-            if (e.HasComponent<DirectionalLightComponent>())
+            if (!e.HasComponent<DirectionalLightComponent>())
                 return;
             DirectionalLightComponent& dlc = e.GetComponent<DirectionalLightComponent>();
 
@@ -495,7 +495,7 @@ class Application {
         }
 
         void PointLightWindow(Entity e) {
-            if (e.HasComponent<PointLightComponent>())
+            if (!e.HasComponent<PointLightComponent>())
                 return;
             PointLightComponent& plc = e.GetComponent<PointLightComponent>();
 

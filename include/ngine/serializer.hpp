@@ -2,6 +2,8 @@
 
 // std libs
 #include <memory>
+#include <string>
+#include <iostream>
 // internal libs
 #include "ngine/ngine.hpp"
 // external libs
@@ -49,7 +51,7 @@ namespace Ngine {
 
             void DeserializeEntity(json j) {
                 // create entity
-                std:string name = j["name"];
+                std::string name = j["name"];
                 Entity entity = _scene->CreateEntity(name);
                 // extract transform
                 TransformComponent& transform = entity.GetComponent<TransformComponent>();

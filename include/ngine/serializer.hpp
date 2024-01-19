@@ -26,11 +26,12 @@ class JsonSerializer : public ISerializer {
 
         // read in json file to scene
         void Serialize(const std::string& filepath) override {
-            
+            // not implemented
         }
 
         // output json file to scene
         void Deserialize(const std::string& filepath) override {
             // not implemented
+            
         }
 };

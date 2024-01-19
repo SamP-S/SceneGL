@@ -20,7 +20,7 @@ using namespace LA;
 #include "tiny_gltf.h"
 
 
-class ModelLoader : public AssetLoader {
+class ModelLoader : public IAssetLoader {
 
 private:
     std::vector<std::string> _extensions = {".gltf"};
@@ -97,7 +97,7 @@ private:
 public:
 
 	ModelLoader()
-		: AssetLoader() {}
+		: IAssetLoader() {}
 
 	bool Load(const std::string& filepath) {
 		tinygltf::Model model;

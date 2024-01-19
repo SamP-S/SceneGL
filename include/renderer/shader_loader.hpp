@@ -20,7 +20,7 @@
 // .frag - a fragment shader
 // .comp - a compute shader
 
-class ShaderLoader : public AssetLoader {
+class ShaderLoader : public IAssetLoader {
 private:
     std::vector<std::string> _extensions = {".vert", ".tesc", ".tese", ".geom", ".frag", ".comp"};
     
@@ -36,7 +36,7 @@ private:
 public:
 
 	ShaderLoader()
-		: AssetLoader() {}
+		: IAssetLoader() {}
 
 	bool Load(const std::string& filepath) {
 		// inspect file extension

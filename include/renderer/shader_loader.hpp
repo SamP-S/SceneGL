@@ -10,7 +10,8 @@
 
 #include "tai/tai.hpp"
 #include "core/filepath.hpp"
-#include "renderer/shader.hpp"
+#include "platform/opengl/opengl_shader.hpp"
+#include "platform/opengl/opengl_shader_source.hpp"
 
 //  GLSL standard shader file extensions
 // .vert - a vertex shader
@@ -24,13 +25,13 @@ class ShaderLoader : public Tai::IAssetLoader {
 private:
     std::vector<std::string> _extensions = {".vert", ".tesc", ".tese", ".geom", ".frag", ".comp"};
     
-    std::unordered_map<std::string, int> _extToType = {
-        {".vert", SHADER_VERTEX},
-        {".tesc", SHADER_TESSELLATION_CONTROL},
-        {".tese", SHADER_TESSELLATION_EVALUATION},
-        {".geom", SHADER_GEOMETRY},
-        {".frag", SHADER_FRAGMENT},
-        {".comp", SHADER_COMPUTE}
+    std::unordered_map<std::string, ShaderStage> _extToType = {
+        {".vert", ShaderStage::VERTEX},
+        {".tesc", ShaderStage::TESSELLATION_CONTROL},
+        {".tese", ShaderStage::TESSELLATION_EVALUATION},
+        {".geom", ShaderStage::GEOMETRY},
+        {".frag", ShaderStage::FRAGMENT},
+        {".comp", ShaderStage::COMPUTE}
     };
 
 public:
@@ -67,8 +68,8 @@ public:
             // look up stage type
             auto it = _extToType.find(ext);
             if (it != _extToType.end()) {
-                int stage = it->second;
-                assetManager.CreateAsset<ShaderStage>(name, source, stage);
+                ShaderStage stage = it->second;
+                assetManager.CreateAsset<OpenGLShaderSource>(name, source, stage);
             } else {
                 std::cout << "WARNING (ShaderLoader): Unsupported shader extension @ " << filepath << std::endl;
                 return false;

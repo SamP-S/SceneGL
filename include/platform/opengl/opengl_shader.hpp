@@ -10,22 +10,22 @@
 
 class OpenGLShader : public Shader {
     private:
-        bool _isValid = false;
-        uint32_t _id = 0;
+        bool _validShader = false;
+        uint32_t _programId = 0;
 
     public:
-        OpenGLShader(std::string name="Default Shader", std::shared_ptr<ShaderStage> vs=nullptr, std::shared_ptr<ShaderStage> fs=nullptr)
+        OpenGLShader(std::string name="Default Shader", std::shared_ptr<ShaderSource> vs=nullptr, std::shared_ptr<ShaderSource> fs=nullptr)
             : Shader(name, vs, fs) {
             Compile();
         }
         
         // validity getter
-        bool IsUsable() const {
+        bool IsUsable() const override {
             return _validShader;
         }
 
         // OpenGL based calls
-         void Compile() {
+         void Compile() override {
             _validShader = false;
             if (vs == nullptr) {
                 std::cout << "WARNING (Shader): Can't compile shader with null vertex shader source." << std::endl;
@@ -35,28 +35,28 @@ class OpenGLShader : public Shader {
                 std::cout << "WARNING (Shader): Can't compile shader with null fragment shader source." << std::endl;
                 return;
             }
-            if (vs.stage != ShaderStage::VERTEX || fs.stage != ShaderStage::FRAGMENT) {
+            if (vs->stage != ShaderStage::VERTEX || fs->stage != ShaderStage::FRAGMENT) {
                 std::cout << "WARNING (Shader): Trying to compile non-matching stages." << std::endl;
                 return;
             }
 
             try {
                 // compile shader stages
-                uint32_t vertex = vs.Compile();
-                uint32_t fragment = fs.Compile();
+                uint32_t vertex = vs->Compile();
+                uint32_t fragment = fs->Compile();
 
-                _id = glCreateProgram();
-                glAttachShader(_id, vertex);
-                glAttachShader(_id, fragment);
-                glBindFragDataLocation(_id, 0, SHADER_OUTPUT_FRAG);
-                glLinkProgram(_id);
+                _programId = glCreateProgram();
+                glAttachShader(_programId, vertex);
+                glAttachShader(_programId, fragment);
+                glBindFragDataLocation(_programId, 0, SHADER_OUTPUT_FRAG);
+                glLinkProgram(_programId);
                 
                 // validate shader program correct
                 int success;
                 static char infoLog[1024];
-                glGetProgramiv(program, GL_LINK_STATUS, &success);
+                glGetProgramiv(_programId, GL_LINK_STATUS, &success);
                 if (!success) {
-                    glGetProgramInfoLog(program, 1024, NULL, infoLog);
+                    glGetProgramInfoLog(_programId, 1024, NULL, infoLog);
                     throw infoLog;
                 }
 
@@ -72,52 +72,52 @@ class OpenGLShader : public Shader {
             _validShader = true;
         }
 
-        void Bind() const {
-            glUseProgram(shader);
+        void Bind() const override {
+            glUseProgram(_programId);
         }
 
-        void Unbind() const {
+        void Unbind() const override {
             glUseProgram(0);
         }
 
-        void SetBool(const std::string& name, bool value) const {
-            glUniform1i(glGetUniformLocation(_id, name.c_str()), value);
+        void SetBool(const std::string& name, bool value) const override {
+            glUniform1i(glGetUniformLocation(_programId, name.c_str()), value);
         }
 
-        void SetInt(const std::string& name, int value) const {
-            glUniform1i(glGetUniformLocation(_id, name.c_str()), value);
+        void SetInt(const std::string& name, int value) const override {
+            glUniform1i(glGetUniformLocation(_programId, name.c_str()), value);
         }
 
-        void SetFloat(const std::string& name, float value) const {
-            glUniform1f(glGetUniformLocation(_id, name.c_str()), value);
+        void SetFloat(const std::string& name, float value) const override {
+            glUniform1f(glGetUniformLocation(_programId, name.c_str()), value);
         }
 
-        void SetVec2(const std::string& name, vec2 v) const {
-            glUniform2f(glGetUniformLocation(_id, name.c_str()), v.x, v.y);
+        void SetVec2(const std::string& name, vec2 v) const override {
+            glUniform2f(glGetUniformLocation(_programId, name.c_str()), v.x, v.y);
         }
 
-        void SetVec2(const std::string& name, float x, float y) const {
-            glUniform2f(glGetUniformLocation(_id, name.c_str()), x, y);
+        void SetVec2(const std::string& name, float x, float y) const override {
+            glUniform2f(glGetUniformLocation(_programId, name.c_str()), x, y);
         }
 
-        void SetVec3(const std::string& name, vec3 v) const {
-            glUniform3f(glGetUniformLocation(_id, name.c_str()), v.x, v.y, v.z);
+        void SetVec3(const std::string& name, vec3 v) const override {
+            glUniform3f(glGetUniformLocation(_programId, name.c_str()), v.x, v.y, v.z);
         }
 
-        void SetVec3(const std::string& name, float x, float y, float z) const {
-            glUniform3f(glGetUniformLocation(_id, name.c_str()), x, y, z);
+        void SetVec3(const std::string& name, float x, float y, float z) const override {
+            glUniform3f(glGetUniformLocation(_programId, name.c_str()), x, y, z);
         }
 
-        void SetVec4(const std::string& name, vec4 v) const {
-            glUniform4f(glGetUniformLocation(_id, name.c_str()), v.x, v.y, v.z, v.w);
+        void SetVec4(const std::string& name, vec4 v) const override {
+            glUniform4f(glGetUniformLocation(_programId, name.c_str()), v.x, v.y, v.z, v.w);
         }
         
-        void SetVec4(const std::string& name, float x, float y, float z, float w) const {
-            glUniform4f(glGetUniformLocation(_id, name.c_str()), x, y, z, w);
+        void SetVec4(const std::string& name, float x, float y, float z, float w) const override {
+            glUniform4f(glGetUniformLocation(_programId, name.c_str()), x, y, z, w);
         }
 
-        void SetMat4(const std::string& name, float* mPtr) const {
-            glUniformMatrix4fv(glGetUniformLocation(_id, name.c_str()), 1, GL_FALSE, mPtr);
+        void SetMat4(const std::string& name, float* mPtr) const override {
+            glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, mPtr);
         }
 
 };

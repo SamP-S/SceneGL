@@ -20,8 +20,9 @@
 #include "la_extended.h"
 
 #include "core/frame_timer.hpp"
-#include "renderer/shader_stage.hpp"
-#include "renderer/shader.hpp"
+#include "platform/opengl/opengl_shader.hpp"
+#include "platform/opengl/opengl_shader_source.hpp"
+
 #include "renderer/mesh.hpp"
 #include "renderer/frame.hpp"
 #include "renderer/editor_camera.hpp"
@@ -79,15 +80,15 @@ class GraphicsEngine {
             loaderManager.Load("shaders/base.frag");
             loaderManager.Load("shaders/lighting.vert");
             loaderManager.Load("shaders/lighting.frag");
-            assetManager.CreateAsset<Shader>(
+            assetManager.CreateAsset<OpenGLShader>(
                 "base",
-                assetManager.GetAsset<ShaderStage>("base_vert"),
-                assetManager.GetAsset<ShaderStage>("base_frag")
+                assetManager.GetAsset<OpenGLShaderSource>("base_vert"),
+                assetManager.GetAsset<OpenGLShaderSource>("base_frag")
             );
-            assetManager.CreateAsset<Shader>(
+            assetManager.CreateAsset<OpenGLShader>(
                 "lighting",
-                assetManager.GetAsset<ShaderStage>("lighting_vert"),
-                assetManager.GetAsset<ShaderStage>("lighting_frag")
+                assetManager.GetAsset<OpenGLShaderSource>("lighting_vert"),
+                assetManager.GetAsset<OpenGLShaderSource>("lighting_frag")
             );
 
             LoadScene("scene/Preset.json");    
@@ -170,7 +171,7 @@ class GraphicsEngine {
         }
 
         void SetupShader(std::shared_ptr<Shader> shader) {
-            shader->Use();
+            shader->Bind();
             // vertex uniforms
             shader->SetMat4("iView", &inverse(editorCamera.transform.GetTransform())[0][0]);
             shader->SetMat4("iProjection", &(editorCamera.GetProjection())[0][0]);
@@ -229,14 +230,14 @@ class GraphicsEngine {
             GL_Interface::SetViewport(_width, _height);
             GL_Interface::SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
-            std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<Shader>();
+            std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
             for (auto shader : shaders) {
                 auto ptr = std::dynamic_pointer_cast<Shader>(shader);
                 SetupShader(ptr);
             }
 
-            std::shared_ptr<Shader> baseShader = assetManager.GetAsset<Shader>("base");
-            std::shared_ptr<Shader> lightingShader = assetManager.GetAsset<Shader>("lighting");
+            std::shared_ptr<Shader> baseShader = assetManager.GetAsset<OpenGLShader>("base");
+            std::shared_ptr<Shader> lightingShader = assetManager.GetAsset<OpenGLShader>("lighting");
 
             editorCamera.Update();
 
@@ -246,13 +247,13 @@ class GraphicsEngine {
                 GL_Interface::EnableFeature(FEATURE_DEPTH);
                 GL_Interface::EnableFeature(FEATURE_CULL);
                 GL_Interface::SetFrontFace(FRONT_CCW);
-                lightingShader->Use();
+                lightingShader->Bind();
                 RenderObject(ent, mat4(), lightingShader, false);
 
                 // draw wireframe
                 GL_Interface::EnableFeature(FEATURE_DEPTH);
                 GL_Interface::EnableFeature(FEATURE_CULL);
-                baseShader->Use();
+                baseShader->Bind();
                 RenderObject(ent, mat4(), baseShader, true);
             }
 

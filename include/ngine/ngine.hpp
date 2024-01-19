@@ -23,18 +23,18 @@ namespace Ngine {
     };
 
     struct TransformComponent {
-        LA::vec3 _position  = LA::vec3(0.0f);
-        LA::vec3 _rotation  = LA::vec3(0.0f);
-        LA::vec3 _scale     = LA::vec3(1.0f);
+        LA::vec3 position  = LA::vec3(0.0f);
+        LA::vec3 rotation  = LA::vec3(0.0f);
+        LA::vec3 scale     = LA::vec3(1.0f);
 
         TransformComponent() = default;
         TransformComponent(const TransformComponent&) = default;
         TransformComponent(const LA::vec3& pos)
-            : _position(pos) {}
+            : position(pos) {}
 
 
         LA::mat4 GetTransform() {
-            return LA::Transformation(_position, _rotation, _scale);
+            return LA::Transformation(position, rotation, scale);
         }
 
         LA::vec3 GetForward() {
@@ -153,6 +153,7 @@ namespace Ngine {
     Entity Scene::CreateEntity(const std::string& name=std::string("Name")) {
         Entity entity = {_registry.create(), this};
         entity.AddComponent<CoreComponent>(name);
+        entity.AddComponent<TransformComponent>(name);
         return entity;
     }
 

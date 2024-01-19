@@ -8,7 +8,8 @@
 // external libs
 #include <entt.hpp>
 // internal
-#include "components.hpp"
+#include "ngine/object.hpp"
+#include "ngine/components.hpp"
 
 namespace Ngine {
     

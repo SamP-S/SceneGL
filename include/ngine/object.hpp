@@ -9,7 +9,8 @@ struct Object {
         inline static ObjectId _nextId = 0;
 
     public:
-        const ObjectId id;
+        // DO NOT MODIFY STORED VALUE
+        ObjectId id;
         
         Object()
             : id(Object::_nextId++) {}

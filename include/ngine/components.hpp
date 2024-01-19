@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 // internal libs
+#include "ngine/object.hpp"
 #include "la_extended.h"
 
 struct CoreComponent : public Object {

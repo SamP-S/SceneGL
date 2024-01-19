@@ -38,7 +38,7 @@ namespace Ngine {
 
             // read in json file to scene
             void Deserialize(const std::string& filepath) override {
-                _scene->clear();
+                _scene->Clear();
                 json j = LoadJson(filepath);
                 for (const auto& entityJson : j) {
                     DeserializeEntity(entityJson);

@@ -58,6 +58,12 @@ namespace Ngine {
             operator bool() const { return _entityHandle != entt::null; }
             operator entt::entity() const { return _entityHandle; }
 		    operator uint32_t() const { return (uint32_t)_entityHandle; }
+            bool operator==(const Entity& other) const {
+                return _entityHandle == other._entityHandle && _scene == other._scene;
+            }
+            bool operator!=(const Entity& other) const {
+                return !operator==(other);
+            }
             
             // check for single component type
             template<typename T>

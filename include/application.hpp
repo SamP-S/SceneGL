@@ -13,18 +13,18 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
+#include "ngine/components.hpp"
+#include "ngine/ngine.hpp"
+using namespace Ngine;
+
 #include "renderer/texture.hpp"
 #include "renderer/graphics.hpp"
 #include "renderer/input.hpp"
-#include "ecs/entity.hpp"
+
 #include "la_extended.h"
 using namespace LA;
 
-#include "renderer/light_directional.hpp"
-#include "renderer/light_point.hpp"
-#include "renderer/mesh_renderer.hpp"
-#include "renderer/camera.hpp"
-#include "scripting/first_person.hpp"
+#include "renderer/editor_camera.hpp"
 
 class Application {
     private:
@@ -48,14 +48,13 @@ class Application {
         bool show_world_window = true;
         bool show_properties_window = true;
         bool show_demo_window = false;
-        bool show_firstperson_window = true;
         int texture_load_channel = -1;
         float aspectRatio = 0.0f;
         bool renderer_focused = false;
         ImVec2 render_region_min = ImVec2();
         ImVec2 render_region_max = ImVec2();
         ImVec2 window_pos = ImVec2();
-        Entity* entitySelected = NULL;
+        Entity entitySelected;
         int new_entity_count = 0;
         int componentPanelCount = 0;
 
@@ -76,9 +75,6 @@ class Application {
             Initialise_SDL2(_width, _height);
             Initialise();
             Graphics.Initialise();
-
-            // Load project folder
-            entitySelected = nullptr;
 
             // Main loop
             while (!isQuit)
@@ -123,8 +119,6 @@ class Application {
                     WorldWindow();
                 if (show_properties_window) 
                     PropertiesWindow();
-                if (show_firstperson_window)
-                    FirstPersonWindow();
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -295,49 +289,33 @@ class Application {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Entity")) {
-                    if (entitySelected != NULL) {
+                    if (entitySelected) {
                         if (ImGui::MenuItem("New Empty")) {
                             // debug
                             std::cout << "Entity: Create new entity" << std::endl;
                             // create empty
                             std::string new_name = "new_" + std::to_string(new_entity_count);
-                            
-                            Entity* newEntity = new Entity(new_name, entitySelected);
-                            entitySelected->AddChild(newEntity);
+                            entitySelected = Graphics.scene->CreateEntity(new_name);
                             new_entity_count += 1;
-                            entitySelected = newEntity;
 
                             // build components
                             int meshId = resourceMeshes.GetId("empty");
-                            MeshRenderer* mr = newEntity->AddComponent<MeshRenderer>();
-                            mr->SetMeshId(meshId);
+                            MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
+                            mrc.mesh = meshId;
                         }
                         if (ImGui::MenuItem("New Cube")) {
                             // debug
                             std::cout << "Entity: Create new entity" << std::endl;
                             // create entity
                             std::string new_name = "cube_" + std::to_string(new_entity_count);
-                            Entity* newEntity = new Entity(new_name, entitySelected);
-                            entitySelected->AddChild(newEntity);
+                            entitySelected = Graphics.scene->CreateEntity(new_name);
                             new_entity_count += 1;
-                            entitySelected = newEntity;
 
                             // build components
                             int meshId = resourceMeshes.GetId("vertex_cube");
-                            MeshRenderer* mr = entitySelected->AddComponent<MeshRenderer>();
-                            mr->SetMeshId(meshId);
+                            MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
+                            mrc.mesh = meshId;
                         }
-                    }
-                    ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("Component")) {
-                    if (ImGui::MenuItem("Add Camera") && entitySelected != nullptr) {
-                        entitySelected->AddComponent<Camera>();
-                        std::cout << "DEBUG: Add camera component." << std::endl;
-                    }
-                    if (ImGui::MenuItem("Add MeshRenderer") && entitySelected != nullptr) {
-                        entitySelected->AddComponent<MeshRenderer>();
-                        std::cout << "DEBUG: Add MeshRenderer component." << std::endl;
                     }
                     ImGui::EndMenu();
                 }
@@ -345,7 +323,6 @@ class Application {
                     ImGui::MenuItem("Render Display", NULL, &show_render_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
                     ImGui::MenuItem("World Tree", NULL, &show_world_window);
-                    ImGui::MenuItem("Viewport Properties", NULL, &show_firstperson_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }
@@ -400,19 +377,16 @@ class Application {
             ImGui::End();
         }
 
-        void WorldNode(Entity* entitiy) {
+        // flattened until scene tree implemented
+        void WorldNode(Entity entitiy) {
             ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
             if (entitySelected == entitiy)
                 node_flags |= ImGuiTreeNodeFlags_Selected;
-            if (entitiy->GetNumChildren() == 0)
-                node_flags |= ImGuiTreeNodeFlags_Leaf;
-            bool node_open = ImGui::TreeNodeEx(entitiy->GetName().c_str(), node_flags);
+            node_flags |= ImGuiTreeNodeFlags_Leaf;
+            bool node_open = ImGui::TreeNodeEx(entitiy.GetComponent<CoreComponent>().name.c_str(), node_flags);
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                 entitySelected = entitiy;
             if (node_open) {
-                for (int i = 0; i < entitiy->GetNumChildren(); i++) {
-                    WorldNode(entitiy->GetChild(i));
-                }
                 ImGui::TreePop();
             }   
         }
@@ -421,69 +395,62 @@ class Application {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
             if (Graphics.scene != nullptr) {
-                for (auto sceneIt = Graphics.scene->begin(); sceneIt != Graphics.scene->end(); ++sceneIt) {
-                    WorldNode(*sceneIt);
+                std::vector<Entity> entities = Graphics.scene->GetEntities();
+                for (auto e : entities) {
+                    WorldNode(e);
                 }
             }
             ImGui::End();
         }
 
-        void FirstPersonWindow() {
-            ImGuiWindowFlags cameraWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("Viewport Properties", &show_firstperson_window, cameraWindowFlags);
-            ImGui::PushID(componentPanelCount);
-            FirstPersonPanel(Graphics.sceneCam->GetComponent<FirstPersonController>());
-            ImGui::PopID();
-            ImGui::End();
+        void CorePanel(Entity e) {
+            CoreComponent& cc = e.GetComponent<CoreComponent>();
+            // entity name
+            ImGui::Text("Name:");
+            char buffer[256];
+            std::strncpy(buffer, cc.name.c_str(), sizeof(buffer));
+            buffer[sizeof(buffer) - 1] = 0; // Ensure null termination
+            if (ImGui::InputText("##NameEntity", buffer, sizeof(buffer))) {
+                cc.name = std::string(buffer);
+            }
+            ImGui::Checkbox("Active", &cc.active);
         }
 
-        void TransformPanel(Transform* t) {
-            if (t == nullptr)
-                return;
+        void TransformPanel(Entity e) {
+            TransformComponent& t = e.GetComponent<TransformComponent>();
             ImGui::Separator();
             ImGui::Text("Transform:");
             // position
             ImGui::Text("Pos");
             ImGui::SameLine();
-            vec3 position = t->GetPosition();
-            if (ImGui::InputFloat3("##PosInput", position.m)) {
-                t->SetPosition(position);     
-            }
+            ImGui::InputFloat3("##PosInput", t.position.m);
             // rotation
             ImGui::Text("Rot");
             ImGui::SameLine();
-            vec3 rotation = t->GetRotation();
-            if (ImGui::InputFloat3("##RotInput", rotation.m)) {
-                t->SetRotation(rotation);     
-            }
+            ImGui::InputFloat3("##RotInput", t.rotation.m);
             // scale
             ImGui::Text("Scl");
             ImGui::SameLine();
-            vec3 scale = t->GetScale();
-            if (ImGui::InputFloat3("##SclInput", scale.m)) {
-                t->SetScale(scale);     
-            }
+            ImGui::InputFloat3("##SclInput", t.scale.m);
         }
 
-        void MeshRendererPanel(Component* c) {
-            if (c == nullptr)
+        void MeshRendererPanel(Entity e) {
+            if (!e.HasComponent<MeshRendererComponent>())
                 return;
-            MeshRenderer* renderer = dynamic_cast<MeshRenderer*>(c);
-            if (renderer == nullptr) {
-                return;
-            }
+            MeshRendererComponent& mrc = e.GetComponent<MeshRendererComponent>();
+
             ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Mesh Renderer");
             ImGui::SameLine();
             if (ImGui::Button("X")) {
-                renderer->entity->RemoveComponent<MeshRenderer>(renderer);
+                e.RemoveComponent<MeshRendererComponent>();
             }
-            int meshId = renderer->GetMeshId();
+            int meshId = mrc.mesh;
             if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": resourceMeshes.Get(meshId)->GetName().c_str()))) {
                 for (auto it = resourceMeshes.begin(); it != resourceMeshes.end(); it++) {
                     if (ImGui::Selectable(it->second->GetName().c_str())) {
-                    renderer->SetMeshId(it->first);
+                    mrc.mesh = it->first;
                     }
                 }
                 ImGui::EndCombo();
@@ -492,154 +459,92 @@ class Application {
             componentPanelCount++;
         }
 
-        void CameraPanel(Component* c) {
-            if (c == nullptr)
+        void CameraPanel(Entity e) {
+            if (e.HasComponent<CameraComponent>())
                 return;
-            Camera* camera = dynamic_cast<Camera*>(c);
-            if (camera == nullptr) {
-                return;
-            }
+            CameraComponent& cc = e.GetComponent<CameraComponent>();
+
             ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Camera");
             ImGui::SameLine();
             if (ImGui::Button("X")) {
-                camera->entity->RemoveComponent<Camera>(camera);
+                e.RemoveComponent<CameraComponent>();
             }
-            float fov = camera->GetFov();
-            if (ImGui::SliderFloat("FOV", &fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat)) {
-                camera->SetFov(fov);
-            }
+            ImGui::SliderFloat("FOV", &cc.fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
             ImGui::PopID();
             componentPanelCount++;
         }
         
-        void DirectionalLightWindow(Component* c) {
-            if (c == nullptr)
+        void DirectionalLightWindow(Entity e) {
+            if (e.HasComponent<DirectionalLightComponent>())
                 return;
-            DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(c);
-            if (dirLight == nullptr) {
-                return;
-            }
+            DirectionalLightComponent& dlc = e.GetComponent<DirectionalLightComponent>();
+
             ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Directional Light");
             ImGui::SameLine();
             if (ImGui::Button("X")) {
-                dirLight->entity->RemoveComponent<DirectionalLight>(dirLight);
+                e.RemoveComponent<DirectionalLightComponent>();
             }
-            vec3 colour = dirLight->GetColour();
-            if (ImGui::InputFloat3("Colour", colour.m)) {
-                dirLight->SetColour(colour);    
-            }
-            float intensity = dirLight->GetIntensity();
-            if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
-                dirLight->SetIntensity(intensity);
-            }
+            ImGui::InputFloat3("Colour", dlc.colour.m);
+            ImGui::SliderFloat("Intensity", &dlc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
             ImGui::PopID();
             componentPanelCount++;
         }
 
-        void PointLightWindow(Component* c) {
-            if (c == nullptr)
+        void PointLightWindow(Entity e) {
+            if (e.HasComponent<PointLightComponent>())
                 return;
-            PointLight* pointLight = dynamic_cast<PointLight*>(c);
-            if (pointLight == nullptr) {
-                return;
-            }
+            PointLightComponent& plc = e.GetComponent<PointLightComponent>();
+
             ImGui::PushID(componentPanelCount);
             ImGui::Separator();
             ImGui::Text("Point Light");
             ImGui::SameLine();
             if (ImGui::Button("X")) {
-                pointLight->entity->RemoveComponent<PointLight>(pointLight);
+                e.RemoveComponent<PointLightComponent>();
             }
-            vec3 colour = pointLight->GetColour();
-            if (ImGui::InputFloat3("Colour", colour.m)) {
-                pointLight->SetColour(colour);    
-            }
-            float intensity = pointLight->GetIntensity();
-            if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
-                pointLight->SetIntensity(intensity);
-            }
-            float range = pointLight->GetRange();
-            if (ImGui::SliderFloat("Range", &range, 0.01f, 20.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat)) {
-                pointLight->SetRange(range);
-            }
-            ImGui::PopID();
-            componentPanelCount++;
-        }
+            ImGui::InputFloat3("Colour", plc.colour.m);
+            ImGui::SliderFloat("Intensity", &plc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
+            ImGui::SliderFloat("Range", &plc.range, 0.01f, 20.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
 
-        void FirstPersonPanel(Component* c) {
-            if (c == nullptr)
-                return;
-            FirstPersonController* fpc = dynamic_cast<FirstPersonController*>(c);
-            if (fpc == nullptr)
-                return;
-            ImGui::Separator();
-            ImGui::Text("First Person Controller");
-            // look sensitivity
-            float mouseSens = fpc->GetLookSensitivity();
-            if (ImGui::SliderFloat("Mouse Sensitivity", &mouseSens, 1.0f, 8.0f, "%.1f", ImGuiSliderFlags_None))
-                fpc->SetLookSensitivity(mouseSens);
-            // movement speed
-            float speed = fpc->GetMovementSpeed();
-            if (ImGui::SliderFloat("Movement Speed", &speed, 1.0f, 10.0f, "%.1f", ImGuiSliderFlags_None))
-                fpc->SetMovementSpeed(speed);
+            ImGui::PopID();
             componentPanelCount++;
         }
 
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
-            if (entitySelected == NULL) {
+            if (!entitySelected) {
                 ImGui::Text("Nothing selected");
             } else {
-                Entity* ent = entitySelected;
-                // entity name
-                ImGui::Text("Name:");
-                std::string name = ent->GetName();
-                char buffer[256];
-                std::strncpy(buffer, name.c_str(), sizeof(buffer));
-                buffer[sizeof(buffer) - 1] = 0; // Ensure null termination
-                if (ImGui::InputText("##NameEntity", buffer, sizeof(buffer))) {
-                    ent->SetName(buffer);
-                }
-                // parent
-                Entity* p = ent->GetParent();
-                ImGui::Text(("Parent: " + ((p == nullptr) ? "ROOT" : p->GetName())).c_str());
+                Entity ent = entitySelected;
+                
                 // components display
                 componentPanelCount = 0;
                 // transform display
-                TransformPanel(ent->transform);
+                TransformPanel(ent);
                 // non-singlton components
-                for (auto* component : ent->_components) {
-                    if (component->Type().compare("MeshRenderer") == 0)
-                        MeshRendererPanel(component);
-                    else if (component->Type().compare("Camera") == 0)
-                        CameraPanel(component);
-                    else if (component->Type().compare("DirectionalLight") == 0)
-                        DirectionalLightWindow(component);
-                    else if (component->Type().compare("PointLight") == 0)
-                        PointLightWindow(component);
-                    else if (component->Type().compare("FirstPersonController") == 0);
-                        FirstPersonPanel(component);
-                }
+                MeshRendererPanel(ent);
+                CameraPanel(ent);
+                DirectionalLightWindow(ent);
+                PointLightWindow(ent);
+                
                 // add component button/drop-down
                 if (ImGui::Button("Add Component")) {
                     ImGui::OpenPopup("Add Component");
                 }
                 if (ImGui::BeginPopup("Add Component")) {
                     if (ImGui::MenuItem("Camera")) {
-                        ent->AddComponent<Camera>();
+                        ent.AddComponent<CameraComponent>();
                     } else if (ImGui::MenuItem("Directional Light")) {
-                        ent->AddComponent<DirectionalLight>();
+                        ent.AddComponent<DirectionalLightComponent>();
                     } else if (ImGui::MenuItem("Point Light")) {
-                        ent->AddComponent<PointLight>();
+                        ent.AddComponent<PointLightComponent>();
                     } else if (ImGui::MenuItem("Mesh Renderer")) {
-                        ent->AddComponent<MeshRenderer>();
-                    } else if (ImGui::MenuItem("First Person Controller")) {
-                        ent->AddComponent<FirstPersonController>();
+                        ent.AddComponent<MeshRendererComponent>();
                     }
                     ImGui::EndPopup();
                 }

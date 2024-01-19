@@ -120,9 +120,9 @@ class GraphicsEngine {
             }
             for (int i = 0; i < DIRECTIONAL_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
-                TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
-                DirectionalLightComponent& dlc = entities[i].GetComponent<DirectionalLightComponent>();
                 if (i < entities.size()) {
+                    TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
+                    DirectionalLightComponent& dlc = entities[i].GetComponent<DirectionalLightComponent>();
                     shader.SetVec3("iDirectionalLights" + index + ".direction", tc.GetForward());
                     shader.SetFloat("iDirectionalLights" + index + ".intensity", dlc.intensity);
                     shader.SetVec3("iDirectionalLights" + index + ".colour", dlc.colour);
@@ -142,9 +142,9 @@ class GraphicsEngine {
             }
             for (int i = 0; i < POINT_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
-                TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
-                PointLightComponent& plc = entities[i].GetComponent<PointLightComponent>();
                 if (i < entities.size()) {
+                    TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
+                    PointLightComponent& plc = entities[i].GetComponent<PointLightComponent>();
                     shader.SetVec3("iPointLights" + index + ".position", tc.position);
                     shader.SetFloat("iPointLights" + index + ".intensity", plc.intensity);
                     shader.SetVec3("iPointLights" + index + ".colour", plc.colour);

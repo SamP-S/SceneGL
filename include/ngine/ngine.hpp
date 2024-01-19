@@ -153,7 +153,7 @@ namespace Ngine {
     Entity Scene::CreateEntity(const std::string& name=std::string("Name")) {
         Entity entity = {_registry.create(), this};
         entity.AddComponent<CoreComponent>(name);
-        entity.AddComponent<TransformComponent>(name);
+        entity.AddComponent<TransformComponent>();
         return entity;
     }
 

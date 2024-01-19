@@ -38,6 +38,7 @@ namespace Ngine {
 
             // read in json file to scene
             void Deserialize(const std::string& filepath) override {
+                _scene->clear();
                 json j = LoadJson(filepath);
                 for (const auto& entityJson : j) {
                     DeserializeEntity(entityJson);
@@ -71,10 +72,10 @@ namespace Ngine {
                     } else if (value.contains("meshRenderer")) {
                         // not implemented
                     } else if (value.contains("camera")) {
-                        entity.AddComponent<CameraComponent>();
-                        fov = j["camera"]["fov"];
-                        near = j["camera"]["near"];
-                        far = j["camera"]["far"];
+                        CameraComponent& cc = entity.AddComponent<CameraComponent>();
+                        cc.fov = j["camera"]["fov"];
+                        cc.near = j["camera"]["near"];
+                        cc.far = j["camera"]["far"];
                     } else if (value.contains("firstPersonController")) {
                         // not implemented
                     } else {

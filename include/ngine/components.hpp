@@ -68,8 +68,8 @@ struct CameraComponent {
 
 #define DIRECTIONAL_LIGHT_MAX 4
 struct DirectionalLightComponent {
-    vec3 _colour = vec3({1.0f, 1.0f, 1.0f});
-    float _intensity = 1.0f;
+    vec3 colour = vec3({1.0f, 1.0f, 1.0f});
+    float intensity = 1.0f;
 
     DirectionalLightComponent() = default;
     DirectionalLightComponent(const DirectionalLightComponent&) = default;
@@ -77,9 +77,9 @@ struct DirectionalLightComponent {
 
 #define POINT_LIGHT_MAX 16
 struct PointLightComponent {
-    vec3 _colour = vec3({1.0f, 1.0f, 1.0f});
-    float _intensity = 1.0f;
-    float _range = 10.0f;
+    vec3 colour = vec3({1.0f, 1.0f, 1.0f});
+    float intensity = 1.0f;
+    float range = 10.0f;
 
     PointLightComponent() = default;
     PointLightComponent(const PointLightComponent&) = default;

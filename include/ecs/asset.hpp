@@ -15,7 +15,7 @@ class Asset : public Object {
 
         Asset() = default;
         Asset(const Asset&) = default;
-        Asset(const std::string& name, const std::string& path)
+        Asset(const std::string& name="Asset", const std::string& path="")
             : name(name), path(path) {}
 
 };

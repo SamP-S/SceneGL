@@ -10,12 +10,11 @@
 #include <fstream>
 #include <sstream>
 
-#include "ecs/resource.hpp"
-#include "ecs/resource_manager.hpp"
+#include "ecs/asset.hpp"
 #include "renderer/shader_stage.hpp"
 #include "renderer/gl_interface.hpp"
 
-class Shader : public Resource {
+class Shader : public Asset {
     private:
         ShaderStage* _vs = nullptr;
         ShaderStage* _fs = nullptr;
@@ -46,7 +45,7 @@ class Shader : public Resource {
 
     public:
         Shader(std::string name="Default Shader", ShaderStage* vs=nullptr, ShaderStage* fs=nullptr) : 
-        Resource(name), _vs(vs), _fs(fs) {
+        Asset(name), _vs(vs), _fs(fs) {
             _validShader = Compile();
         }
         
@@ -101,5 +100,3 @@ class Shader : public Resource {
         }
 
 };
-
-extern ResourceManager<Shader> resourceShaders;

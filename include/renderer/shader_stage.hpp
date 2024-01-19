@@ -5,8 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "ecs/resource.hpp"
-#include "ecs/resource_manager.hpp"
+#include "ecs/asset.hpp"
 
 #define SHADER_INVALID  0
 #define SHADER_VERTEX   1
@@ -16,14 +15,14 @@
 #define SHADER_TESSELLATION_CONTROL     5
 #define SHADER_TESSELLATION_EVALUATION  6
 
-class ShaderStage : public Resource {
+class ShaderStage : public Asset {
     private:
         std::string _source;
         int _stage = SHADER_INVALID;
         
     public:
         ShaderStage(std::string name="Default Shader Stage", const std::string& source="", int stage=SHADER_INVALID) :
-            Resource(name),
+            Asset(name),
             _source(source),
             _stage(stage) {}
 
@@ -46,5 +45,3 @@ class ShaderStage : public Resource {
         }
 
 };
-
-extern ResourceManager<ShaderStage> resourceShaderStages;

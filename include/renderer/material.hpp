@@ -4,10 +4,9 @@
 #include <map>
 #include <iostream>
 
-#include "ecs/resource.hpp"
-#include "ecs/resource_manager.hpp"
+#include "ecs/asset.hpp"
 
-class Material : public Resource {
+class Material : public Asset {
 
     private:
         vec4 _baseColour = vec4(1.0f);
@@ -16,10 +15,10 @@ class Material : public Resource {
 
     public:
         Material(std::string name)
-        : Resource(name) {}
+        : Asset(name) {}
 
         Material(std::string name, vec4 baseColour, float metallic, float roughness)
-        : Resource(name),
+        : Asset(name),
         _baseColour(baseColour),
         _metallic(metallic),
         _roughness(roughness) {}
@@ -48,5 +47,3 @@ class Material : public Resource {
             return "Material";
         }
 };
-
-ResourceManager<Material> resourceMaterials = ResourceManager<Material>();

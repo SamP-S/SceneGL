@@ -7,14 +7,13 @@
 #include "la_extended.h"
 using namespace LA;
 #include "gl_interface.hpp"
-#include "ecs/resource.hpp"
-#include "ecs/resource_manager.hpp"
+#include "ecs/asset.hpp"
 
 // might need to add sub mesh support for future more complex meshes
 // each sub-mesh can have its own material but ONLY 1 material
 // multiple materials for a submesh need multiple sub-meshes
 
-class Mesh : public Resource {
+class Mesh : public Asset {
     private:
         bool _isGenerated = false;
 
@@ -26,18 +25,18 @@ class Mesh : public Resource {
 
     // todo add assimp loaded meshes
         Mesh(std::string name)
-            : Resource(name) {
+            : Asset(name) {
             std::cout << "Ok: Created empty mesh" << std::endl;
         }
 
         Mesh(std::string name, std::vector<vec3> vertices)
-            : Resource(name) {
+            : Asset(name) {
             _vertices = vertices;
             GenerateBuffers();
         }
 
         Mesh(std::string name, std::vector<vec3> vertices, std::vector<uint32_t> indicies)
-            : Resource(name) {
+            : Asset(name) {
             _vertices = vertices;
             _indicies = indicies;
             GenerateBuffers();
@@ -45,7 +44,7 @@ class Mesh : public Resource {
         }
 
         Mesh(std::string name, std::vector<vec3> vertices, std::vector<vec3> normals, std::vector<uint32_t> indicies)
-            : Resource(name) {
+            : Asset(name) {
             _vertices = vertices;
             _normals = normals;
             _indicies = indicies;
@@ -137,5 +136,3 @@ class Mesh : public Resource {
             _isGenerated = true;
         }
 };
-
-extern ResourceManager<Mesh> resourceMeshes;

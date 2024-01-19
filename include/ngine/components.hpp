@@ -54,8 +54,8 @@ struct CameraComponent {
     float fov = 45.0f;
     float near = 0.1f;
     float far = 100.0f;
-    unit32_t width = 800;
-    unit32_t height = 600;
+    uint32_t width = 800;
+    uint32_t height = 600;
 
 
     CameraComponent() = default;
@@ -66,3 +66,28 @@ struct CameraComponent {
     }
 };
 
+#define DIRECTIONAL_LIGHT_MAX 4
+struct DirectionalLightComponent {
+    vec3 _colour = vec3({1.0f, 1.0f, 1.0f});
+    float _intensity = 1.0f;
+
+    DirectionalLightComponent() = default;
+    DirectionalLightComponent(const DirectionalLightComponent&) = default;
+};
+
+#define POINT_LIGHT_MAX 16
+struct PointLightComponent {
+    vec3 _colour = vec3({1.0f, 1.0f, 1.0f});
+    float _intensity = 1.0f;
+    float _range = 10.0f;
+
+    PointLightComponent() = default;
+    PointLightComponent(const PointLightComponent&) = default;
+};
+
+struct MeshRendererComponent {
+    uint32_t mesh = 0;
+
+    MeshRendererComponent() = default;
+    MeshRendererComponent(const MeshRendererComponent&) = default;
+};

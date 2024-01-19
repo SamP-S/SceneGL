@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "ecs/asset.hpp"
+#include "tai/tai.hpp"
 
 #define SHADER_INVALID  0
 #define SHADER_VERTEX   1

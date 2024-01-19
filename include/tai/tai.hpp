@@ -9,7 +9,6 @@
 
 #include "core/filepath.hpp"
 #include "ngine/object.hpp"
-#include "ecs/asset_loader.hpp"
 
 namespace Tai {
 

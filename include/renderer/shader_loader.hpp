@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ecs/asset_loader.hpp"
+#include "tai/tai.hpp"
 #include "core/filepath.hpp"
 #include "renderer/shader.hpp"
 

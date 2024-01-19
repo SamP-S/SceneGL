@@ -15,8 +15,7 @@
 
 #include "ngine/ngine.hpp"
 #include "ngine/serializer.hpp"
-
-#include "ecs/asset_manager.hpp"
+#include "tai/tai.hpp"
 
 #include "la_extended.h"
 

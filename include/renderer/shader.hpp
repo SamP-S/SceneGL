@@ -10,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "ecs/asset.hpp"
+#include "tai/tai.hpp"
 #include "renderer/shader_stage.hpp"
 #include "renderer/gl_interface.hpp"
 
@@ -100,3 +100,5 @@ class Shader : public Asset {
         }
 
 };
+
+extern ResourceManager<Shader> resourceShaders;

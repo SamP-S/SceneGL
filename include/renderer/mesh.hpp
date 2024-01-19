@@ -7,7 +7,7 @@
 #include "la_extended.h"
 using namespace LA;
 #include "gl_interface.hpp"
-#include "ecs/asset.hpp"
+#include "tai/tai.hpp"
 
 // might need to add sub mesh support for future more complex meshes
 // each sub-mesh can have its own material but ONLY 1 material

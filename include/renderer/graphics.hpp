@@ -20,11 +20,13 @@
 #include "la_extended.h"
 
 #include "core/frame_timer.hpp"
+
+#include "platform/opengl/opengl.hpp"
 #include "platform/opengl/opengl_shader.hpp"
 #include "platform/opengl/opengl_shader_source.hpp"
 #include "platform/opengl/opengl_frame_buffer.hpp"
+#include "platform/opengl/opengl_mesh.hpp"
 
-#include "renderer/mesh.hpp"
 #include "renderer/editor_camera.hpp"
 
 #include "renderer/model_loader.hpp"
@@ -134,12 +136,12 @@ class GraphicsEngine {
                 if (i < entities.size()) {
                     TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
                     DirectionalLightComponent& dlc = entities[i].GetComponent<DirectionalLightComponent>();
-                    shader->SetVec3("iDirectionalLights" + index + ".direction", tc.GetForward());
-                    shader->SetFloat("iDirectionalLights" + index + ".intensity", dlc.intensity);
-                    shader->SetVec3("iDirectionalLights" + index + ".colour", dlc.colour);
-                    shader->SetInt("iDirectionalLights" + index + ".enabled", 1);
+                    shader->SetVec3("uDirectionalLights" + index + ".direction", tc.GetForward());
+                    shader->SetFloat("uDirectionalLights" + index + ".intensity", dlc.intensity);
+                    shader->SetVec3("uDirectionalLights" + index + ".colour", dlc.colour);
+                    shader->SetInt("uDirectionalLights" + index + ".enabled", 1);
                 } else {
-                    shader->SetInt("iDirectionalLights" + index + ".enabled", 0);
+                    shader->SetInt("uDirectionalLights" + index + ".enabled", 0);
                 }
             }
         }
@@ -156,12 +158,12 @@ class GraphicsEngine {
                 if (i < entities.size()) {
                     TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
                     PointLightComponent& plc = entities[i].GetComponent<PointLightComponent>();
-                    shader->SetVec3("iPointLights" + index + ".position", tc.position);
-                    shader->SetFloat("iPointLights" + index + ".intensity", plc.intensity);
-                    shader->SetVec3("iPointLights" + index + ".colour", plc.colour);
-                    shader->SetInt("iPointLights" + index + ".enabled", 1);
+                    shader->SetVec3("uPointLights" + index + ".position", tc.position);
+                    shader->SetFloat("uPointLights" + index + ".intensity", plc.intensity);
+                    shader->SetVec3("uPointLights" + index + ".colour", plc.colour);
+                    shader->SetInt("uPointLights" + index + ".enabled", 1);
                 } else {
-                    shader->SetInt("iPointLights" + index + ".enabled", 0);
+                    shader->SetInt("uPointLights" + index + ".enabled", 0);
                 }
             }
         }
@@ -169,39 +171,17 @@ class GraphicsEngine {
         void SetupShader(std::shared_ptr<Shader> shader) {
             shader->Bind();
             // vertex uniforms
-            shader->SetMat4("iView", &inverse(editorCamera.transform.GetTransform())[0][0]);
-            shader->SetMat4("iProjection", &(editorCamera.GetProjection())[0][0]);
+            shader->SetMat4("uView", &inverse(editorCamera.transform.GetTransform())[0][0]);
+            shader->SetMat4("uProjection", &(editorCamera.GetProjection())[0][0]);
             // fragment uniforms
-            shader->SetVec3("iResolution", _width, _height, 1.0f);
-            shader->SetFloat("iTime", ft.GetTotalElapsed());
-            shader->SetFloat("iTimeDelta", ft.GetFrameElapsed());
-            shader->SetInt("iFrame", ft.GetFrameCount());
-            shader->SetVec3("iCameraPosition", editorCamera.transform.position); 
+            shader->SetVec3("uResolution", _width, _height, 1.0f);
+            shader->SetFloat("uTime", ft.GetTotalElapsed());
+            shader->SetFloat("uTimeDelta", ft.GetFrameElapsed());
+            shader->SetInt("uFrame", ft.GetFrameCount());
+            shader->SetVec3("uCameraPosition", editorCamera.transform.position); 
  
             ShaderDirectionalLights(shader);
             ShaderPointLights(shader);     
-        }
-
-        void Draw(MeshRendererComponent& renderer, bool wireframe=false) {
-            if (renderer.mesh != 0) {
-                std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>(renderer.mesh);
-                if (mesh == NULL || !mesh->GetIsGenerated()) {
-                    std::cout << "WARNING (Graphics): Attempting to render a bad mesh." << std::endl;
-                    return;
-                }
-
-                GL_Interface::BindVertexArrayObject(mesh->vao);
-                if (wireframe) {
-                    GL_Interface::PolygonMode(POLYGON_LINE);
-                    GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, mesh->GetVerticesSize());
-                    GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
-                    GL_Interface::PolygonMode(POLYGON_FILL);
-                } else {
-                    GL_Interface::DrawArrays(DRAW_TRIANGLES, 0, mesh->GetVerticesSize());
-                    GL_Interface::DrawElements(DRAW_TRIANGLES, mesh->GetIndiciesSize(), TYPE_UINT);
-                }
-                return;
-            }
         }
 
         void RenderObject(Entity entity, mat4 root_trans = mat4(), std::shared_ptr<Shader> shader=nullptr, bool wireframe=false) {
@@ -211,12 +191,24 @@ class GraphicsEngine {
             // check entity has renderer
             if (!entity.HasComponent<MeshRendererComponent>())
                 return;
-            // check mesh is not empty
+
+            // check meshrenderer mesh is not none
             MeshRendererComponent& mrc = entity.GetComponent<MeshRendererComponent>();
-            if (mrc.mesh == 0)
+            if (mrc.mesh == 0) {
+                std::cout << "WARNING (Graphics): Attempting to draw None mesh." << std::endl;
                 return;
-            shader->SetMat4("iModel", &model[0][0]);
-            Draw(mrc, wireframe);
+            }
+
+            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>(mrc.mesh);
+            if (mesh == nullptr) {
+                std::cout << "WARNING (Grahpics): Attempting to draw null mesh." << std::endl;
+                return;
+            }
+
+            // pass model coordinate space
+            shader->SetMat4("uModel", &model[0][0]);
+            // draw mesh
+            mesh->Draw();
         }
 
         void Render() {
@@ -237,16 +229,18 @@ class GraphicsEngine {
             std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
             for (auto& ent : renderables) {
                 // draw lit
-                GL_Interface::EnableFeature(FEATURE_DEPTH);
-                GL_Interface::EnableFeature(FEATURE_CULL);
-                GL_Interface::SetFrontFace(FRONT_CCW);
                 lightingShader->Bind();
+                glEnable(GL_DEPTH_TEST);
+                glDisable(GL_CULL_FACE);
+                glFrontFace(GL_CCW);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 RenderObject(ent, mat4(), lightingShader, false);
 
                 // draw wireframe
-                GL_Interface::EnableFeature(FEATURE_DEPTH);
-                GL_Interface::EnableFeature(FEATURE_CULL);
                 baseShader->Bind();
+                glEnable(GL_DEPTH_TEST);
+                glDisable(GL_CULL_FACE);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 RenderObject(ent, mat4(), baseShader, true);
             }
 

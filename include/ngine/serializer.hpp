@@ -8,7 +8,7 @@
 // internal libs
 #include "ngine/ngine.hpp"
 #include "tai/tai.hpp"
-#include "renderer/mesh.hpp"
+#include "platform/opengl/opengl_mesh.hpp"
 // external libs
 #include "json.hpp"
 using namespace nlohmann;
@@ -99,7 +99,7 @@ namespace Ngine
                 {
                     MeshRendererComponent &mrc = entity.AddComponent<MeshRendererComponent>();
                     std::string meshName = value["meshRenderer"]["meshName"];
-                    std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>(meshName);
+                    std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>(meshName);
                     if (mesh == nullptr)
                         mrc.mesh = 0;
                     else

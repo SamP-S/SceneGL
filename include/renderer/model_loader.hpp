@@ -83,7 +83,10 @@ private:
 				indices.push_back(index);
 			}
 			// std::cout << vertices.size() << "|" << normals.size() << "|" << indices.size() << std::endl;
-			assetManager.CreateAsset<Mesh>(mesh.name, vertices, normals, indices);
+			std::shared_ptr<OpenGLMesh> meshGL = assetManager.CreateAsset<OpenGLMesh>(mesh.name);
+			meshGL->vertices = vertices;
+			meshGL->normals = normals;
+			meshGL->indices = indices;
 		}
 	}
 

@@ -300,7 +300,7 @@ class Application {
                             new_entity_count += 1;
 
                             // build components
-                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>("empty");
+                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("empty");
                             MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
                             mrc.mesh = mesh->id;
                         }
@@ -313,7 +313,7 @@ class Application {
                             new_entity_count += 1;
 
                             // build components
-                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<Mesh>("vertex_cube");
+                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
                             MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
                             mrc.mesh = mesh->id;
                         }
@@ -448,8 +448,8 @@ class Application {
                 e.RemoveComponent<MeshRendererComponent>();
             }
             ObjectId meshId = mrc.mesh;
-            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": assetManager.GetAsset<Mesh>(meshId)->name.c_str()))) {
-                for (auto it = assetManager.begin<Mesh>(); it != assetManager.end<Mesh>(); ++it) {
+            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": assetManager.GetAsset<OpenGLMesh>(meshId)->name.c_str()))) {
+                for (auto it = assetManager.begin<OpenGLMesh>(); it != assetManager.end<OpenGLMesh>(); ++it) {
                     auto mesh = *it;
                     if (ImGui::Selectable(mesh->name.c_str())) {
                         mrc.mesh = mesh->id;

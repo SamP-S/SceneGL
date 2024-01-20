@@ -88,7 +88,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Icosphere-Mesh"
+                    "meshName": "Icosphere-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -115,7 +116,8 @@
                 "components": [
                     {
                         "meshRenderer": {
-                            "meshName": "Icosphere-Mesh"
+                            "meshName": "Icosphere-Mesh",
+                            "shaderName": "lighting"
                         }
                     }
                 ],
@@ -145,7 +147,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Cylinder-Mesh"
+                    "meshName": "Cylinder-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -173,7 +176,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Plane-Mesh"
+                    "meshName": "Plane-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -201,7 +205,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Cone-Mesh"
+                    "meshName": "Cone-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -229,7 +234,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Cube-Mesh"
+                    "meshName": "Cube-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -257,7 +263,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Dome-Mesh"
+                    "meshName": "Dome-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -285,7 +292,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Sphere-Mesh"
+                    "meshName": "Sphere-Mesh",
+                    "shaderName": "lighting"
                 }
             },
             {
@@ -324,7 +332,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Dome-Mesh"
+                    "meshName": "Dome-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],
@@ -352,7 +361,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Cube-Mesh"
+                    "meshName": "Cube-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],

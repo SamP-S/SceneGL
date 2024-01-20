@@ -54,7 +54,8 @@
         "components": [
             {
                 "meshRenderer": {
-                    "meshName": "Cube-Mesh"
+                    "meshName": "Cube-Mesh",
+                    "shaderName": "lighting"
                 }
             }
         ],

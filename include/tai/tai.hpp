@@ -10,6 +10,10 @@
 #include "core/filepath.hpp"
 #include "ngine/object.hpp"
 
+//// TODO:
+// Implement asset destruction
+// Maybe change naming to find instead of get as not always return asset
+
 namespace Tai {
 
     struct Asset : public Object {
@@ -122,6 +126,22 @@ namespace Tai {
         }
 
         template<typename T>
+        ObjectId GetAssetId(const std::string& name) {
+            std::string s = typeid(T).name();
+            // didnt find buffer to even hold T, return null
+            if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
+                return 0;
+            }
+            std::vector<std::shared_ptr<Asset>> arr = GetAssets<T>();
+            for (auto asset : arr) {
+                if (asset->name.compare(name) == 0)
+                    return asset->id;
+            }
+            // could not find matching name
+            return 0;
+        }
+
+        template<typename T>
         std::vector<std::shared_ptr<Asset>> GetAssets() {
             std::string s = typeid(T).name();
             // check for buffer of T
@@ -130,8 +150,6 @@ namespace Tai {
             }
             return _assetLibrary[_typeToBuffer[s]];
         }
-        
-        /// TODO: Implement asset destruction
     };
 
         class IAssetLoader {

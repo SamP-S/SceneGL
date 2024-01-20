@@ -6,7 +6,7 @@ using ObjectId = int32_t;
 
 struct Object {
     private:
-        inline static ObjectId _nextId = 0;
+        inline static ObjectId _nextId = 1;
 
     public:
         // DO NOT MODIFY STORED VALUE

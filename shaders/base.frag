@@ -1,19 +1,24 @@
 #version 330 core
 
+// // standard variables
 // in vec4 gl_FragCoord;
 // in bool gl_FrontFacing;
 // in vec2 gl_PointCoord;
+// out float gl_FragDepth;
 
-uniform vec3    iResolution;
-uniform float   iTime;
-uniform float   iTimeDelta;
-uniform int     iFrame;  
+// "varying" variables
+in vec3 vColour;
 
-in vec3 fColour;
+// uniforms
+uniform vec3    uResolution;
+uniform float   uTime;
+uniform float   uTimeDelta;
+uniform int     uFrame;  
 
+// outputs
 out vec4 oColour;
 
 void main()
 {
-    oColour = vec4(fColour, 1);
+    oColour = vec4(vColour, 1);
 }

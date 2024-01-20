@@ -8,6 +8,9 @@
 #include "platform/opengl/opengl.hpp"
 #include "renderer/shader.hpp"
 
+//// TODO:
+// unfix binding fragment data output location to "oColour"
+
 class OpenGLShader : public Shader {
     private:
         bool _validShader = false;
@@ -52,7 +55,7 @@ class OpenGLShader : public Shader {
                 _programId = glCreateProgram();
                 glAttachShader(_programId, vertex);
                 glAttachShader(_programId, fragment);
-                glBindFragDataLocation(_programId, 0, SHADER_OUTPUT_FRAG);
+                glBindFragDataLocation(_programId, 0, "oColour");
                 glLinkProgram(_programId);
                 
                 // validate shader program correct

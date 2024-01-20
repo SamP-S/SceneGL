@@ -9,7 +9,7 @@
 class Material : public Tai::Asset {
 
     private:
-        vec4 _baseColour = vec4(1.0f);
+        LA::vec4 _baseColour = LA::vec4(1.0f);
         float _metallic = 1.0f;
         float _roughness = 1.0f;
 
@@ -17,7 +17,7 @@ class Material : public Tai::Asset {
         Material(std::string name)
         : Asset(name) {}
 
-        Material(std::string name, vec4 baseColour, float metallic, float roughness)
+        Material(std::string name, LA::vec4 baseColour, float metallic, float roughness)
         : Asset(name),
         _baseColour(baseColour),
         _metallic(metallic),
@@ -28,7 +28,7 @@ class Material : public Tai::Asset {
         }
         void FromJson(json j) {
             json colour = j["baseColour"];
-            _baseColour = vec4({colour["r"], colour["g"], colour["b"], colour["a"]});
+            _baseColour = LA::vec4({colour["r"], colour["g"], colour["b"], colour["a"]});
             _metallic = j["metallic"];
             _roughness = j["roughness"];
             return;

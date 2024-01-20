@@ -96,7 +96,7 @@ class OpenGLShader : public Shader {
             glUniform1f(glGetUniformLocation(_programId, name.c_str()), value);
         }
 
-        void SetVec2(const std::string& name, vec2 v) const override {
+        void SetVec2(const std::string& name, const LA::vec2& v) const override {
             glUniform2f(glGetUniformLocation(_programId, name.c_str()), v.x, v.y);
         }
 
@@ -104,7 +104,7 @@ class OpenGLShader : public Shader {
             glUniform2f(glGetUniformLocation(_programId, name.c_str()), x, y);
         }
 
-        void SetVec3(const std::string& name, vec3 v) const override {
+        void SetVec3(const std::string& name, const LA::vec3& v) const override {
             glUniform3f(glGetUniformLocation(_programId, name.c_str()), v.x, v.y, v.z);
         }
 
@@ -112,12 +112,16 @@ class OpenGLShader : public Shader {
             glUniform3f(glGetUniformLocation(_programId, name.c_str()), x, y, z);
         }
 
-        void SetVec4(const std::string& name, vec4 v) const override {
+        void SetVec4(const std::string& name, const LA::vec4& v) const override {
             glUniform4f(glGetUniformLocation(_programId, name.c_str()), v.x, v.y, v.z, v.w);
         }
         
         void SetVec4(const std::string& name, float x, float y, float z, float w) const override {
             glUniform4f(glGetUniformLocation(_programId, name.c_str()), x, y, z, w);
+        }
+
+        void SetMat4(const std::string& name, const LA::mat4& m) const override {
+            glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, &(m)[0][0]);
         }
 
         void SetMat4(const std::string& name, float* mPtr) const override {

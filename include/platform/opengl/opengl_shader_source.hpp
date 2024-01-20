@@ -5,8 +5,8 @@
 #include <fstream>
 #include <sstream>
 
-#include "renderer/shader_source.hpp"
 #include "platform/opengl/opengl.hpp"
+#include "renderer/shader_source.hpp"
 
 class OpenGLShaderSource : public ShaderSource {
     std::map<ShaderStage, GLenum> _stageToGL = {

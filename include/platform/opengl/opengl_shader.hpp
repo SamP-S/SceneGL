@@ -47,35 +47,52 @@ class OpenGLShader : public Shader {
                 return;
             }
 
+            // compile vertex shader
+            uint32_t vertex = 0;
             try {
-                // compile shader stages
-                uint32_t vertex = vs->Compile();
-                uint32_t fragment = fs->Compile();
-
-                _programId = glCreateProgram();
-                glAttachShader(_programId, vertex);
-                glAttachShader(_programId, fragment);
-                glBindFragDataLocation(_programId, 0, "oColour");
-                glLinkProgram(_programId);
-                
-                // validate shader program correct
-                int success;
-                static char infoLog[1024];
-                glGetProgramiv(_programId, GL_LINK_STATUS, &success);
-                if (!success) {
-                    glGetProgramInfoLog(_programId, 1024, NULL, infoLog);
-                    throw infoLog;
-                }
-
-                // delete stages as opengl has copied to GPU
-                glDeleteShader(vertex);
-                glDeleteShader(fragment);
-
+                vertex = vs->Compile();
             } catch (const char* err) {
-                std::cout << "Error: Shader::Compile - Complilation failed:" << std::endl;
+                std::cout << "Error (OpenGLShader): VERTEX shader compile failed:" << std::endl;
+                std::cout << vs->name << std::endl;
                 std::cout << err << std::endl;
                 return;
             }
+
+            // compile fragment shader
+            uint32_t fragment = 0;
+            try {
+                fragment = fs->Compile();
+            } catch (const char* err) {
+                std::cout << "Error (OpenGLShader): FRAGMENT shader compile failed:" << std::endl;
+                std::cout << fs->name << std::endl;
+                std::cout << err << std::endl;
+                return;
+            }
+            
+            // link shader program
+            _programId = glCreateProgram();
+            glAttachShader(_programId, vertex);
+            glAttachShader(_programId, fragment);
+            glBindFragDataLocation(_programId, 0, "oColour");
+            glLinkProgram(_programId);
+
+            // free shaders as they are copied on linking
+            glDeleteShader(vertex);
+            glDeleteShader(fragment);
+
+            // validate shader program correct
+            int success;
+            static char infoLog[1024];
+            glGetProgramiv(_programId, GL_LINK_STATUS, &success);
+            if (!success) {
+                glGetProgramInfoLog(_programId, 1024, NULL, infoLog);
+                std::cout << "Error (OpenGLShader): Shader program linking failed:" << std::endl;
+                std::cout << name << std::endl;
+                std::cout << infoLog << std::endl;
+                return;
+            }
+            
+            // success
             _validShader = true;
         }
 

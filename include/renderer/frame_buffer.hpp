@@ -1,8 +1,8 @@
 #pragma once
 
-#include "tai/tai.hpp"
+#include "ngine/ngine.hpp"
 
-class FrameBuffer : public Tai::Asset {
+class FrameBuffer : public Ngine::Asset {
     protected:
         int _width = 0;
         int _height = 0;

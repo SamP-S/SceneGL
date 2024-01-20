@@ -15,7 +15,6 @@
 
 #include "ngine/components.hpp"
 #include "ngine/ngine.hpp"
-#include "tai/tai.hpp"
 using namespace Ngine;
 
 #include "renderer/graphics.hpp"
@@ -57,7 +56,7 @@ class Application {
         int new_entity_count = 0;
         int componentPanelCount = 0;
 
-        Tai::AssetManager&  assetManager = Tai::AssetManager::Instance();
+        AssetManager&  assetManager = AssetManager::Instance();
 
         std::map<char*, float> arMap = {
             {"None", 0.0f},

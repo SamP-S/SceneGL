@@ -7,7 +7,6 @@
 #include <fstream>
 // internal libs
 #include "ngine/ngine.hpp"
-#include "tai/tai.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
 #include "platform/opengl/opengl_shader.hpp"
 // external libs
@@ -20,7 +19,7 @@ namespace Ngine
     class ISerializer
     {
     public:
-        Tai::AssetManager &assetManager = Tai::AssetManager::Instance();
+        Ngine::AssetManager &assetManager = Ngine::AssetManager::Instance();
         ISerializer(std::shared_ptr<Scene> scene)
             : _scene(scene) {}
 

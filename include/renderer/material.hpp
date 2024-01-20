@@ -4,9 +4,9 @@
 #include <map>
 #include <iostream>
 
-#include "tai/tai.hpp"
+#include "ngine/ngine.hpp"
 
-class Material : public Tai::Asset {
+class Material : public Ngine::Asset {
 
     private:
         LA::vec4 _baseColour = LA::vec4(1.0f);

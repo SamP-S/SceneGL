@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "tai/tai.hpp"
+#include "ngine/ngine.hpp"
 
 enum ShaderStage {
     INVALID = 0,
@@ -17,7 +17,7 @@ enum ShaderStage {
     TESSELLATION_EVALUATION = 6
 };
 
-class ShaderSource : public Tai::Asset {
+class ShaderSource : public Ngine::Asset {
     public:
         std::string source = "";
         ShaderStage stage = ShaderStage::INVALID;

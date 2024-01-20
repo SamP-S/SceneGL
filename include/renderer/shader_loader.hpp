@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "tai/tai.hpp"
+#include "ngine/ngine.hpp"
 #include "core/filepath.hpp"
 #include "platform/opengl/opengl_shader.hpp"
 #include "platform/opengl/opengl_shader_source.hpp"
@@ -21,7 +21,7 @@
 // .frag - a fragment shader
 // .comp - a compute shader
 
-class ShaderLoader : public Tai::IAssetLoader {
+class ShaderLoader : public Ngine::IAssetLoader {
 private:
     std::vector<std::string> _extensions = {".vert", ".tesc", ".tese", ".geom", ".frag", ".comp"};
     

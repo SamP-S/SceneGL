@@ -6,52 +6,10 @@
 #include <cstdint>
 #include <vector>
 // internal libs
-#include "ngine/object.hpp"
+#include "ngine/ngine.hpp"
 #include "la_extended.h"
 
-struct CoreComponent : public Object {
-    std::string name;
-    bool active = true;
-
-    CoreComponent() = default;
-    CoreComponent(const CoreComponent&) = default;
-    CoreComponent(const std::string& pName)
-        : name(pName) {}
-};
-
-struct TransformComponent : public Object {
-    LA::vec3 position  = LA::vec3(0.0f);
-    LA::vec3 rotation  = LA::vec3(0.0f);
-    LA::vec3 scale     = LA::vec3(1.0f);
-
-    TransformComponent() = default;
-    TransformComponent(const TransformComponent&) = default;
-    TransformComponent(const LA::vec3& pos)
-        : position(pos) {}
-
-
-    LA::mat4 GetTransform() {
-        return LA::Transformation(position, rotation, scale);
-    }
-
-    LA::vec3 GetForward() {
-        LA::mat4 total = GetTransform();
-        return LA::vec3({ total[2][0], total[2][1], total[2][2] });
-    }
-
-    LA::vec3 GetRight() {
-        LA::mat4 total = GetTransform();
-        return LA::vec3({ total[0][0], total[0][1], total[0][2] });
-    }
-
-    LA::vec3 GetUp() {
-        LA::mat4 total = GetTransform();
-        return LA::vec3({ total[1][0], total[1][1], total[1][2] });
-    }
-    
-};
-
-struct CameraComponent : public Object {
+struct CameraComponent : public Ngine::Object {
     float fov = 45.0f;
     float near = 0.1f;
     float far = 100.0f;
@@ -68,7 +26,7 @@ struct CameraComponent : public Object {
 };
 
 #define DIRECTIONAL_LIGHT_MAX 4
-struct DirectionalLightComponent : public Object {
+struct DirectionalLightComponent : public Ngine::Object {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
 
@@ -77,7 +35,7 @@ struct DirectionalLightComponent : public Object {
 };
 
 #define POINT_LIGHT_MAX 16
-struct PointLightComponent : public Object {
+struct PointLightComponent : public Ngine::Object {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
     float range = 10.0f;
@@ -86,7 +44,7 @@ struct PointLightComponent : public Object {
     PointLightComponent(const PointLightComponent&) = default;
 };
 
-struct MeshRendererComponent : public Object {
+struct MeshRendererComponent : public Ngine::Object {
     ObjectId mesh = 0;
     ObjectId shader = 0;
 

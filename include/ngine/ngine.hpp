@@ -5,13 +5,91 @@
 #include <cassert>
 #include <cstdint>
 #include <vector>
+#include <typeinfo>
+#include <map>
+#include <iostream>
 // external libs
 #include <entt.hpp>
-// internal
-#include "ngine/object.hpp"
-#include "ngine/components.hpp"
+// internal libs
+#include "la_extended.h"
+
+//// TODO: the asset N entity engine
+// Entities:
+//
+// Assets:
+// Implement asset destruction
+// Maybe change naming to find instead of get as not always return asset
+// Improve GetAssets to remove iterative conversion/vector build
+
+using ObjectId = int32_t;
 
 namespace Ngine {
+
+    struct Object {
+        private:
+            inline static ObjectId _nextId = 1;
+
+        public:
+            // DO NOT MODIFY STORED VALUE
+            ObjectId id;
+            
+            Object()
+                : id(Object::_nextId++) {}
+
+            operator bool() const {
+                return id != 0;
+            }
+
+            bool operator==(const Object& cmp) const {
+                return id == cmp.id;
+            }
+
+            bool operator!=(const Object& cmp) const {
+                return id != cmp.id;
+            }
+    };
+
+    struct CoreComponent : public Object {
+        std::string name;
+        bool active = true;
+
+        CoreComponent() = default;
+        CoreComponent(const CoreComponent&) = default;
+        CoreComponent(const std::string& pName)
+            : name(pName) {}
+    };
+
+    struct TransformComponent : public Object {
+        LA::vec3 position  = LA::vec3(0.0f);
+        LA::vec3 rotation  = LA::vec3(0.0f);
+        LA::vec3 scale     = LA::vec3(1.0f);
+
+        TransformComponent() = default;
+        TransformComponent(const TransformComponent&) = default;
+        TransformComponent(const LA::vec3& pos)
+            : position(pos) {}
+
+
+        LA::mat4 GetTransform() {
+            return LA::Transformation(position, rotation, scale);
+        }
+
+        LA::vec3 GetForward() {
+            LA::mat4 total = GetTransform();
+            return LA::vec3({ total[2][0], total[2][1], total[2][2] });
+        }
+
+        LA::vec3 GetRight() {
+            LA::mat4 total = GetTransform();
+            return LA::vec3({ total[0][0], total[0][1], total[0][2] });
+        }
+
+        LA::vec3 GetUp() {
+            LA::mat4 total = GetTransform();
+            return LA::vec3({ total[1][0], total[1][1], total[1][2] });
+        }
+        
+    };
     
     class Entity;
 
@@ -103,6 +181,7 @@ namespace Ngine {
                 assert(HasComponent<T>() && "We don't have a component of this type to remove.");
                 _scene->_registry.remove<T>(_entityHandle);
             }
+
     };
 
     Scene::Scene() {}
@@ -155,5 +234,190 @@ namespace Ngine {
         auto view = _registry.view<CoreComponent>();
         return view.size();
     }
+
+    struct Asset : public Object {
+    public:
+        std::string name;
+        std::string path;
+
+        Asset() = default;
+        Asset(const Asset&) = default;
+        Asset(const std::string& name="Asset", const std::string& path="")
+            : name(name), path(path) {}
+        virtual ~Asset() = default;
+    };
+
+    // note: using map as is already sorted when iterating
+    class AssetManager : public Object {
+    private:
+        std::map<std::string, uint32_t> _typeToBuffer;
+        std::vector<std::map<ObjectId, uint32_t>> _idToIndex;
+        std::vector<std::vector<std::shared_ptr<Asset>>> _assetLibrary;
+
+        // private constructor for singleton
+        AssetManager() {}
+        ~AssetManager() {}
+
+        // Delete copy constructor and assignment operator
+        AssetManager(const AssetManager&) = delete;
+        AssetManager& operator=(const AssetManager&) = delete;
+
+        template<typename T>
+        void CheckForBuffer() {
+            std::string s = typeid(T).name();
+            if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
+                uint32_t buf = _assetLibrary.size();
+                _typeToBuffer[s] = buf;
+                // add buffer
+                std::vector<std::shared_ptr<Asset>> newBuffer;
+                _assetLibrary.push_back(newBuffer);
+                // add id look up table
+                std::map<ObjectId, uint32_t> newLut;
+                _idToIndex.push_back(newLut);
+            }
+        }
+
+    public:
+        // Public static method to get the single instance
+        static AssetManager& Instance() {
+            static AssetManager instance;
+            return instance;
+        }
+
+        template<typename T>
+        auto begin() {
+            CheckForBuffer<T>();
+            std::string s = typeid(T).name();
+            uint32_t buf = _typeToBuffer[s];
+            return _assetLibrary[buf].begin();
+        }
+
+        template<typename T>
+        auto end() {
+            CheckForBuffer<T>();
+            std::string s = typeid(T).name();
+            uint32_t buf = _typeToBuffer[s];
+            return _assetLibrary[buf].end();
+        }
+
+        template<typename T, typename... Args>
+        std::shared_ptr<T> CreateAsset(Args&&... args) {
+            CheckForBuffer<T>();
+            std::string s = typeid(T).name();
+            uint32_t buf = _typeToBuffer[s];
+            std::shared_ptr<T> newAsset = std::make_shared<T>(std::forward<Args>(args)...);
+            uint32_t idx = _assetLibrary[buf].size();
+            _idToIndex[buf].emplace(newAsset->id, idx);
+            _assetLibrary[buf].push_back(newAsset);
+            return newAsset;
+        }
+
+        template<typename T>
+        std::shared_ptr<T> GetAsset(ObjectId id) {
+            std::string s = typeid(T).name();
+            // didnt find buffer to even hold T, return null
+            if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
+                return nullptr;
+            }
+            uint32_t buf = _typeToBuffer[s];
+            // couldnt find id in index map
+            if (_idToIndex[buf].find(id) == _idToIndex[buf].end()) {
+                return nullptr;
+            }
+            uint32_t idx = _idToIndex[buf][id];
+            std::shared_ptr<Asset> ptr = _assetLibrary[buf][idx];
+            return std::dynamic_pointer_cast<T>(ptr);
+        }
+
+        template<typename T>
+        std::shared_ptr<T> GetAsset(const std::string& name) {
+            std::string s = typeid(T).name();
+            // didnt find buffer to even hold T, return null
+            if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
+                return nullptr;
+            }
+            std::vector<std::shared_ptr<Asset>> arr = GetAssets<T>();
+            for (auto asset : arr) {
+                if (asset->name.compare(name) == 0)
+                    return std::dynamic_pointer_cast<T>(asset);
+            }
+            // could not find matching name
+            return nullptr;
+        }
+
+        template<typename T>
+        ObjectId GetAssetId(const std::string& name) {
+            std::string s = typeid(T).name();
+            // didnt find buffer to even hold T, return null
+            if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
+                return 0;
+            }
+            std::vector<std::shared_ptr<Asset>> arr = GetAssets<T>();
+            for (auto asset : arr) {
+                if (asset->name.compare(name) == 0)
+                    return asset->id;
+            }
+            // could not find matching name
+            return 0;
+        }
+
+        template<typename T>
+        std::vector<std::shared_ptr<Asset>> GetAssets() {
+            std::string s = typeid(T).name();
+            // check for buffer of T
+            if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
+                return std::vector<std::shared_ptr<Asset>>();
+            }
+            return _assetLibrary[_typeToBuffer[s]];
+        }
+    };
+
+        class IAssetLoader {
+    private:
+        std::vector<std::string> _extensions;
+        
+    public:
+        AssetManager&  assetManager = AssetManager::Instance();
+        virtual bool Load(const std::string& filepath) = 0;
+        virtual std::vector<std::string> GetSupportedExt() = 0;
+        virtual bool CanLoad(const std::string& filepath) = 0;
+        
+    };
+
+    class LoaderManager : public Object {
+    private:
+        std::vector<IAssetLoader*> _loaders;
+
+    public:
+        LoaderManager() {}
+        ~LoaderManager() {
+            // clear loaders
+            for (IAssetLoader* loader : _loaders) {
+                delete loader;
+            }
+            _loaders.clear();
+        }
+
+        void AddLoader(IAssetLoader* loader) {
+            _loaders.push_back(loader);
+        }
+
+        void RemoveLoader(IAssetLoader* loader) {
+            auto it = std::find(_loaders.begin(), _loaders.end(), loader);
+            if (it != _loaders.end()) {
+                _loaders.erase(it);
+            }
+        }
+
+        bool Load(const std::string& filepath) {
+            for (auto loader : _loaders) {
+                if (loader != nullptr && loader->CanLoad(filepath)) {
+                    return loader->Load(filepath);
+                }
+            }
+            std::cout << "ERROR (LoaderManager): Unsupported file extension @ " << filepath << std::endl;
+            return false;
+        }
+    };
 
 }

@@ -15,7 +15,6 @@
 
 #include "ngine/ngine.hpp"
 #include "ngine/serializer.hpp"
-#include "tai/tai.hpp"
 
 #include "la_extended.h"
 
@@ -40,8 +39,8 @@ class GraphicsEngine {
         frame_timer ft = frame_timer();
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-        Tai::AssetManager& assetManager = Tai::AssetManager::Instance();
-        Tai::LoaderManager loaderManager = Tai::LoaderManager();
+        Ngine::AssetManager& assetManager = Ngine::AssetManager::Instance();
+        Ngine::LoaderManager loaderManager = Ngine::LoaderManager();
         std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
 
         GraphicsEngine(int width, int height) :
@@ -192,7 +191,7 @@ class GraphicsEngine {
 
     private:
         void SetupShaders() {
-            std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
+            std::vector<std::shared_ptr<Ngine::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
             for (auto asset : shaders) {
                 SetupShader(std::dynamic_pointer_cast<Shader>(asset));
             }

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "tai/tai.hpp"
+#include "ngine/ngine.hpp"
 #include "la_extended.h"
 
 //// TODO:
@@ -14,7 +14,7 @@
 // support more texture channels
 // add internal state to ensure recompilation if vertices changed
 
-class Mesh : public Tai::Asset {
+class Mesh : public Ngine::Asset {
     public:
         std::vector<LA::vec3> vertices;
         std::vector<LA::vec3> normals;

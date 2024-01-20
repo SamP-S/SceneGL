@@ -8,7 +8,8 @@
 #include <map>
 #include <vector>
 
-#include "tai/tai.hpp"
+#include "core/filepath.hpp"
+#include "ngine/ngine.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"
 #include "la_extended.h"
@@ -21,7 +22,7 @@ using namespace LA;
 #include "tiny_gltf.h"
 
 
-class ModelLoader : public Tai::IAssetLoader {
+class ModelLoader : public Ngine::IAssetLoader {
 
 private:
     std::vector<std::string> _extensions = {".gltf"};

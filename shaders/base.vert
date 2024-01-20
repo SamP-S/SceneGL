@@ -14,10 +14,10 @@ layout(location = 0) in vec3 aPosition;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec4 aTangent;
 layout(location = 3) in vec4 aColour;
-layout(location = 4) in vec2 iUV0;
-layout(location = 5) in vec2 iUV1;
-layout(location = 6) in vec2 iUV2;
-layout(location = 7) in vec2 iUV3;
+layout(location = 4) in vec2 aUV0;
+layout(location = 5) in vec2 aUV1;
+layout(location = 6) in vec2 aUV2;
+layout(location = 7) in vec2 aUV3;
 
 // "varying" variables
 out vec3 vColour;
@@ -30,6 +30,6 @@ uniform mat4	uProjection;
 
 void main()
 {
-    vColour = uPosition;
-	gl_Position = uProjection * uView * uModel * vec4(uPosition, 1.0f);
+    vColour = aPosition;
+	gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0f);
 }

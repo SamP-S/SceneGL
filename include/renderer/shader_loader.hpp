@@ -69,7 +69,11 @@ public:
             auto it = _extToType.find(ext);
             if (it != _extToType.end()) {
                 ShaderStage stage = it->second;
-                assetManager.CreateAsset<OpenGLShaderSource>(name, source, stage);
+                std::shared_ptr<ShaderSource> shaderSource = assetManager.CreateAsset<OpenGLShaderSource>();
+                shaderSource->name = name;
+                shaderSource->path = filepath;
+                shaderSource->source = source;
+                shaderSource->stage = stage;
             } else {
                 std::cout << "WARNING (ShaderLoader): Unsupported shader extension @ " << filepath << std::endl;
                 return false;

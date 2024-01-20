@@ -31,7 +31,7 @@ class OpenGLMesh : public Mesh {
         
 
     // todo add assimp loaded meshes
-        OpenGLMesh(std::string name)
+        OpenGLMesh(std::string name="Mesh")
             : Mesh(name) {}
 
         ~OpenGLMesh() {

@@ -26,6 +26,7 @@ class ModelLoader : public Ngine::IAssetLoader {
 
 private:
     std::vector<std::string> _extensions = {".gltf"};
+	std::string _currentlyLoading = "";
 
 	void ProcessMesh(const tinygltf::Mesh& mesh, const tinygltf::Model& model) {
 		std::vector<vec3> vertices;
@@ -84,7 +85,9 @@ private:
 				indices.push_back(index);
 			}
 			// std::cout << vertices.size() << "|" << normals.size() << "|" << indices.size() << std::endl;
-			std::shared_ptr<OpenGLMesh> meshGL = assetManager.CreateAsset<OpenGLMesh>(mesh.name);
+			std::shared_ptr<OpenGLMesh> meshGL = assetManager.CreateAsset<OpenGLMesh>();
+			meshGL->name = mesh.name;
+			meshGL->path = _currentlyLoading;
 			meshGL->vertices = vertices;
 			meshGL->normals = normals;
 			meshGL->indices = indices;
@@ -115,7 +118,7 @@ public:
 			std::cout << "WARNING: Failed to load glTF file: " << err << std::endl;
 			return false;
 		}
-
+		_currentlyLoading = filepath;
 		for (const tinygltf::Material& material : model.materials) {
 			ProcessMaterial(material, model);
 		}
@@ -123,6 +126,7 @@ public:
 		for (const tinygltf::Mesh& mesh : model.meshes) {
 			ProcessMesh(mesh, model);
 		}
+		_currentlyLoading = "";
 		return true;
 	}
 

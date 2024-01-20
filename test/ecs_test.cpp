@@ -4,7 +4,7 @@
 
 // internal libs
 #include "ngine/ngine.hpp"
-#include "ngine/serializer.hpp"
+// #include "ngine/serializer.hpp"
 using namespace Ngine;
 
 // we have two example components here
@@ -50,6 +50,15 @@ void test_ngine() {
     std::cout << uint32_t(entity) << std::endl;
 }
 
+// void test_serializer() {
+//     std::cout << "test_serializer" << std::endl;
+//     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+//     JsonSerializer js = JsonSerializer(scene);
+//     js.Deserialize("./scene/Preset.json");
+//     std::cout << "Loaded scene entity count: " << scene->GetEntityCount() << std::endl;
+// }
+
 int main() {
     test_ngine();
+    // test_serializer();
 }

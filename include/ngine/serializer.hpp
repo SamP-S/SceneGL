@@ -9,6 +9,7 @@
 #include "ngine/ngine.hpp"
 #include "tai/tai.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
+#include "platform/opengl/opengl_shader.hpp"
 // external libs
 #include "json.hpp"
 using namespace nlohmann;
@@ -99,11 +100,9 @@ namespace Ngine
                 {
                     MeshRendererComponent &mrc = entity.AddComponent<MeshRendererComponent>();
                     std::string meshName = value["meshRenderer"]["meshName"];
-                    std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>(meshName);
-                    if (mesh == nullptr)
-                        mrc.mesh = 0;
-                    else
-                        mrc.mesh = mesh->id;
+                    std::string shaderName = value["meshRenderer"]["shaderName"];
+                    mrc.mesh = assetManager.GetAssetId<OpenGLMesh>(meshName);
+                    mrc.shader = assetManager.GetAssetId<OpenGLShader>(shaderName);
                 }
                 else if (value.contains("camera"))
                 {

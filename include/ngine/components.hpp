@@ -87,7 +87,8 @@ struct PointLightComponent : public Object {
 };
 
 struct MeshRendererComponent : public Object {
-    uint32_t mesh = 0;
+    ObjectId mesh = 0;
+    ObjectId shader = 0;
 
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = default;

@@ -124,6 +124,96 @@ class GraphicsEngine {
             std::cout << "NOT IMPLEMENTED" << std::endl;
         }
 
+        void RenderObject(Entity entity, mat4 root_trans = mat4(), bool wireframe=false) {
+            TransformComponent& tc = entity.GetComponent<TransformComponent>();
+            mat4 model = root_trans *  tc.GetTransform();
+
+            // check entity has renderer
+            if (!entity.HasComponent<MeshRendererComponent>())
+                return;
+
+            // check meshrenderer mesh is not none
+            MeshRendererComponent& mrc = entity.GetComponent<MeshRendererComponent>();
+            if (mrc.mesh == 0) {
+                std::cout << "WARNING (Graphics): Attempting to draw None mesh." << std::endl;
+                return;
+            }
+
+            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>(mrc.mesh);
+            if (mesh == nullptr) {
+                std::cout << "WARNING (Graphics): Attempting to draw null mesh." << std::endl;
+                return;
+            }
+
+            std::shared_ptr<Shader> shader = nullptr;
+            if (wireframe) {
+                shader = assetManager.GetAsset<OpenGLShader>("base");
+            } else {
+                shader = assetManager.GetAsset<OpenGLShader>(mrc.shader);
+            }
+             
+            if (shader == nullptr) {
+                std::cout << "WARNING (Graphics): Attempting to use null shader." << std::endl;
+                return;
+            }
+            // pass model coordinate space
+            shader->Bind();
+            shader->SetMat4("uModel", &model[0][0]);
+            // draw mesh
+            mesh->Draw();
+        }
+
+        void Render(bool wireframe=false) {
+            frameBuffer->Bind();
+            frameBuffer->Clear();
+            editorCamera.Update();
+            SetupShaders();
+
+            std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
+            for (auto& ent : renderables) {
+                // draw lit
+                glEnable(GL_DEPTH_TEST);
+                glEnable(GL_CULL_FACE);
+                glFrontFace(GL_CCW);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                RenderObject(ent, mat4(), false);
+
+                // draw wireframe
+                glEnable(GL_DEPTH_TEST);
+                glDisable(GL_CULL_FACE);
+                glLineWidth(3.0f);
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                RenderObject(ent, mat4(), true);
+            }
+
+            frameBuffer->Unbind();
+            ft.Frame();
+        }
+
+    private:
+        void SetupShaders() {
+            std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
+            for (auto asset : shaders) {
+                SetupShader(std::dynamic_pointer_cast<Shader>(asset));
+            }
+        }
+
+        void SetupShader(std::shared_ptr<Shader> shader) {
+            shader->Bind();
+            // vertex uniforms
+            shader->SetMat4("uView", inverse(editorCamera.transform.GetTransform()));
+            shader->SetMat4("uProjection", editorCamera.GetProjection());
+            // fragment uniforms
+            shader->SetVec3("uResolution", _width, _height, 1.0f);
+            shader->SetFloat("uTime", ft.GetTotalElapsed());
+            shader->SetFloat("uTimeDelta", ft.GetFrameElapsed());
+            shader->SetInt("uFrame", ft.GetFrameCount());
+            shader->SetVec3("uCameraPosition", editorCamera.transform.position); 
+
+            ShaderDirectionalLights(shader);
+            ShaderPointLights(shader);   
+        }
+
         void ShaderDirectionalLights(std::shared_ptr<Shader> shader) {
             std::vector<Entity> entities = scene->GetEntitiesWith<DirectionalLightComponent>();
             
@@ -166,87 +256,6 @@ class GraphicsEngine {
                     shader->SetInt("uPointLights" + index + ".enabled", 0);
                 }
             }
-        }
-
-        void SetupShader(std::shared_ptr<Shader> shader) {
-            shader->Bind();
-            // vertex uniforms
-            shader->SetMat4("uView", &inverse(editorCamera.transform.GetTransform())[0][0]);
-            shader->SetMat4("uProjection", &(editorCamera.GetProjection())[0][0]);
-            // fragment uniforms
-            shader->SetVec3("uResolution", _width, _height, 1.0f);
-            shader->SetFloat("uTime", ft.GetTotalElapsed());
-            shader->SetFloat("uTimeDelta", ft.GetFrameElapsed());
-            shader->SetInt("uFrame", ft.GetFrameCount());
-            shader->SetVec3("uCameraPosition", editorCamera.transform.position); 
- 
-            ShaderDirectionalLights(shader);
-            ShaderPointLights(shader);     
-        }
-
-        void RenderObject(Entity entity, mat4 root_trans = mat4(), std::shared_ptr<Shader> shader=nullptr, bool wireframe=false) {
-            TransformComponent& tc = entity.GetComponent<TransformComponent>();
-            mat4 model = root_trans *  tc.GetTransform();
-
-            // check entity has renderer
-            if (!entity.HasComponent<MeshRendererComponent>())
-                return;
-
-            // check meshrenderer mesh is not none
-            MeshRendererComponent& mrc = entity.GetComponent<MeshRendererComponent>();
-            if (mrc.mesh == 0) {
-                std::cout << "WARNING (Graphics): Attempting to draw None mesh." << std::endl;
-                return;
-            }
-
-            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>(mrc.mesh);
-            if (mesh == nullptr) {
-                std::cout << "WARNING (Grahpics): Attempting to draw null mesh." << std::endl;
-                return;
-            }
-
-            // pass model coordinate space
-            shader->SetMat4("uModel", &model[0][0]);
-            // draw mesh
-            mesh->Draw();
-        }
-
-        void Render() {
-            frameBuffer->Bind();
-            frameBuffer->Clear();
-            
-            std::vector<std::shared_ptr<Tai::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
-            for (auto shader : shaders) {
-                auto ptr = std::dynamic_pointer_cast<Shader>(shader);
-                SetupShader(ptr);
-            }
-
-            std::shared_ptr<Shader> baseShader = assetManager.GetAsset<OpenGLShader>("base");
-            std::shared_ptr<Shader> lightingShader = assetManager.GetAsset<OpenGLShader>("lighting");
-
-            editorCamera.Update();
-
-            std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
-            for (auto& ent : renderables) {
-                // draw lit
-                lightingShader->Bind();
-                glEnable(GL_DEPTH_TEST);
-                glDisable(GL_CULL_FACE);
-                glFrontFace(GL_CCW);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                RenderObject(ent, mat4(), lightingShader, false);
-
-                // draw wireframe
-                baseShader->Bind();
-                glEnable(GL_DEPTH_TEST);
-                glDisable(GL_CULL_FACE);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                RenderObject(ent, mat4(), baseShader, true);
-            }
-
-            frameBuffer->Unbind();
-            
-            ft.Frame();
         }
 
 };

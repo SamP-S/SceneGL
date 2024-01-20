@@ -384,13 +384,13 @@ namespace Ngine {
         
     };
 
-    class LoaderManager : public Object {
+    class AssetLoaderManager : public Object {
     private:
         std::vector<IAssetLoader*> _loaders;
 
     public:
-        LoaderManager() {}
-        ~LoaderManager() {
+        AssetLoaderManager() {}
+        ~AssetLoaderManager() {
             // clear loaders
             for (IAssetLoader* loader : _loaders) {
                 delete loader;
@@ -415,7 +415,7 @@ namespace Ngine {
                     return loader->Load(filepath);
                 }
             }
-            std::cout << "ERROR (LoaderManager): Unsupported file extension @ " << filepath << std::endl;
+            std::cout << "ERROR (AssetLoaderManager): Unsupported file extension @ " << filepath << std::endl;
             return false;
         }
     };

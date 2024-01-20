@@ -40,7 +40,7 @@ class GraphicsEngine {
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
         Ngine::AssetManager& assetManager = Ngine::AssetManager::Instance();
-        Ngine::LoaderManager loaderManager = Ngine::LoaderManager();
+        Ngine::AssetLoaderManager loaderManager = Ngine::AssetLoaderManager();
         std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
 
         GraphicsEngine(int width, int height) :

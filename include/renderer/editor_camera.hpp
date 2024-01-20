@@ -2,7 +2,7 @@
 
 #include "la_extended.h"
 
-#include "ngine/components.hpp"
+#include "renderer/components.hpp"
 #include "renderer/input.hpp"
 
 #define MODE_STOP 0

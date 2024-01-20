@@ -13,10 +13,10 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-#include "ngine/components.hpp"
 #include "ngine/ngine.hpp"
 using namespace Ngine;
 
+#include "renderer/components.hpp"
 #include "renderer/graphics.hpp"
 #include "renderer/input.hpp"
 

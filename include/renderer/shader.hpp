@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "la_extended.h"
+
 #include "tai/tai.hpp"
 #include "renderer/shader_source.hpp"
 
@@ -26,11 +28,11 @@ class Shader : public Tai::Asset {
         virtual void SetBool(const std::string& name, bool value) const = 0;
         virtual void SetInt(const std::string& name, int value) const = 0;
         virtual void SetFloat(const std::string& name, float value) const = 0;
-        virtual void SetVec2(const std::string& name, const vec2& v) const = 0;
+        virtual void SetVec2(const std::string& name, const LA::vec2& v) const = 0;
         virtual void SetVec2(const std::string& name, float x, float y) const = 0;
-        virtual void SetVec3(const std::string& name, const vec3& v) const = 0;
+        virtual void SetVec3(const std::string& name, const LA::vec3& v) const = 0;
         virtual void SetVec3(const std::string& name, float x, float y, float z) const = 0;
-        virtual void SetVec4(const std::string& name, const vec4& v) const = 0;
+        virtual void SetVec4(const std::string& name, const LA::vec4& v) const = 0;
         virtual void SetVec4(const std::string& name, float x, float y, float z, float w) const = 0;
         virtual void SetMat4(const std::string& name, const LA::mat4& m) const = 0;
         virtual void SetMat4(const std::string& name, float* mPtr) const = 0;

@@ -24,7 +24,7 @@ struct PointLight {
 
 // variables passed on from vertex shader
 in vec3 vPosition;
-in vec3 vfNormal;
+in vec3 vNormal;
 in vec2 vUV0;
 
 // uniforms

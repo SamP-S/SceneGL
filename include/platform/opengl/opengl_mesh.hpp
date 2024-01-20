@@ -63,7 +63,7 @@ class OpenGLMesh : public Mesh {
             // draw call depending on if using indicie buffer
             glBindVertexArray(vaId);
             if (_isIndexed) {
-                glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
             } else {
                 glDrawArrays(GL_TRIANGLES, 0, vertices.size());
             }
@@ -78,7 +78,7 @@ class OpenGLMesh : public Mesh {
         uint32_t GenerateBuffer(GLenum target, const std::vector<T>& data) {
             uint32_t buf = 0;
             glGenBuffers(1, &buf);
-            glBindVertexArray(buf);
+            glBindBuffer(target, buf);
             glBufferData(target, data.size() * sizeof(T), &data.front(), GL_STATIC_DRAW);
             return buf;
         }

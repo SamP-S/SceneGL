@@ -1,8 +1,12 @@
 #pragma once
 
+// include opengl deps
 #define GL_VERSION_4_6
 #include <GL/glew.h>
 #include <SDL_opengl.h>
+
+// include our maths
+#include "la_extended.h"
 
 bool OpenGLErrorCheck() {
     uint32_t error = glGetError();

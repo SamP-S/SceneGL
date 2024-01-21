@@ -124,14 +124,16 @@ class GraphicsEngine {
             float ratio = width / height;
         }
 
+        // Load Scene from JSON
         void LoadScene(const std::string& filepath) {
-            // Load Scene
             JsonSerializer js = JsonSerializer(scene);
             js.Deserialize(filepath);
         }
 
+        // Save scene to JSON
         void SaveScene(const std::string& filepath) {
-            std::cout << "NOT IMPLEMENTED" << std::endl;
+            JsonSerializer js = JsonSerializer(scene);
+            js.Serialize(filepath);
         }
 
         void RenderObject(Entity entity, mat4 root_trans = mat4(), bool wireframe=false) {

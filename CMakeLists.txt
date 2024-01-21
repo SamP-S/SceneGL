@@ -16,7 +16,7 @@ if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
 endif()
 
 add_subdirectory("dependencies/tinyfiledialogs")
-add_subdirectory("dependencies/imgui")
+add_subdirectory("dependencies/imguizmo")
 add_subdirectory("dependencies/la")
 
 set(INCLUDE_DIRS
@@ -32,7 +32,7 @@ add_executable(graphics ${SRC_FILES})
 target_include_directories(graphics PUBLIC ${INCLUDE_DIRS})
 
 target_link_libraries(graphics PUBLIC tinyfiledialogs)
-target_link_libraries(graphics PUBLIC imgui)
+target_link_libraries(graphics PUBLIC imguizmo)
 target_link_libraries(graphics PUBLIC la)
 target_link_libraries(graphics PUBLIC ${CMAKE_DL_LIBS})
 

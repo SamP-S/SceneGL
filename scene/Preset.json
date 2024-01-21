@@ -1,371 +1,330 @@
 [
     {
-        "name": "Directional Light",
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Cube-Mesh"
+                }
+            }
+        ],
+        "name": "Cube-Mesh",
         "transform": {
             "position": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
+                "x": 0.0,
+                "y": 2.0361359119415283,
+                "z": -14.090570449829102
             },
             "rotation": {
-                "x": 0.000000,
-                "y": 45.00000,
-                "z": 45.00000
+                "x": 30.0,
+                "y": 45.0,
+                "z": 0.0
             },
             "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
+                "x": 1.0,
+                "y": 0.3282490074634552,
+                "z": 3.6061220169067383
             }
-        },
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Dome-Mesh"
+                }
+            }
+        ],
+        "name": "Dome-Mesh",
+        "transform": {
+            "position": {
+                "x": 10.78468132019043,
+                "y": 1.2820299863815308,
+                "z": -11.428034782409668
+            },
+            "rotation": {
+                "x": -30.0,
+                "y": 0.0,
+                "z": 90.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "pointLight": {
+                    "colour": {
+                        "b": 1.0,
+                        "g": 0.800000011920929,
+                        "r": 0.800000011920929
+                    },
+                    "intensity": 1.0,
+                    "range": 5.0
+                }
+            },
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Sphere-Mesh"
+                }
+            }
+        ],
+        "name": "Sphere-Mesh",
+        "transform": {
+            "position": {
+                "x": 9.049539566040039,
+                "y": 3.0809030532836914,
+                "z": 8.87570571899414
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Dome-Mesh"
+                }
+            }
+        ],
+        "name": "Dome-Mesh",
+        "transform": {
+            "position": {
+                "x": -11.950596809387207,
+                "y": 1.4313709735870361,
+                "z": 8.740150451660156
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Cube-Mesh"
+                }
+            }
+        ],
+        "name": "Cube-Mesh",
+        "transform": {
+            "position": {
+                "x": -12.285518646240234,
+                "y": 4.838169097900391,
+                "z": 1.8363749980926514
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Cone-Mesh"
+                }
+            }
+        ],
+        "name": "Cone-Mesh",
+        "transform": {
+            "position": {
+                "x": 0.0,
+                "y": 2.9805400371551514,
+                "z": 8.208776473999023
+            },
+            "rotation": {
+                "x": 45.0,
+                "y": 45.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Plane-Mesh"
+                }
+            }
+        ],
+        "name": "Plane-Mesh",
+        "transform": {
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 20.0,
+                "y": 1.0,
+                "z": 20.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Cylinder-Mesh"
+                }
+            }
+        ],
+        "name": "Cylinder-Mesh",
+        "transform": {
+            "position": {
+                "x": 9.51916217803955,
+                "y": 4.797037124633789,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": -32.637516021728516,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.5,
+                "y": 2.5,
+                "z": 1.5
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "meshRenderer": {
+                    "materialName": "default-material",
+                    "meshName": "Icosphere-Mesh"
+                }
+            }
+        ],
+        "name": "Ico 1",
+        "transform": {
+            "position": {
+                "x": -12.625904083251953,
+                "y": 2.0959949493408203,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
+        "components": [
+            {
+                "pointLight": {
+                    "colour": {
+                        "b": 1.0,
+                        "g": 0.800000011920929,
+                        "r": 0.800000011920929
+                    },
+                    "intensity": 0.10000000149011612,
+                    "range": 5.0
+                }
+            }
+        ],
+        "name": "Point Light",
+        "transform": {
+            "position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            }
+        }
+    },
+    {
         "components": [
             {
                 "directionalLight": {
                     "colour": {
-                        "r": 1.0,
-                        "g": 0.95,
-                        "b": 0.85
+                        "b": 0.8500000238418579,
+                        "g": 0.949999988079071,
+                        "r": 1.0
                     },
                     "intensity": 1.0
                 }
             }
         ],
-        "children": []
-    },
-    {
-        "name": "Point Light",
+        "name": "Directional Light",
         "transform": {
             "position": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
             },
             "rotation": {
-                "x": 0.000000,
-                "y": 0.00000,
-                "z": 0.00000
+                "x": 0.0,
+                "y": 45.0,
+                "z": 45.0
             },
             "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
             }
-        },
-        "components": [
-            {
-                "pointLight": {
-                    "colour": {
-                        "r": 0.8,
-                        "g": 0.8,
-                        "b": 1.0
-                    },
-                    "intensity": 0.1,
-                    "range": 5.0
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Ico 1",
-        "transform": {
-            "position": {
-                "x": -12.625904,
-                "y": 2.095995,
-                "z": 0.000000
-            },
-            "rotation": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Icosphere-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": [
-            {
-                "name": "Ico 2",
-                "transform": {
-                    "position": {
-                        "x": 0.000000,
-                        "y": 6.093969,
-                        "z": 0.000000
-                    },
-                    "rotation": {
-                        "x": 0.000000,
-                        "y": 0.000000,
-                        "z": 0.000000
-                    },
-                    "scale": {
-                        "x": 3.000000,
-                        "y": 3.000000,
-                        "z": 3.000000
-                    }
-                },
-                "components": [
-                    {
-                        "meshRenderer": {
-                            "meshName": "Icosphere-Mesh",
-                            "shaderName": "lighting"
-                        }
-                    }
-                ],
-                "children": []
-            }
-        ]
-    },
-    {
-        "name": "Cylinder-Mesh",
-        "transform": {
-            "position": {
-                "x": 9.519162,
-                "y": 4.797037,
-                "z": 0.000000
-            },
-            "rotation": {
-                "x": -32.637516,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.500000,
-                "y": 2.500000,
-                "z": 1.500000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Cylinder-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Plane-Mesh",
-        "transform": {
-            "position": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "rotation": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 20.000000,
-                "y": 1.000000,
-                "z": 20.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Plane-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Cone-Mesh",
-        "transform": {
-            "position": {
-                "x": 0.000000,
-                "y": 2.980540,
-                "z": 8.208776
-            },
-            "rotation": {
-                "x": 45.000000,
-                "y": 45.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Cone-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Cube-Mesh",
-        "transform": {
-            "position": {
-                "x": -12.285519,
-                "y": 4.838169,
-                "z": 1.836375
-            },
-            "rotation": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Cube-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Dome-Mesh",
-        "transform": {
-            "position": {
-                "x": -11.950597,
-                "y": 1.431371,
-                "z": 8.740150
-            },
-            "rotation": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Dome-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Sphere-Mesh",
-        "transform": {
-            "position": {
-                "x": 9.049540,
-                "y": 3.080903,
-                "z": 8.875706
-            },
-            "rotation": {
-                "x": 0.000000,
-                "y": 0.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Sphere-Mesh",
-                    "shaderName": "lighting"
-                }
-            },
-            {
-                "pointLight": {
-                    "colour": {
-                        "r": 0.8,
-                        "g": 0.8,
-                        "b": 1.0
-                    },
-                    "intensity": 1.0,
-                    "range": 5.0
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Dome-Mesh",
-        "transform": {
-            "position": {
-                "x": 10.784681,
-                "y": 1.282030,
-                "z": -11.428035
-            },
-            "rotation": {
-                "x": -30.000000,
-                "y": 0.000000,
-                "z": 90.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 1.000000,
-                "z": 1.000000
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Dome-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
-    },
-    {
-        "name": "Cube-Mesh",
-        "transform": {
-            "position": {
-                "x": 0.000000,
-                "y": 2.036136,
-                "z": -14.090570
-            },
-            "rotation": {
-                "x": 30.000000,
-                "y": 45.000000,
-                "z": 0.000000
-            },
-            "scale": {
-                "x": 1.000000,
-                "y": 0.328249,
-                "z": 3.606122
-            }
-        },
-        "components": [
-            {
-                "meshRenderer": {
-                    "meshName": "Cube-Mesh",
-                    "shaderName": "lighting"
-                }
-            }
-        ],
-        "children": []
+        }
     }
 ]

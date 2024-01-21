@@ -149,11 +149,11 @@ class GraphicsEngine {
             std::shared_ptr<Mesh> mesh = mrc.mesh;
             std::shared_ptr<Material> material = mrc.material;
             if (mesh == nullptr) {
-                std::cout << "WARNING (Graphics): Attempting to draw null mesh." << std::endl;
+                // std::cout << "WARNING (Graphics): Attempting to draw null mesh." << std::endl;
                 return;
             }
             if (material == nullptr) {
-                std::cout << "WARNING (Graphics): Attempting to draw null material." << std::endl;
+                // std::cout << "WARNING (Graphics): Attempting to draw null material." << std::endl;
                 return;
             }
 
@@ -163,7 +163,7 @@ class GraphicsEngine {
             } else {
                 shader = material->shader;
             }
-            if (shader == nullptr) {
+            if (!material->IsUsable()) {
                 std::cout << "WARNING (Graphics): Attempting to draw mesh with null shader." << std::endl;
                 return;
             }

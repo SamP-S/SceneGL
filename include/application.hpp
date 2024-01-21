@@ -404,6 +404,10 @@ class Application {
         }
 
         void CorePanel(Entity e) {
+            if (!e.HasComponent<CoreComponent>()) {
+                std::cout << "ERROR (App): Missing core component." << std::endl;
+                return;
+            }
             CoreComponent& cc = e.GetComponent<CoreComponent>();
             // entity name
             ImGui::Text("Name:");
@@ -417,6 +421,11 @@ class Application {
         }
 
         void TransformPanel(Entity e) {
+            if (!e.HasComponent<TransformComponent>()) {
+                CoreComponent& cc = e.GetComponent<CoreComponent>();
+                std::cout << "ERROR (App): Missing transform component on " << cc.name << std::endl;
+                return;
+            }
             TransformComponent& t = e.GetComponent<TransformComponent>();
             ImGui::Separator();
             ImGui::Text("Transform:");

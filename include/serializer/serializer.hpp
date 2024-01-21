@@ -139,7 +139,7 @@ private:
                     std::string materialName = value["meshRenderer"]["materialName"];
                     mrc.material = assetManager.GetAsset<OpenGLMaterial>(materialName);
                 } catch (const std::exception& e) {
-                    std::cout << "WARNING (Serializer): mesh name bad." << std::endl;
+                    std::cout << "WARNING (Serializer): material name bad." << std::endl;
                     std::cout << e.what() << std::endl;
                 }
             } else if (value.contains("camera")) {

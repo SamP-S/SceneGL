@@ -7,3 +7,6 @@
 [submodule "dependencies/la"]
 	path = dependencies/la
 	url = git@github.com:SamP-S/LA.git
+[submodule "dependencies/imguizmo"]
+	path = dependencies/imguizmo
+	url = git@github.com:SamP-S/libimguizmo.git

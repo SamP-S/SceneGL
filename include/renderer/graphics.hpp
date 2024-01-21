@@ -133,33 +133,35 @@ class GraphicsEngine {
 
             // check meshrenderer mesh is not none
             MeshRendererComponent& mrc = entity.GetComponent<MeshRendererComponent>();
-            if (mrc.mesh == 0) {
-                std::cout << "WARNING (Graphics): Attempting to draw None mesh." << std::endl;
-                return;
-            }
-
-            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>(mrc.mesh);
+            std::shared_ptr<Mesh> mesh = mrc.mesh;
+            std::shared_ptr<Material> material = mrc.material;
             if (mesh == nullptr) {
                 std::cout << "WARNING (Graphics): Attempting to draw null mesh." << std::endl;
                 return;
             }
+            if (material == nullptr) {
+                std::cout << "WARNING (Graphics): Attempting to draw null material." << std::endl;
+                return;
+            }
 
-            std::shared_ptr<Shader> shader = nullptr;
+            std::shared_ptr<Shader> shader;
             if (wireframe) {
                 shader = assetManager.GetAsset<OpenGLShader>("base");
             } else {
-                shader = assetManager.GetAsset<OpenGLShader>(mrc.shader);
+                shader = material->shader;
             }
-             
             if (shader == nullptr) {
-                std::cout << "WARNING (Graphics): Attempting to use null shader." << std::endl;
+                std::cout << "WARNING (Graphics): Attempting to draw mesh with null shader." << std::endl;
                 return;
             }
+            
             // pass model coordinate space
-            shader->Bind();
-            shader->SetMat4("uModel", &model[0][0]);
+            material->shader->Bind();
+            material->Bind();
+            material->shader->SetMat4("uModel", &model[0][0]);
+
             // draw mesh
-            mesh->Draw();
+            mrc.mesh->Draw();
         }
 
         void Render(bool wireframe=false) {

@@ -301,7 +301,7 @@ class Application {
                             // build components
                             std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("empty");
                             MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                            mrc.mesh = mesh->id;
+                            mrc.mesh = mesh;
                         }
                         if (ImGui::MenuItem("New Cube")) {
                             // debug
@@ -314,7 +314,7 @@ class Application {
                             // build components
                             std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
                             MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                            mrc.mesh = mesh->id;
+                            mrc.mesh = mesh;
                         }
                     }
                     ImGui::EndMenu();
@@ -446,12 +446,15 @@ class Application {
             if (ImGui::Button("X")) {
                 e.RemoveComponent<MeshRendererComponent>();
             }
-            ObjectId meshId = mrc.mesh;
-            if (ImGui::BeginCombo("Select Mesh", ((meshId == 0) ? "None": assetManager.GetAsset<OpenGLMesh>(meshId)->name.c_str()))) {
+
+            if (ImGui::BeginCombo("Select Mesh", ((mrc.mesh == nullptr) ? "None": mrc.mesh->name.c_str()))) {
+                if (ImGui::Selectable("None")) {
+                    mrc.mesh == nullptr;
+                }
                 for (auto it = assetManager.begin<OpenGLMesh>(); it != assetManager.end<OpenGLMesh>(); ++it) {
-                    auto mesh = *it;
+                    std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(*it);
                     if (ImGui::Selectable(mesh->name.c_str())) {
-                        mrc.mesh = mesh->id;
+                        mrc.mesh = mesh;
                     }
                 }
                 ImGui::EndCombo();

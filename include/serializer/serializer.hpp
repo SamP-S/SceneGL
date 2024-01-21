@@ -15,7 +15,7 @@ using namespace nlohmann;
 #include "ngine/ngine.hpp"
 #include "renderer/components.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
-#include "platform/opengl/opengl_shader.hpp"
+#include "platform/opengl/opengl_material.hpp"
 
 // note: should make a serializer per scene
 class JsonSerializer : public Ngine::ISerializer
@@ -85,10 +85,24 @@ private:
             else if (value.contains("meshRenderer"))
             {
                 MeshRendererComponent &mrc = entity.AddComponent<MeshRendererComponent>();
-                std::string meshName = value["meshRenderer"]["meshName"];
-                std::string shaderName = value["meshRenderer"]["shaderName"];
-                mrc.mesh = assetManager.GetAssetId<OpenGLMesh>(meshName);
-                mrc.shader = assetManager.GetAssetId<OpenGLShader>(shaderName);
+
+                // set mesh
+                try {
+                    std::string meshName = value["meshRenderer"]["meshName"];
+                    mrc.mesh = assetManager.GetAsset<OpenGLMesh>(meshName);
+                } catch (const std::exception& e) {
+                    std::cout << "WARNING (Serializer): mesh name bad." << std::endl;
+                    std::cout << e.what() << std::endl;
+                }
+
+                // set material
+                try {
+                    std::string materialName = value["meshRenderer"]["materialName"];
+                    mrc.material = assetManager.GetAsset<OpenGLMaterial>(materialName);
+                } catch (const std::exception& e) {
+                    std::cout << "WARNING (Serializer): mesh name bad." << std::endl;
+                    std::cout << e.what() << std::endl;
+                }
             }
             else if (value.contains("camera"))
             {

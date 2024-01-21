@@ -5,9 +5,12 @@
 #include <cassert>
 #include <cstdint>
 #include <vector>
+
 // internal libs
 #include "ngine/ngine.hpp"
 #include "la_extended.h"
+#include "renderer/mesh.hpp"
+#include "renderer/material.hpp"
 
 struct CameraComponent : public Ngine::Object {
     float fov = 45.0f;
@@ -44,9 +47,10 @@ struct PointLightComponent : public Ngine::Object {
     PointLightComponent(const PointLightComponent&) = default;
 };
 
+// Note: will keep assets alive even if it has been removed from AssetManager until reassigned
 struct MeshRendererComponent : public Ngine::Object {
-    ObjectId mesh = 0;
-    ObjectId shader = 0;
+    std::shared_ptr<Mesh> mesh = nullptr;
+    std::shared_ptr<Material> material = nullptr;
 
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = default;

@@ -406,9 +406,11 @@ class Application {
                 std::cout << "ERROR (App): Missing core component." << std::endl;
                 return;
             }
+            ImGui::PushID(componentPanelCount);
             CoreComponent& cc = e.GetComponent<CoreComponent>();
             // entity name
             ImGui::Text("Name:");
+            ImGui::SameLine();
             char buffer[256];
             std::strncpy(buffer, cc.name.c_str(), sizeof(buffer));
             buffer[sizeof(buffer) - 1] = 0; // Ensure null termination
@@ -416,6 +418,8 @@ class Application {
                 cc.name = std::string(buffer);
             }
             ImGui::Checkbox("Active", &cc.active);
+            ImGui::PopID();
+            componentPanelCount++;
         }
 
         void TransformPanel(Entity e) {
@@ -424,8 +428,8 @@ class Application {
                 std::cout << "ERROR (App): Missing transform component on " << cc.name << std::endl;
                 return;
             }
+            ImGui::PushID(componentPanelCount);
             TransformComponent& t = e.GetComponent<TransformComponent>();
-            ImGui::Separator();
             ImGui::Text("Transform:");
             // position
             ImGui::Text("Pos");
@@ -439,6 +443,8 @@ class Application {
             ImGui::Text("Scl");
             ImGui::SameLine();
             ImGui::InputFloat3("##SclInput", t.scale.m);
+            ImGui::PopID();
+            componentPanelCount++;
         }
 
         void MeshRendererPanel(Entity e) {
@@ -567,37 +573,42 @@ class Application {
                 ImGui::Text("Nothing selected");
             } else {
                 Entity ent = entitySelected;
-                
                 // components display
                 componentPanelCount = 0;
-                // transform display
-                TransformPanel(ent);
-                // non-singlton components
-                MeshRendererPanel(ent);
-                CameraPanel(ent);
-                DirectionalLightWindow(ent);
-                PointLightWindow(ent);
-                SpotLightWindow(ent);
-                
-                // add component button/drop-down
-                if (ImGui::Button("Add Component")) {
-                    ImGui::OpenPopup("Add Component");
-                }
-                if (ImGui::BeginPopup("Add Component")) {
-                    if (ImGui::MenuItem("Camera")) {
-                        ent.AddComponent<CameraComponent>();
-                    } else if (ImGui::MenuItem("Directional Light")) {
-                        ent.AddComponent<DirectionalLightComponent>();
-                    } else if (ImGui::MenuItem("Point Light")) {
-                        ent.AddComponent<PointLightComponent>();
-                    } else if (ImGui::MenuItem("Spot Light")) {
-                        ent.AddComponent<SpotLightComponent>();
-                    } else if (ImGui::MenuItem("Mesh Renderer")) {
-                        ent.AddComponent<MeshRendererComponent>();
+                if (ImGui::Button("Delete Entity")) {
+                    Graphics.scene->DestroyEntity(ent);
+                    entitySelected = Entity();
+                } else {
+                    // name/enable
+                    CorePanel(ent);
+                    // transform display
+                    TransformPanel(ent);
+                    // non-singlton components
+                    MeshRendererPanel(ent);
+                    CameraPanel(ent);
+                    DirectionalLightWindow(ent);
+                    PointLightWindow(ent);
+                    SpotLightWindow(ent);
+                    
+                    // add component button/drop-down
+                    if (ImGui::Button("Add Component")) {
+                        ImGui::OpenPopup("Add Component");
                     }
-                    ImGui::EndPopup();
+                    if (ImGui::BeginPopup("Add Component")) {
+                        if (ImGui::MenuItem("Camera")) {
+                            ent.AddComponent<CameraComponent>();
+                        } else if (ImGui::MenuItem("Directional Light")) {
+                            ent.AddComponent<DirectionalLightComponent>();
+                        } else if (ImGui::MenuItem("Point Light")) {
+                            ent.AddComponent<PointLightComponent>();
+                        } else if (ImGui::MenuItem("Spot Light")) {
+                            ent.AddComponent<SpotLightComponent>();
+                        } else if (ImGui::MenuItem("Mesh Renderer")) {
+                            ent.AddComponent<MeshRendererComponent>();
+                        }
+                        ImGui::EndPopup();
+                    }
                 }
-                
             }
             ImGui::End();
         }

@@ -27,6 +27,7 @@ class Shader : public Ngine::Asset {
         virtual void Unbind() const = 0;
         virtual void SetBool(const std::string& name, bool value) const = 0;
         virtual void SetInt(const std::string& name, int value) const = 0;
+        virtual void SetUint(const std::string& name, uint32_t value) const = 0;
         virtual void SetFloat(const std::string& name, float value) const = 0;
         virtual void SetVec2(const std::string& name, const LA::vec2& v) const = 0;
         virtual void SetVec2(const std::string& name, float x, float y) const = 0;

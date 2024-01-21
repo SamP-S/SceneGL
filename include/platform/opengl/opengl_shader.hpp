@@ -119,6 +119,10 @@ class OpenGLShader : public Shader {
             glUniform1i(glGetUniformLocation(_programId, name.c_str()), value);
         }
 
+        void SetUint(const std::string& name, uint32_t value) const override {
+            glUniform1ui(glGetUniformLocation(_programId, name.c_str()), value);
+        }
+
         void SetFloat(const std::string& name, float value) const override {
             glUniform1f(glGetUniformLocation(_programId, name.c_str()), value);
         }

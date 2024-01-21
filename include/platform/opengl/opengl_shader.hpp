@@ -97,12 +97,9 @@ class OpenGLShader : public Shader {
         }
 
         void Bind() const override {
-            if (!IsUsable()) {
-                Compile();
-                if (!IsUsable) {
-                    std::cout << "WARNING (OpenGLShader): Cannot bind invalid shader." << std::endl; 
-                    return;
-                }
+            if (!IsUsable) {
+                std::cout << "WARNING (OpenGLShader): Cannot bind invalid shader." << std::endl; 
+                return;
             }
             glUseProgram(_programId);
         }

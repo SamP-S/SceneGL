@@ -164,7 +164,7 @@ class GraphicsEngine {
                 shader = material->shader;
             }
             if (!material->IsUsable()) {
-                std::cout << "WARNING (Graphics): Attempting to draw mesh with null shader." << std::endl;
+                // std::cout << "WARNING (Graphics): Attempting to draw mesh with null shader." << std::endl;
                 return;
             }
             
@@ -226,7 +226,8 @@ class GraphicsEngine {
             shader->SetVec3("uCameraPosition", editorCamera.transform.position); 
 
             ShaderDirectionalLights(shader);
-            ShaderPointLights(shader);   
+            ShaderPointLights(shader);
+            ShaderSpotLights(shader);
         }
 
         void ShaderDirectionalLights(std::shared_ptr<Shader> shader) {
@@ -241,9 +242,9 @@ class GraphicsEngine {
                 if (i < entities.size()) {
                     TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
                     DirectionalLightComponent& dlc = entities[i].GetComponent<DirectionalLightComponent>();
-                    shader->SetVec3("uDirectionalLights" + index + ".direction", tc.GetForward());
-                    shader->SetFloat("uDirectionalLights" + index + ".intensity", dlc.intensity);
                     shader->SetVec3("uDirectionalLights" + index + ".colour", dlc.colour);
+                    shader->SetFloat("uDirectionalLights" + index + ".intensity", dlc.intensity);
+                    shader->SetVec3("uDirectionalLights" + index + ".direction", tc.GetForward());
                     shader->SetInt("uDirectionalLights" + index + ".enabled", 1);
                 } else {
                     shader->SetInt("uDirectionalLights" + index + ".enabled", 0);
@@ -263,12 +264,37 @@ class GraphicsEngine {
                 if (i < entities.size()) {
                     TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
                     PointLightComponent& plc = entities[i].GetComponent<PointLightComponent>();
-                    shader->SetVec3("uPointLights" + index + ".position", tc.position);
-                    shader->SetFloat("uPointLights" + index + ".intensity", plc.intensity);
                     shader->SetVec3("uPointLights" + index + ".colour", plc.colour);
+                    shader->SetFloat("uPointLights" + index + ".intensity", plc.intensity);
+                    shader->SetVec3("uPointLights" + index + ".position", tc.position);
                     shader->SetInt("uPointLights" + index + ".enabled", 1);
                 } else {
                     shader->SetInt("uPointLights" + index + ".enabled", 0);
+                }
+            }
+        }
+
+        void ShaderSpotLights(std::shared_ptr<Shader> shader) {
+            std::vector<Entity> entities = scene->GetEntitiesWith<SpotLightComponent>();
+
+            // point lights
+            if (entities.size() >= POINT_LIGHT_MAX) {
+                std::cout << "WARNING (Graphics): Too many spot lights, only first 4 will be used" << std::endl;
+            }
+            for (int i = 0; i < POINT_LIGHT_MAX; i++) {
+                std::string index = "[" + std::to_string(i) + "]";
+                if (i < entities.size()) {
+                    TransformComponent& tc = entities[i].GetComponent<TransformComponent>();
+                    SpotLightComponent& slc = entities[i].GetComponent<SpotLightComponent>();
+                    shader->SetVec3("uSpotLights" + index + ".colour", slc.colour);
+                    shader->SetFloat("uSpotLights" + index + ".intensity", slc.intensity);
+                    shader->SetVec3("uSpotLights" + index + ".position", tc.position);
+                    shader->SetVec3("uSpotLights" + index + ".direction", tc.GetForward());
+                    shader->SetFloat("uSpotLights" + index + ".cutOff", slc.cutOff);
+                    shader->SetFloat("uSpotLights" + index + ".outerCutOff", slc.outerCutOff);
+                    shader->SetInt("uSpotLights" + index + ".enabled", 1);
+                } else {
+                    shader->SetInt("uSpotLights" + index + ".enabled", 0);
                 }
             }
         }

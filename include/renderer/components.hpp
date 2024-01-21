@@ -47,6 +47,17 @@ struct PointLightComponent : public Ngine::Object {
     PointLightComponent(const PointLightComponent&) = default;
 };
 
+#define SPOT_LIGHT_MAX 4
+struct SpotLightComponent: public Ngine::Object {
+    LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
+    float intensity = 1.0f;
+    float cutOff = 12.5f;
+    float outerCutOff = 15.0f;
+
+    SpotLightComponent() = default;
+    SpotLightComponent(const SpotLightComponent&) = default;
+};
+
 // Note: will keep assets alive even if it has been removed from AssetManager until reassigned
 struct MeshRendererComponent : public Ngine::Object {
     std::shared_ptr<Mesh> mesh = nullptr;

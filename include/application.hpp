@@ -289,33 +289,31 @@ class Application {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Entity")) {
-                    if (entitySelected) {
-                        if (ImGui::MenuItem("New Empty")) {
-                            // debug
-                            std::cout << "Entity: Create new entity" << std::endl;
-                            // create empty
-                            std::string new_name = "new_" + std::to_string(new_entity_count);
-                            entitySelected = Graphics.scene->CreateEntity(new_name);
-                            new_entity_count += 1;
+                    if (ImGui::MenuItem("New Empty")) {
+                        // debug
+                        std::cout << "Entity: Create new entity" << std::endl;
+                        // create empty
+                        std::string new_name = "new_" + std::to_string(new_entity_count);
+                        entitySelected = Graphics.scene->CreateEntity(new_name);
+                        new_entity_count += 1;
 
-                            // build components
-                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("empty");
-                            MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                            mrc.mesh = mesh;
-                        }
-                        if (ImGui::MenuItem("New Cube")) {
-                            // debug
-                            std::cout << "Entity: Create new entity" << std::endl;
-                            // create entity
-                            std::string new_name = "cube_" + std::to_string(new_entity_count);
-                            entitySelected = Graphics.scene->CreateEntity(new_name);
-                            new_entity_count += 1;
+                        // build components
+                        std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("empty");
+                        MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
+                        mrc.mesh = mesh;
+                    }
+                    if (ImGui::MenuItem("New Cube")) {
+                        // debug
+                        std::cout << "Entity: Create new entity" << std::endl;
+                        // create entity
+                        std::string new_name = "cube_" + std::to_string(new_entity_count);
+                        entitySelected = Graphics.scene->CreateEntity(new_name);
+                        new_entity_count += 1;
 
-                            // build components
-                            std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
-                            MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                            mrc.mesh = mesh;
-                        }
+                        // build components
+                        std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
+                        MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
+                        mrc.mesh = mesh;
                     }
                     ImGui::EndMenu();
                 }
@@ -541,6 +539,27 @@ class Application {
             componentPanelCount++;
         }
 
+        void SpotLightWindow(Entity e) {
+            if (!e.HasComponent<SpotLightComponent>())
+                return;
+            SpotLightComponent& slc = e.GetComponent<SpotLightComponent>();
+
+            ImGui::PushID(componentPanelCount);
+            ImGui::Separator();
+            ImGui::Text("Spot Light");
+            ImGui::SameLine();
+            if (ImGui::Button("X")) {
+                e.RemoveComponent<SpotLightComponent>();
+            }
+            ImGui::InputFloat3("Colour", slc.colour.m);
+            ImGui::SliderFloat("Intensity", &slc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
+            ImGui::SliderFloat("Cut Off", &slc.cutOff, 5.0f, 15.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
+            ImGui::SliderFloat("Outer Cut Off", &slc.cutOff, 5.0f, 90.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
+
+            ImGui::PopID();
+            componentPanelCount++;
+        }
+
         void PropertiesWindow() {
             ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
@@ -558,6 +577,7 @@ class Application {
                 CameraPanel(ent);
                 DirectionalLightWindow(ent);
                 PointLightWindow(ent);
+                SpotLightWindow(ent);
                 
                 // add component button/drop-down
                 if (ImGui::Button("Add Component")) {
@@ -570,6 +590,8 @@ class Application {
                         ent.AddComponent<DirectionalLightComponent>();
                     } else if (ImGui::MenuItem("Point Light")) {
                         ent.AddComponent<PointLightComponent>();
+                    } else if (ImGui::MenuItem("Spot Light")) {
+                        ent.AddComponent<SpotLightComponent>();
                     } else if (ImGui::MenuItem("Mesh Renderer")) {
                         ent.AddComponent<MeshRendererComponent>();
                     }

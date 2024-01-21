@@ -39,3 +39,6 @@ target_link_libraries(graphics PUBLIC ${CMAKE_DL_LIBS})
 add_executable(ecs_test "test/ecs_test.cpp")
 target_include_directories(ecs_test PUBLIC ${INCLUDE_DIRS})
 target_link_libraries(ecs_test PUBLIC la)
+
+add_executable(imguizmo_test "test/imguizmo_test.cpp")
+target_link_libraries(imguizmo_test PUBLIC imguizmo)

@@ -34,6 +34,10 @@ class Shader : public Ngine::Asset {
         virtual void SetVec3(const std::string& name, float x, float y, float z) const = 0;
         virtual void SetVec4(const std::string& name, const LA::vec4& v) const = 0;
         virtual void SetVec4(const std::string& name, float x, float y, float z, float w) const = 0;
+        virtual void SetMat2(const std::string& name, const LA::mat2& m) const = 0;
+        virtual void SetMat2(const std::string& name, float* mPtr) const = 0;
+        virtual void SetMat3(const std::string& name, const LA::mat3& m) const = 0;
+        virtual void SetMat3(const std::string& name, float* mPtr) const = 0;
         virtual void SetMat4(const std::string& name, const LA::mat4& m) const = 0;
         virtual void SetMat4(const std::string& name, float* mPtr) const = 0;
 

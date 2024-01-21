@@ -97,6 +97,13 @@ class OpenGLShader : public Shader {
         }
 
         void Bind() const override {
+            if (!IsUsable()) {
+                Compile();
+                if (!IsUsable) {
+                    std::cout << "WARNING (OpenGLShader): Cannot bind invalid shader." << std::endl; 
+                    return;
+                }
+            }
             glUseProgram(_programId);
         }
 
@@ -138,6 +145,22 @@ class OpenGLShader : public Shader {
         
         void SetVec4(const std::string& name, float x, float y, float z, float w) const override {
             glUniform4f(glGetUniformLocation(_programId, name.c_str()), x, y, z, w);
+        }
+
+        void SetMat2(const std::string& name, const LA::mat2& m) const override {
+            glUniformMatrix2fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, &(m)[0][0]);
+        }
+
+        void SetMat2(const std::string& name, float* mPtr) const override {
+            glUniformMatrix2fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, mPtr);
+        }
+
+        void SetMat3(const std::string& name, const LA::mat3& m) const override {
+            glUniformMatrix3fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, &(m)[0][0]);
+        }
+
+        void SetMat3(const std::string& name, float* mPtr) const override {
+            glUniformMatrix3fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, mPtr);
         }
 
         void SetMat4(const std::string& name, const LA::mat4& m) const override {

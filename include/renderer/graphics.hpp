@@ -72,22 +72,33 @@ class GraphicsEngine {
             loaderManager.Load("models/presets/plane.gltf");
             loaderManager.Load("models/presets/prism.gltf");
             loaderManager.Load("models/presets/sphere.gltf");
-            // load default shader(s)
+
+            // load default shader source(s)
             loaderManager.Load("shaders/base.vert");
             loaderManager.Load("shaders/base.frag");
             loaderManager.Load("shaders/lighting.vert");
             loaderManager.Load("shaders/lighting.frag");
-            assetManager.CreateAsset<OpenGLShader>(
+
+            // load default shader(s)
+            std::shared_ptr<Shader> base = assetManager.CreateAsset<OpenGLShader>(
                 "base",
                 assetManager.GetAsset<OpenGLShaderSource>("base_vert"),
                 assetManager.GetAsset<OpenGLShaderSource>("base_frag")
             );
-            assetManager.CreateAsset<OpenGLShader>(
+            std::shared_ptr<Shader> lighting = assetManager.CreateAsset<OpenGLShader>(
                 "lighting",
                 assetManager.GetAsset<OpenGLShaderSource>("lighting_vert"),
                 assetManager.GetAsset<OpenGLShaderSource>("lighting_frag")
             );
 
+            // load material(s)
+            std::shared_ptr<Material> material = assetManager.CreateAsset<OpenGLMaterial>(
+                "default-material"
+            );
+            material->SetProperty("colour", vec4(1.0f));
+            material->shader = lighting;
+
+            // load scene
             LoadScene("scene/Preset.json");    
 
             // setup editor camera
@@ -156,9 +167,10 @@ class GraphicsEngine {
             }
             
             // pass model coordinate space
-            material->shader->Bind();
             material->Bind();
-            material->shader->SetMat4("uModel", &model[0][0]);
+            // rebind for wireframe
+            shader->Bind();
+            shader->SetMat4("uModel", &model[0][0]);
 
             // draw mesh
             mrc.mesh->Draw();

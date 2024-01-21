@@ -449,7 +449,7 @@ class Application {
 
             if (ImGui::BeginCombo("Select Mesh", ((mrc.mesh == nullptr) ? "None": mrc.mesh->name.c_str()))) {
                 if (ImGui::Selectable("None")) {
-                    mrc.mesh == nullptr;
+                    mrc.mesh = nullptr;
                 }
                 for (auto it = assetManager.begin<OpenGLMesh>(); it != assetManager.end<OpenGLMesh>(); ++it) {
                     std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(*it);
@@ -459,6 +459,20 @@ class Application {
                 }
                 ImGui::EndCombo();
             }
+
+            if (ImGui::BeginCombo("Select Material", ((mrc.material == nullptr) ? "None": mrc.material->name.c_str()))) {
+                if (ImGui::Selectable("None")) {
+                    mrc.material = nullptr;
+                } 
+                for (auto it = assetManager.begin<OpenGLMaterial>(); it != assetManager.end<OpenGLMaterial>(); ++it) {
+                    std::shared_ptr<Material> material = std::dynamic_pointer_cast<Material>(*it);
+                    if (ImGui::Selectable(material->name.c_str())) {
+                        mrc.material = material;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+
             ImGui::PopID();
             componentPanelCount++;
         }

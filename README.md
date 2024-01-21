@@ -20,13 +20,13 @@ Goals:
     - [x] Implement Point Lights
     - [x] Implement Directional Lights
     - [ ] Implement Spot Lights
-    - [ ] Support materials
+    - [x] Support materials
     - [ ] Support textures
-    - [ ] Wireframe rendering
-    - [ ] Impl shader loader as asset_loader
+    - [x] Wireframe rendering
+    - [x] Impl shader loader as asset_loader
     - [ ] Create renderer interface
-    - [ ] Use opengl calls directly in OpenGL rasterizer
-    - [ ] Remove gl_interface
+    - [x] Use opengl calls directly in OpenGL rasterizer
+    - [x] Remove gl_interface
 
     ### Camera
     - [x] Support cameras
@@ -67,7 +67,7 @@ Goals:
 
     ### Asset Loaders
     - [ ] Support loading and saving
-    - [ ] Support json files
+    - [x] Support json files
     - [ ] Support audio files
     - [ ] Support image files
     - [ ] Support text files
@@ -88,6 +88,11 @@ Goals:
     - [ ] Support dynamic scene switching
     - [x] Load/save scene to file
     - [x] Handle entity management
+
+    ### Serialization
+    - [x] Serialize entities
+    - [x] Serialize scene
+    - [ ] Serialize assets 
 
     ### GUI
     - [x] Implement ImGui

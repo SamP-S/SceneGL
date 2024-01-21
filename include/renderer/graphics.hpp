@@ -290,8 +290,8 @@ class GraphicsEngine {
                     shader->SetFloat("uSpotLights" + index + ".intensity", slc.intensity);
                     shader->SetVec3("uSpotLights" + index + ".position", tc.position);
                     shader->SetVec3("uSpotLights" + index + ".direction", tc.GetForward());
-                    shader->SetFloat("uSpotLights" + index + ".cutOff", slc.cutOff);
-                    shader->SetFloat("uSpotLights" + index + ".outerCutOff", slc.outerCutOff);
+                    shader->SetFloat("uSpotLights" + index + ".cutOff", LA::Radians(slc.cutOff));
+                    shader->SetFloat("uSpotLights" + index + ".outerCutOff", LA::Radians(slc.outerCutOff));
                     shader->SetInt("uSpotLights" + index + ".enabled", 1);
                 } else {
                     shader->SetInt("uSpotLights" + index + ".enabled", 0);

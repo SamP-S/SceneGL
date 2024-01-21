@@ -554,7 +554,7 @@ class Application {
             ImGui::InputFloat3("Colour", slc.colour.m);
             ImGui::SliderFloat("Intensity", &slc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
             ImGui::SliderFloat("Cut Off", &slc.cutOff, 5.0f, 15.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-            ImGui::SliderFloat("Outer Cut Off", &slc.cutOff, 5.0f, 90.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
+            ImGui::SliderFloat("Outer Cut Off", &slc.outerCutOff, 5.0f, 90.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
 
             ImGui::PopID();
             componentPanelCount++;

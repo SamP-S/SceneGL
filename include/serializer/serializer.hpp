@@ -75,6 +75,16 @@ private:
             j["components"].push_back(next);
         }
 
+        if (e.HasComponent<SpotLightComponent>()) {
+            json next;
+            SpotLightComponent& slc = e.GetComponent<SpotLightComponent>();
+            next["spotLight"]["colour"] = SerializeColour3(slc.colour);
+            next["spotLight"]["intensity"] = slc.intensity;
+            next["spotLight"]["cutOff"] = slc.cutOff;
+            next["spotLight"]["outerCutOff"] = slc.outerCutOff;
+            j["components"].push_back(next);
+        }
+
         if (e.HasComponent<MeshRendererComponent>()) {
             json next;
             MeshRendererComponent& mrc = e.GetComponent<MeshRendererComponent>();
@@ -122,10 +132,15 @@ private:
                 plc.intensity = value["pointLight"]["intensity"];
                 plc.range = value["pointLight"]["range"];
 
+            } else if (value.contains("spotLight")) {
+                SpotLightComponent &slc = entity.AddComponent<SpotLightComponent>();
+                slc.colour = DeserializeColour3(value["spotLight"]["colour"]);
+                slc.intensity = value["spotLight"]["intensity"];
+                slc.cutOff = value["spotLight"]["cutOff"];
+                slc.outerCutOff = value["spotLight"]["outerCutOff"];
+
             } else if (value.contains("meshRenderer")) {
                 MeshRendererComponent &mrc = entity.AddComponent<MeshRendererComponent>();
-
-                // set mesh
                 try {
                     std::string meshName = value["meshRenderer"]["meshName"];
                     mrc.mesh = assetManager.GetAsset<OpenGLMesh>(meshName);
@@ -134,7 +149,6 @@ private:
                     std::cout << e.what() << std::endl;
                 }
 
-                // set material
                 try {
                     std::string materialName = value["meshRenderer"]["materialName"];
                     mrc.material = assetManager.GetAsset<OpenGLMaterial>(materialName);
@@ -142,6 +156,7 @@ private:
                     std::cout << "WARNING (Serializer): material name bad." << std::endl;
                     std::cout << e.what() << std::endl;
                 }
+
             } else if (value.contains("camera")) {
                 CameraComponent &cc = entity.AddComponent<CameraComponent>();
                 cc.fov = value["camera"]["fov"];

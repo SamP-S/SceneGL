@@ -60,7 +60,7 @@ namespace Ngine {
             : name(pName) {}
     };
 
-    struct TransformComponent : public Object {
+    struct TransformComponent {
         LA::vec3 position  = LA::vec3(0.0f);
         LA::vec3 rotation  = LA::vec3(0.0f);
         LA::vec3 scale     = LA::vec3(1.0f);
@@ -120,7 +120,7 @@ namespace Ngine {
             
     };
 
-    class Entity : public Object {
+    class Entity {
         private:
             entt::entity _entityHandle{entt::null};
             Scene* _scene = nullptr;
@@ -199,10 +199,7 @@ namespace Ngine {
 
     Entity Scene::CreateEntity(const std::string& name="Entity") {
         Entity entity = {_registry.create(), this};
-        if (name.compare("Entity") == 0)
-            entity.AddComponent<CoreComponent>(name + "_" + std::to_string(entity.id));
-        else
-            entity.AddComponent<CoreComponent>(name);
+        entity.AddComponent<CoreComponent>(name);
         entity.AddComponent<TransformComponent>();
         return entity;
     }

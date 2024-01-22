@@ -12,7 +12,7 @@
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"
 
-struct CameraComponent : public Ngine::Object {
+struct CameraComponent {
     float fov = 45.0f;
     float near = 0.1f;
     float far = 100.0f;
@@ -29,7 +29,7 @@ struct CameraComponent : public Ngine::Object {
 };
 
 #define DIRECTIONAL_LIGHT_MAX 4
-struct DirectionalLightComponent : public Ngine::Object {
+struct DirectionalLightComponent {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
 
@@ -38,7 +38,7 @@ struct DirectionalLightComponent : public Ngine::Object {
 };
 
 #define POINT_LIGHT_MAX 16
-struct PointLightComponent : public Ngine::Object {
+struct PointLightComponent {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
     float range = 10.0f;
@@ -48,7 +48,7 @@ struct PointLightComponent : public Ngine::Object {
 };
 
 #define SPOT_LIGHT_MAX 4
-struct SpotLightComponent: public Ngine::Object {
+struct SpotLightComponent {
     LA::vec3 colour = LA::vec3({1.0f, 1.0f, 1.0f});
     float intensity = 1.0f;
     float cutOff = 12.5f;
@@ -59,7 +59,7 @@ struct SpotLightComponent: public Ngine::Object {
 };
 
 // Note: will keep assets alive even if it has been removed from AssetManager until reassigned
-struct MeshRendererComponent : public Ngine::Object {
+struct MeshRendererComponent {
     std::shared_ptr<Mesh> mesh = nullptr;
     std::shared_ptr<Material> material = nullptr;
 

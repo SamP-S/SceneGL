@@ -11,6 +11,7 @@
 // think about renaming position to "vertex" or "fragment" for coordinate space to be inherant in the name
 // modify to use an array of buffers instead of having 8 fixed buffers, glGenBuffers(n, &buffers)
 // support uv4-uv7, bitangents
+// implement using VertexAttribute configuration structs to make it flexible
 
 enum OpenGLAttribLocs : uint32_t {
     POSITION = 0,
@@ -28,6 +29,10 @@ class OpenGLMesh : public Mesh {
         uint32_t vertexId, normalId, tangentId, colourId, indexId = 0;
         uint32_t uv0Id, uv1Id, uv2Id, uv3Id = 0;
         uint32_t vaId = 0;
+
+        // Set if no vertex attribute data
+        // Otherwise leave as 0
+        uint32_t vertexCount = 0;
         
 
     // todo add assimp loaded meshes
@@ -89,23 +94,20 @@ class OpenGLMesh : public Mesh {
                 return;
             }
 
-            // bad mesh data
-            if (vertices.size() == 0) {
-                std::cout << "WARNING (Mesh): Trying to generate buffers for mesh with no verices." << std::endl;
-                return;
-            }
-            
             // create vao
             _isGenerated = true;
             glGenVertexArrays(1, &vaId);
             glBindVertexArray(vaId);
 
             // vertices
-            vertexId = GenerateBuffer<LA::vec3>(GL_ARRAY_BUFFER, vertices);
-            glVertexAttribPointer(OpenGLAttribLocs::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(LA::vec3), (void*)0);
-            glEnableVertexAttribArray(OpenGLAttribLocs::POSITION);
-
-            // indices
+            if (vertices.size() == 0) {
+                std::cout << "DEBUG (Mesh): Trying to generate buffers for mesh with no verices." << std::endl;
+            } else {
+                vertexId = GenerateBuffer<LA::vec3>(GL_ARRAY_BUFFER, vertices);
+                glVertexAttribPointer(OpenGLAttribLocs::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(LA::vec3), (void*)0);
+                glEnableVertexAttribArray(OpenGLAttribLocs::POSITION);
+            }
+            
             if (indices.size() == 0) {
                 _isIndexed = false;
             } else {

@@ -25,12 +25,18 @@ using namespace LA;
 
 #include "renderer/editor_camera.hpp"
 
+struct OpenGLConfig {
+    int major = 4;
+    int minor = 6;
+    const char* glsl = "#version 460 core";
+};
+
 class Application {
     private:
-        // SDL properties
-        int gl_major = 4;
-        int gl_minor = 6;
-        const char* glsl_version = "#version 460 core";
+        // OpenGL properties
+        OpenGLConfig gl_cfg;
+
+        // SDL
         SDL_GLContext gl_context;
         SDL_Window* window;
         bool isQuit = false;
@@ -147,10 +153,10 @@ class Application {
             // GL 4.6 + GLSL 460
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major) != 0)
-                gl_major = 0;
-            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_minor) != 0)
-                gl_minor = 0;
+            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_cfg.major) != 0)
+                gl_cfg.major = 0;
+            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_cfg.minor) != 0)
+                gl_cfg.minor = 0;
 
             // Create window with graphics context
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -186,7 +192,7 @@ class Application {
 
             // Setup Platform/Renderer backends
             ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-            ImGui_ImplOpenGL3_Init(glsl_version);
+            ImGui_ImplOpenGL3_Init(gl_cfg.glsl);
         }
 
         void Shutdown() {

@@ -296,30 +296,23 @@ class Application {
                 }
                 if (ImGui::BeginMenu("Entity")) {
                     if (ImGui::MenuItem("New Empty")) {
-                        // debug
-                        std::cout << "Entity: Create new entity" << std::endl;
-                        // create empty
-                        std::string new_name = "new_" + std::to_string(new_entity_count);
-                        entitySelected = Graphics.scene->CreateEntity(new_name);
-                        new_entity_count += 1;
-
-                        // build components
-                        std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("empty");
+                        entitySelected = Graphics.scene->CreateEntity();
+                    } else if (ImGui::MenuItem("New Cube")) {
+                        entitySelected = Graphics.scene->CreateEntity();
                         MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                        mrc.mesh = mesh;
-                    }
-                    if (ImGui::MenuItem("New Cube")) {
-                        // debug
-                        std::cout << "Entity: Create new entity" << std::endl;
-                        // create entity
-                        std::string new_name = "cube_" + std::to_string(new_entity_count);
-                        entitySelected = Graphics.scene->CreateEntity(new_name);
-                        new_entity_count += 1;
-
-                        // build components
-                        std::shared_ptr<Mesh> mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
-                        MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                        mrc.mesh = mesh;
+                        mrc.mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
+                    } else if (ImGui::MenuItem("New Camera")) {
+                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected.AddComponent<CameraComponent>();
+                    } else if (ImGui::MenuItem("New Directional Light")) {
+                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected.AddComponent<DirectionalLightComponent>();
+                    } else if (ImGui::MenuItem("New Point Light")) {
+                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected.AddComponent<PointLightComponent>();
+                    } else if (ImGui::MenuItem("New Spot Light")) {
+                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected.AddComponent<SpotLightComponent>();
                     }
                     ImGui::EndMenu();
                 }

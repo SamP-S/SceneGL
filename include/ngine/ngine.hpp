@@ -197,9 +197,12 @@ namespace Ngine {
         return arr;
     }
 
-    Entity Scene::CreateEntity(const std::string& name=std::string("Name")) {
+    Entity Scene::CreateEntity(const std::string& name="Entity") {
         Entity entity = {_registry.create(), this};
-        entity.AddComponent<CoreComponent>(name);
+        if (name.compare("Entity") == 0)
+            entity.AddComponent<CoreComponent>(name + "_" + std::to_string(entity.id));
+        else
+            entity.AddComponent<CoreComponent>(name);
         entity.AddComponent<TransformComponent>();
         return entity;
     }

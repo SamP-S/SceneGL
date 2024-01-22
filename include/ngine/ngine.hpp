@@ -249,7 +249,7 @@ namespace Ngine {
     };
 
     // note: using map as is already sorted when iterating
-    class AssetManager : public Object {
+    class AssetManager {
         private:
             std::map<std::string, uint32_t> _typeToBuffer;
             std::vector<std::map<ObjectId, uint32_t>> _idToIndex;
@@ -385,7 +385,7 @@ namespace Ngine {
             
     };
 
-    class AssetLoaderManager : public Object {
+    class AssetLoaderManager {
         private:
             std::vector<IAssetLoader*> _loaders;
 

@@ -19,7 +19,7 @@ class EditorCamera {
         uint32_t width = 800;
         uint32_t height = 600;
         float near = 0.1f;
-        float far = 100.0f;
+        float far = 40.0f;
         bool isPerspective = true;
 
         // perspective properties
@@ -28,8 +28,8 @@ class EditorCamera {
         float aspectRatio = 0.0f;   
 
         // orthographic properties
-        float orthoWidth;
-        float orthoHeight;
+        float orthoWidth = 20.0f;
+        float orthoHeight = 20.0f;
         
         // first person controller
         bool active = false;

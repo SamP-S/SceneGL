@@ -5,6 +5,8 @@
 #include "gui/im_window.hpp"
 #include "renderer/editor_camera.hpp"
 
+#include "ImGuizmo.h"
+
 class ImEditorCamera : public IImWindow {
     
     static inline std::map<std::string, float> _labelToAR = {
@@ -24,12 +26,12 @@ class ImEditorCamera : public IImWindow {
     };
 
     static void PerspectivePanel(std::shared_ptr<EditorCamera> ec) {
-        ImGui::SliderFloat("Fov", &ec->fov, 20.f, 110.f);
+        ImGui::SliderFloat("Fov", &ec->fov, 45.f, 110.f);
     }
 
     static void OrthographicPanel(std::shared_ptr<EditorCamera> ec) {
-        ImGui::SliderFloat("Ortho Width", &ec->orthoWidth, 1, 20);
-        ImGui::SliderFloat("Ortho Height", &ec->orthoHeight, 1, 20);
+        ImGui::SliderFloat("Ortho Width", &ec->orthoWidth, 1, 100);
+        ImGui::SliderFloat("Ortho Height", &ec->orthoHeight, 1, 100);
     }
 
     static void CameraPanel(std::shared_ptr<EditorCamera> ec) {
@@ -41,6 +43,8 @@ class ImEditorCamera : public IImWindow {
             }
             ImGui::EndCombo();
         }
+        ImGui::SliderFloat("Near Plane", &ec->near, 0.01f, 100);
+        ImGui::SliderFloat("Far Plane", &ec->far, 1.0f, 100);
 
         if (ImGui::RadioButton("Perspective", ec->isPerspective))
             ec->isPerspective = true;
@@ -48,10 +52,30 @@ class ImEditorCamera : public IImWindow {
         if (ImGui::RadioButton("Orthographic", !ec->isPerspective))
             ec->isPerspective = false;
 
+        // create correct perspective elements
+        // do not merge with imguizmo
         if (ec->isPerspective)
             PerspectivePanel(ec);
         else
             OrthographicPanel(ec);
+        
+        // ImGuizmo
+        ImGuizmo::SetOrthographic(!ec->isPerspective);
+        ImGuizmo::BeginFrame();
+        
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::Text("X: %f Y: %f", io.MousePos.x, io.MousePos.y);
+        if (ImGuizmo::IsUsing()) {
+            ImGui::Text("Using gizmo");
+        } else {
+            ImGui::Text(ImGuizmo::IsOver() ? "Over gizmo" : "");
+            ImGui::SameLine();
+            ImGui::Text(ImGuizmo::IsOver(ImGuizmo::TRANSLATE) ? "Over translate gizmo" : "");
+            ImGui::SameLine();
+            ImGui::Text(ImGuizmo::IsOver(ImGuizmo::ROTATE) ? "Over rotate gizmo" : "");
+            ImGui::SameLine();
+            ImGui::Text(ImGuizmo::IsOver(ImGuizmo::SCALE) ? "Over scale gizmo" : "");
+        }
     }
 
     static void TransformPanel(std::shared_ptr<EditorCamera> ec) {

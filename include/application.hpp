@@ -300,7 +300,7 @@ class Application {
                     } else if (ImGui::MenuItem("New Cube")) {
                         entitySelected = Graphics.scene->CreateEntity();
                         MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
-                        mrc.mesh = assetManager.GetAsset<OpenGLMesh>("vertex_cube");
+                        mrc.mesh = assetManager.FindAsset<OpenGLMesh>("vertex_cube");
                     } else if (ImGui::MenuItem("New Camera")) {
                         entitySelected = Graphics.scene->CreateEntity();
                         entitySelected.AddComponent<CameraComponent>();

@@ -143,7 +143,7 @@ private:
                 MeshRendererComponent &mrc = entity.AddComponent<MeshRendererComponent>();
                 try {
                     std::string meshName = value["meshRenderer"]["meshName"];
-                    mrc.mesh = assetManager.GetAsset<OpenGLMesh>(meshName);
+                    mrc.mesh = assetManager.FindAsset<OpenGLMesh>(meshName);
                 } catch (const std::exception& e) {
                     std::cout << "WARNING (Serializer): mesh name bad." << std::endl;
                     std::cout << e.what() << std::endl;
@@ -151,7 +151,7 @@ private:
 
                 try {
                     std::string materialName = value["meshRenderer"]["materialName"];
-                    mrc.material = assetManager.GetAsset<OpenGLMaterial>(materialName);
+                    mrc.material = assetManager.FindAsset<OpenGLMaterial>(materialName);
                 } catch (const std::exception& e) {
                     std::cout << "WARNING (Serializer): material name bad." << std::endl;
                     std::cout << e.what() << std::endl;

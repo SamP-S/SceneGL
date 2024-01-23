@@ -12,6 +12,7 @@
 #include <entt.hpp>
 // internal libs
 #include "la_extended.h"
+#include "core/uuid.hpp"
 
 //// TODO: the asset N entity engine
 // Entities:
@@ -22,35 +23,11 @@
 // Improve GetAssets to remove iterative conversion/vector build
 // Note: Do not
 
-using ObjectId = int32_t;
 
 namespace Ngine {
 
-    struct Object {
-        private:
-            inline static ObjectId _nextId = 1;
-
-        public:
-            // DO NOT MODIFY STORED VALUE
-            ObjectId id;
-            
-            Object()
-                : id(Object::_nextId++) {}
-
-            operator bool() const {
-                return id != 0;
-            }
-
-            bool operator==(const Object& cmp) const {
-                return id == cmp.id;
-            }
-
-            bool operator!=(const Object& cmp) const {
-                return id != cmp.id;
-            }
-    };
-
-    struct CoreComponent : public Object {
+    struct CoreComponent {
+        UUID uuid;
         std::string name;
         bool active = true;
 
@@ -94,7 +71,7 @@ namespace Ngine {
     
     class Entity;
 
-    class Scene : public Object {
+    class Scene {
         private:
             entt::registry _registry;
 
@@ -236,8 +213,9 @@ namespace Ngine {
         return view.size();
     }
 
-    struct Asset : public Object {
+    struct Asset {
         public:
+            UUID uuid;
             std::string name;
             std::string path;
 
@@ -252,7 +230,7 @@ namespace Ngine {
     class AssetManager {
         private:
             std::map<std::string, uint32_t> _typeToBuffer;
-            std::vector<std::map<ObjectId, uint32_t>> _idToIndex;
+            std::vector<std::map<UUID, uint32_t>> _idToIndex;
             std::vector<std::vector<std::shared_ptr<Asset>>> _assetLibrary;
 
             // private constructor for singleton
@@ -272,8 +250,8 @@ namespace Ngine {
                     // add buffer
                     std::vector<std::shared_ptr<Asset>> newBuffer;
                     _assetLibrary.push_back(newBuffer);
-                    // add id look up table
-                    std::map<ObjectId, uint32_t> newLut;
+                    // add uuid look up table
+                    std::map<UUID, uint32_t> newLut;
                     _idToIndex.push_back(newLut);
                 }
             }
@@ -308,30 +286,30 @@ namespace Ngine {
                 uint32_t buf = _typeToBuffer[s];
                 std::shared_ptr<T> newAsset = std::make_shared<T>(std::forward<Args>(args)...);
                 uint32_t idx = _assetLibrary[buf].size();
-                _idToIndex[buf].emplace(newAsset->id, idx);
+                _idToIndex[buf].emplace(newAsset->uuid, idx);
                 _assetLibrary[buf].push_back(newAsset);
                 return newAsset;
             }
 
             template<typename T>
-            std::shared_ptr<T> GetAsset(ObjectId id) {
+            std::shared_ptr<T> GetAssetByUUID(UUID uuid) {
                 std::string s = typeid(T).name();
                 // didnt find buffer to even hold T, return null
                 if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
                     return nullptr;
                 }
                 uint32_t buf = _typeToBuffer[s];
-                // couldnt find id in index map
-                if (_idToIndex[buf].find(id) == _idToIndex[buf].end()) {
+                // couldnt find uuid in index map
+                if (_idToIndex[buf].find(uuid) == _idToIndex[buf].end()) {
                     return nullptr;
                 }
-                uint32_t idx = _idToIndex[buf][id];
+                uint32_t idx = _idToIndex[buf][uuid];
                 std::shared_ptr<Asset> ptr = _assetLibrary[buf][idx];
                 return std::dynamic_pointer_cast<T>(ptr);
             }
 
             template<typename T>
-            std::shared_ptr<T> GetAsset(const std::string& name) {
+            std::shared_ptr<T> FindAsset(const std::string& name) {
                 std::string s = typeid(T).name();
                 // didnt find buffer to even hold T, return null
                 if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
@@ -347,7 +325,7 @@ namespace Ngine {
             }
 
             template<typename T>
-            ObjectId GetAssetId(const std::string& name) {
+            UUID GetAssetUUID(const std::string& name) {
                 std::string s = typeid(T).name();
                 // didnt find buffer to even hold T, return null
                 if (_typeToBuffer.find(s) == _typeToBuffer.end()) {
@@ -356,7 +334,7 @@ namespace Ngine {
                 std::vector<std::shared_ptr<Asset>> arr = GetAssets<T>();
                 for (auto asset : arr) {
                     if (asset->name.compare(name) == 0)
-                        return asset->id;
+                        return asset->uuid;
                 }
                 // could not find matching name
                 return 0;
@@ -421,7 +399,7 @@ namespace Ngine {
             }
     };
     
-    // Note: Template base class for serializing scene object
+    // Note: Template base class for serializing scene
     // Specific and unique to each application using Ngine, can't generalise implentation here
     class ISerializer {
         public:

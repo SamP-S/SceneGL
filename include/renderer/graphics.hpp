@@ -82,13 +82,13 @@ class GraphicsEngine {
             // load default shader(s)
             std::shared_ptr<Shader> base = assetManager.CreateAsset<OpenGLShader>(
                 "base",
-                assetManager.GetAsset<OpenGLShaderSource>("base_vert"),
-                assetManager.GetAsset<OpenGLShaderSource>("base_frag")
+                assetManager.FindAsset<OpenGLShaderSource>("base_vert"),
+                assetManager.FindAsset<OpenGLShaderSource>("base_frag")
             );
             std::shared_ptr<Shader> lighting = assetManager.CreateAsset<OpenGLShader>(
                 "lighting",
-                assetManager.GetAsset<OpenGLShaderSource>("lighting_vert"),
-                assetManager.GetAsset<OpenGLShaderSource>("lighting_frag")
+                assetManager.FindAsset<OpenGLShaderSource>("lighting_vert"),
+                assetManager.FindAsset<OpenGLShaderSource>("lighting_frag")
             );
 
             // load material(s)
@@ -159,7 +159,7 @@ class GraphicsEngine {
 
             std::shared_ptr<Shader> shader;
             if (wireframe) {
-                shader = assetManager.GetAsset<OpenGLShader>("base");
+                shader = assetManager.FindAsset<OpenGLShader>("base");
             } else {
                 shader = material->shader;
             }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+#include "gui/im_window.hpp"
 #include "ngine/ngine.hpp"
 #include "renderer/components.hpp"
 
@@ -10,7 +11,7 @@
 // Implement type LUT to automatically try every panel
 // Automate isRequired and title from the component itself
 
-class ImEntity {
+class ImEntity : IImWindow {
 private:
     static inline int _panelCount = 0;
 
@@ -40,8 +41,7 @@ public:
     }
 
     static void EntityWindow(Entity& e, bool* isOpen) {
-        ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
-        ImGui::Begin("Entity Properties", isOpen, worldWindowFlags);
+        ImGui::Begin("Entity Properties", isOpen, _windowFlags);
         if (!e) {
             ImGui::Text("Nothing selected");
         } else {

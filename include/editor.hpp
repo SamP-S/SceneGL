@@ -27,6 +27,7 @@ using namespace LA;
 #include "renderer/editor_camera.hpp"
 
 #include "gui/im_entity.hpp"
+#include "gui/im_scene.hpp"
 
 class Editor {
     private:
@@ -41,11 +42,10 @@ class Editor {
         GraphicsEngine Graphics = GraphicsEngine(gl_cfg.width, gl_cfg.height);
 
         // Application state
-        bool show_editor_window = true;
         bool show_render_window = true;
         bool show_stats_window = true;
-        bool show_world_window = true;
-        bool show_properties_window = true;
+        bool show_scene_window = true;
+        bool show_entity_window = true;
         bool show_demo_window = false;
         float aspectRatio = 0.0f;
         bool renderer_focused = false;
@@ -111,10 +111,10 @@ class Editor {
                     RenderWindow();
                 if (show_stats_window) 
                     StatisticsWindow();
-                if (show_world_window) 
-                    WorldWindow();
-                if (show_properties_window) 
-                    ImEntity::EntityWindow(entitySelected, &show_properties_window);
+                if (show_scene_window) 
+                    ImScene::SceneWindow(Graphics.scene, entitySelected, &show_scene_window);
+                if (show_entity_window) 
+                    ImEntity::EntityWindow(entitySelected, &show_entity_window);
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -276,7 +276,8 @@ class Editor {
                 if (ImGui::BeginMenu("Window")) {
                     ImGui::MenuItem("Render Display", NULL, &show_render_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
-                    ImGui::MenuItem("World Tree", NULL, &show_world_window);
+                    ImGui::MenuItem("Scene Tree", NULL, &show_scene_window);
+                    ImGui::MenuItem("Entity", NULL, &show_entity_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }
@@ -328,32 +329,6 @@ class Editor {
             ImGuiWindowFlags statsWindowFlags = ImGuiWindowFlags_None;
             ImGui::Begin("Statistics Monitor", &show_stats_window, statsWindowFlags);
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-
-        // flattened until scene tree implemented
-        void WorldNode(Entity entitiy) {
-            ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
-            if (entitySelected == entitiy)
-                node_flags |= ImGuiTreeNodeFlags_Selected;
-            node_flags |= ImGuiTreeNodeFlags_Leaf;
-            bool node_open = ImGui::TreeNodeEx(entitiy.GetComponent<CoreComponent>().name.c_str(), node_flags);
-            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                entitySelected = entitiy;
-            if (node_open) {
-                ImGui::TreePop();
-            }   
-        }
-        
-        void WorldWindow() {
-            ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("World Tree", &show_world_window, worldWindowFlags);
-            if (Graphics.scene != nullptr) {
-                std::vector<Entity> entities = Graphics.scene->GetEntities();
-                for (auto e : entities) {
-                    WorldNode(e);
-                }
-            }
             ImGui::End();
         }
 

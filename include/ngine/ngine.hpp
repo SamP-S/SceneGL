@@ -21,7 +21,8 @@
 // Implement asset destruction
 // Maybe change naming to find instead of get as not always return asset
 // Improve GetAssets to remove iterative conversion/vector build
-// Note: Do not
+// Rename asset manager to asset library
+// Consolidate asset manager & asset loader manager into single interface/class, use composition & singleton
 
 
 namespace Ngine {
@@ -374,7 +375,6 @@ namespace Ngine {
         private:
             std::vector<IAssetLoader*> _loaders;
 
-        public:
             AssetLoaderManager() {}
             ~AssetLoaderManager() {
                 // clear loaders
@@ -382,6 +382,13 @@ namespace Ngine {
                     delete loader;
                 }
                 _loaders.clear();
+            }
+
+        public:
+            // Public static method to get the single instance
+            static AssetLoaderManager& Instance() {
+                static AssetLoaderManager instance;
+                return instance;
             }
 
             void AddLoader(IAssetLoader* loader) {

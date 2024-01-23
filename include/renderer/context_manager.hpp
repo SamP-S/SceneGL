@@ -30,6 +30,9 @@ struct OpenGLConfig {
     // window min size
     int minWidth = WINDOW_WIDTH;
     int minHeight = WINDOW_HEIGHT;
+    // window initial size
+    int width = 1280;
+    int height = 720;
 };
 
 class ContextManager {
@@ -73,7 +76,7 @@ public:
         window = SDL_CreateWindow(
             "SceneGL + ImGUI + OpenGL4", SDL_WINDOWPOS_CENTERED, 
             SDL_WINDOWPOS_CENTERED, 
-            gl_cfg.minWidth, gl_cfg.minHeight, 
+            gl_cfg.width, gl_cfg.height, 
             window_flags);
         gl_context = SDL_GL_CreateContext(window);
 

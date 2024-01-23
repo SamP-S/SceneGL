@@ -15,12 +15,22 @@
 
 class EditorCamera {
     public:
-        // camera properties
-        float fov = 45.0f;
-        float near = 0.1f;
-        float far = 100.0f;
+        // common properties
         uint32_t width = 800;
         uint32_t height = 600;
+        float near = 0.1f;
+        float far = 100.0f;
+        bool isPerspective = true;
+
+        // perspective properties
+        float fov = 45.0f;
+        // 0 means no aspect lock
+        float aspectRatio = 0.0f;   
+
+        // orthographic properties
+        float orthoWidth;
+        float orthoHeight;
+        
         // first person controller
         bool active = false;
         int x = 0;
@@ -34,7 +44,15 @@ class EditorCamera {
         ~EditorCamera() {}
 
         LA::mat4 GetProjection() {
-            return LA::Perspective(fov, (float)width / (float)height, near, far);
+            if (isPerspective) {
+                return LA::Perspective(fov, (float)width / (float)height, near, far);
+            } else {
+                float l = -orthoWidth * 0.5;
+                float r = orthoWidth * 0.5;
+                float b = -orthoHeight * 0.5;
+                float t = orthoHeight * 0.5;
+                return LA::Orthographic(l, r, b, t, near, far);
+            }
         }
 
         void RotateCamera(int dx, int dy)

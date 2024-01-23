@@ -26,10 +26,6 @@ enum OpenGLAttribLocs : uint32_t {
 
 class OpenGLMesh : public Mesh {
     public:
-        uint32_t vertexId, normalId, tangentId, colourId, indexId = 0;
-        uint32_t uv0Id, uv1Id, uv2Id, uv3Id = 0;
-        uint32_t vaId = 0;
-
         // Set if no vertex attribute data
         // Otherwise leave as 0
         uint32_t vertexCount = 0;
@@ -41,16 +37,16 @@ class OpenGLMesh : public Mesh {
 
         ~OpenGLMesh() {
             // delete all opengl resources/buffers
-            glDeleteVertexArrays(1, &vaId);
-            glDeleteBuffers(1, &vertexId);
-            glDeleteBuffers(1, &normalId);
-            glDeleteBuffers(1, &tangentId);
-            glDeleteBuffers(1, &colourId);
-            glDeleteBuffers(1, &indexId);
-            glDeleteBuffers(1, &uv0Id);
-            glDeleteBuffers(1, &uv1Id);
-            glDeleteBuffers(1, &uv2Id);
-            glDeleteBuffers(1, &uv3Id);
+            glDeleteVertexArrays(1, &vaBuffer);
+            glDeleteBuffers(1, &vertexBuffer);
+            glDeleteBuffers(1, &normalBuffer);
+            glDeleteBuffers(1, &tangentBuffer);
+            glDeleteBuffers(1, &colourBuffer);
+            glDeleteBuffers(1, &indexBuffer);
+            glDeleteBuffers(1, &uv0Buffer);
+            glDeleteBuffers(1, &uv1Buffer);
+            glDeleteBuffers(1, &uv2Buffer);
+            glDeleteBuffers(1, &uv3Buffer);
         }
 
         bool IsUsable() override {
@@ -66,7 +62,7 @@ class OpenGLMesh : public Mesh {
             }
 
             // draw call depending on if using indicie buffer
-            glBindVertexArray(vaId);
+            glBindVertexArray(vaBuffer);
             if (_isIndexed) {
                 glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
             } else {
@@ -78,6 +74,10 @@ class OpenGLMesh : public Mesh {
     private:
         bool _isGenerated = false;
         bool _isIndexed = false;
+
+        uint32_t _vertexBuffer, _normalBuffer, _tangentBuffer, _colourBuffer, _indexBuffer = 0;
+        uint32_t _uv0Buffer, _uv1Buffer, _uv2Buffer, _uv3Buffer = 0;
+        uint32_t _vaBuffer = 0;
 
         template <typename T>
         uint32_t GenerateBuffer(GLenum target, const std::vector<T>& data) {
@@ -96,14 +96,14 @@ class OpenGLMesh : public Mesh {
 
             // create vao
             _isGenerated = true;
-            glGenVertexArrays(1, &vaId);
-            glBindVertexArray(vaId);
+            glGenVertexArrays(1, &vaBuffer);
+            glBindVertexArray(vaBuffer);
 
             // vertices
             if (vertices.size() == 0) {
                 std::cout << "DEBUG (Mesh): Trying to generate buffers for mesh with no verices." << std::endl;
             } else {
-                vertexId = GenerateBuffer<LA::vec3>(GL_ARRAY_BUFFER, vertices);
+                vertexBuffer = GenerateBuffer<LA::vec3>(GL_ARRAY_BUFFER, vertices);
                 glVertexAttribPointer(OpenGLAttribLocs::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(LA::vec3), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::POSITION);
             }
@@ -112,46 +112,46 @@ class OpenGLMesh : public Mesh {
                 _isIndexed = false;
             } else {
                 _isIndexed = true;
-                indexId = GenerateBuffer<uint32_t>(GL_ELEMENT_ARRAY_BUFFER, indices);
+                indexBuffer = GenerateBuffer<uint32_t>(GL_ELEMENT_ARRAY_BUFFER, indices);
             }
 
             // normals
             if (normals.size() > 0) {
-                normalId = GenerateBuffer<LA::vec3>(GL_ARRAY_BUFFER, normals);
+                normalBuffer = GenerateBuffer<LA::vec3>(GL_ARRAY_BUFFER, normals);
                 glVertexAttribPointer(OpenGLAttribLocs::NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(LA::vec3), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::NORMAL);
             }
             // tangents
             if (tangents.size() > 0) {
-                tangentId = GenerateBuffer<LA::vec4>(GL_ARRAY_BUFFER, tangents);
+                tangentBuffer = GenerateBuffer<LA::vec4>(GL_ARRAY_BUFFER, tangents);
                 glVertexAttribPointer(OpenGLAttribLocs::TANGENT, 4, GL_FLOAT, GL_FALSE, sizeof(LA::vec4), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::TANGENT);
             }
             // colours
             if (colours.size() > 0) {
-                colourId = GenerateBuffer<LA::vec4>(GL_ARRAY_BUFFER, colours);
+                colourBuffer = GenerateBuffer<LA::vec4>(GL_ARRAY_BUFFER, colours);
                 glVertexAttribPointer(OpenGLAttribLocs::COLOUR, 4, GL_FLOAT, GL_FALSE, sizeof(LA::vec4), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::COLOUR);
             }
 
             // textures
             if (uv0.size() > 0) {
-                uv0Id = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv0);
+                uv0Buffer = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv0);
                 glVertexAttribPointer(OpenGLAttribLocs::UV0, 2, GL_FLOAT, GL_FALSE, sizeof(LA::vec2), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::UV0);
             }
             if (uv1.size() > 0) {
-                uv1Id = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv1);
+                uv1Buffer = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv1);
                 glVertexAttribPointer(OpenGLAttribLocs::UV1, 2, GL_FLOAT, GL_FALSE, sizeof(LA::vec2), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::UV1);
             }
             if (uv2.size() > 0) {
-                uv2Id = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv2);
+                uv2Buffer = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv2);
                 glVertexAttribPointer(OpenGLAttribLocs::UV2, 2, GL_FLOAT, GL_FALSE, sizeof(LA::vec2), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::UV2);
             }
             if (uv3.size() > 0) {
-                uv3Id = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv3);
+                uv3Buffer = GenerateBuffer<LA::vec2>(GL_ARRAY_BUFFER, uv3);
                 glVertexAttribPointer(OpenGLAttribLocs::UV3, 2, GL_FLOAT, GL_FALSE, sizeof(LA::vec2), (void*)0);
                 glEnableVertexAttribArray(OpenGLAttribLocs::UV3);
             }

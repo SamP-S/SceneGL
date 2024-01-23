@@ -34,6 +34,7 @@
 
 #include "la_extended.h"
 #include "ImGuizmo.h"
+
 #include <vector>
 #include <algorithm>
 
@@ -116,36 +117,16 @@ namespace ImApp {
 
 
 bool useWindow = true;
-int gizmoCount = 1;
 float camDistance = 8.f;
 static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::TRANSLATE);
 
-LA::mat4 objectMatrix[4] = {
+LA::mat4 objectMatrix = 
    LA::mat4({
       { 1.f, 0.f, 0.f, 0.f},
       { 0.f, 1.f, 0.f, 0.f},
       { 0.f, 0.f, 1.f, 0.f},
       { 0.f, 0.f, 0.f, 1.f}
-   }),
-   LA::mat4({
-      { 1.f, 0.f, 0.f, 0.f},
-      { 0.f, 1.f, 0.f, 0.f},
-      { 0.f, 0.f, 1.f, 0.f},
-      { 2.f, 0.f, 0.f, 1.f}
-   }),
-   LA::mat4({
-      { 1.f, 0.f, 0.f, 0.f},
-      { 0.f, 1.f, 0.f, 0.f},
-      { 0.f, 0.f, 1.f, 0.f},
-      { 2.f, 0.f, 2.f, 1.f}
-   }),
-   LA::mat4({
-      { 1.f, 0.f, 0.f, 0.f},
-      { 0.f, 1.f, 0.f, 0.f},
-      { 0.f, 0.f, 1.f, 0.f},
-      { 0.f, 0.f, 2.f, 1.f}
-   })
-};
+   });
 
 static const LA::mat4 identityMatrix = LA::mat4();
 
@@ -176,6 +157,7 @@ void EditTransform(LA::mat4& cameraView, LA::mat4& cameraProjection, LA::mat4& m
       ImGui::SameLine();
       if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
          mCurrentGizmoOperation = ImGuizmo::SCALE;
+      ImGui::SameLine();
       if (ImGui::RadioButton("Universal", mCurrentGizmoOperation == ImGuizmo::UNIVERSAL))
          mCurrentGizmoOperation = ImGuizmo::UNIVERSAL;
       float matrixTranslation[3], matrixRotation[3], matrixScale[3];
@@ -239,14 +221,12 @@ void EditTransform(LA::mat4& cameraView, LA::mat4& cameraProjection, LA::mat4& m
       viewManipulateTop = ImGui::GetWindowPos().y;
       ImGuiWindow* window = ImGui::GetCurrentWindow();
       gizmoWindowFlags = ImGui::IsWindowHovered() && ImGui::IsMouseHoveringRect(window->InnerRect.Min, window->InnerRect.Max) ? ImGuiWindowFlags_NoMove : 0;
-   }
-   else
-   {
+   } else {
       ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
    }
 
    ImGuizmo::DrawGrid((float*)&cameraView, (float*)&cameraProjection, (float*)&identityMatrix, 100.f);
-   ImGuizmo::DrawCubes((float*)&cameraView, (float*)&cameraProjection, (float*)&objectMatrix[0], gizmoCount);
+   ImGuizmo::DrawCubes((float*)&cameraView, (float*)&cameraProjection, (float*)&objectMatrix, 1);
    ImGuizmo::Manipulate((float*)&cameraView, (float*)&cameraProjection, mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap[0] : NULL, boundSizing ? bounds : NULL, boundSizingSnap ? boundsSnap : NULL);
 
    ImGuizmo::ViewManipulate((float*)&cameraView, camDistance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
@@ -325,7 +305,6 @@ int main(int, char**)
          ImGui::SliderFloat("Ortho width", &viewWidth, 1, 20);
       }
       viewDirty |= ImGui::SliderFloat("Distance", &camDistance, 1.f, 10.f);
-      ImGui::SliderInt("Gizmo count", &gizmoCount, 1, 4);
 
       if (viewDirty || firstFrame)
       {
@@ -356,16 +335,10 @@ int main(int, char**)
          ImGui::Text(ImGuizmo::IsOver(ImGuizmo::SCALE) ? "Over scale gizmo" : "");
       }
       ImGui::Separator();
-      for (int matId = 0; matId < gizmoCount; matId++)
-      {
-         ImGuizmo::SetID(matId);
+      ImGuizmo::SetID(0);
 
-         EditTransform(cameraView, cameraProjection, objectMatrix[matId], lastUsing == matId);
-         if (ImGuizmo::IsUsing())
-         {
-            lastUsing = matId;
-         }
-      }
+      EditTransform(cameraView, cameraProjection, objectMatrix, true);
+      
       ImGui::End();
       
       // render everything

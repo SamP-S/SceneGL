@@ -3,7 +3,7 @@
 #include "la_extended.h"
 
 #include "renderer/components.hpp"
-#include "renderer/input.hpp"
+#include "input/input.hpp"
 
 #define MODE_STOP 0
 #define MOVE_LEFT 1

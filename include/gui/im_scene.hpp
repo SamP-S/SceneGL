@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/im_window.hpp"
+#include "ngine/ngine.hpp"
 
 //// TODO:
 // Implement as tree
@@ -23,7 +24,7 @@ public:
     }
     
     static void SceneWindow(bool* isOpen, std::shared_ptr<Scene> scene, Entity& selected) {
-        ImGui::Begin("World Tree", isOpen, _windowFlags);
+        ImGui::Begin("Scene Tree", isOpen, _windowFlags);
         if (scene != nullptr) {
             std::vector<Entity> entities = scene->GetEntities();
             for (auto e : entities) {

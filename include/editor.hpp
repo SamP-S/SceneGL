@@ -31,6 +31,7 @@ using namespace LA;
 #include "gui/im_entity.hpp"
 #include "gui/im_scene.hpp"
 #include "gui/im_statistics.hpp"
+#include "gui/im_editor_camera.hpp"
 
 class Editor {
     private:
@@ -50,6 +51,7 @@ class Editor {
         bool show_scene_window = true;
         bool show_entity_window = true;
         bool show_demo_window = false;
+        bool show_camera_window = true;
         float aspectRatio = 0.0f;
         bool renderer_focused = false;
         ImVec2 render_region_min = ImVec2();
@@ -118,6 +120,8 @@ class Editor {
                     ImScene::SceneWindow(&show_scene_window, runtimeController.scene, entitySelected);
                 if (show_entity_window) 
                     ImEntity::EntityWindow(&show_entity_window, entitySelected);
+                if (show_camera_window)
+                    ImEditorCamera::EditorCameraWindow(&show_camera_window, runtimeController.editorCamera);
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -143,7 +147,7 @@ class Editor {
             if (event.type == SDL_QUIT) {
                 isQuit = true;
             }
-                        
+            
             if (renderer_focused) {
                 switch (event.type) {
                     case SDL_KEYUP:
@@ -189,10 +193,6 @@ class Editor {
             io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
             io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
             //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-            // Setup Dear ImGui style
-            ImGui::StyleColorsDark();
-            // ImGui::StyleColorsClassic();
 
             // Setup Platform/Renderer backends
             ImGui_ImplSDL2_InitForOpenGL(contextManager.window, contextManager.gl_context);
@@ -281,7 +281,17 @@ class Editor {
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
                     ImGui::MenuItem("Scene Tree", NULL, &show_scene_window);
                     ImGui::MenuItem("Entity", NULL, &show_entity_window);
+                    ImGui::MenuItem("Editor Camera", NULL, &show_camera_window);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Options")) {
+                    if (ImGui::MenuItem("Classic Mode"))
+                        ImGui::StyleColorsClassic();
+                    else if (ImGui::MenuItem("Light Mode"))
+                        ImGui::StyleColorsLight();
+                    else if (ImGui::MenuItem("Dark Mode"))
+                        ImGui::StyleColorsDark();
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Aspect Ratio")) {

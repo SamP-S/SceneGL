@@ -19,14 +19,14 @@ using namespace Ngine;
 #include "renderer/context_manager.hpp"
 #include "renderer/components.hpp"
 #include "renderer/graphics.hpp"
-#include "renderer/input.hpp"
+#include "input/input.hpp"
 
 #include "la_extended.h"
 using namespace LA;
 
 #include "renderer/editor_camera.hpp"
 
-class Application {
+class Editor {
     private:
         // OpenGL properties
         OpenGLConfig gl_cfg;
@@ -34,11 +34,9 @@ class Application {
         // SDL
         ContextManager contextManager  = ContextManager();
         bool isQuit = false;
-        int _width = WINDOW_WIDTH;
-        int _height = WINDOW_HEIGHT;
 
         // Engines
-        GraphicsEngine Graphics = GraphicsEngine(_width, _height);
+        GraphicsEngine Graphics = GraphicsEngine(gl_cfg.width, gl_cfg.height);
 
         // Application state
         bool show_editor_window = true;
@@ -68,10 +66,8 @@ class Application {
 
     public:
 
-        Application() :
-        _width(WINDOW_WIDTH),
-        _height(WINDOW_HEIGHT) {
-            
+        Editor() {
+            // SDL
             contextManager.Initialise(gl_cfg);
             contextManager.AddEventHandler([this](SDL_Event& event) { EventHandler(event); });
             

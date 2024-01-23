@@ -13,6 +13,11 @@
 
 #define NUM_MOUSE_BUTTONS 8
 
+//// TODO:
+// Remove SDL dependancy, need to create intermediate layer
+// Add joystick support
+// Potentiall seperate mouse, keyboard and joystick into seperate managers
+
 class Input {
 private:
 // initialize static variables

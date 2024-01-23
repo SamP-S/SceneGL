@@ -26,6 +26,8 @@ using namespace LA;
 
 #include "renderer/editor_camera.hpp"
 
+#include "gui/im_entity.hpp"
+
 class Editor {
     private:
         // OpenGL properties
@@ -65,7 +67,6 @@ class Editor {
         };
 
     public:
-
         Editor() {
             // SDL
             contextManager.Initialise(gl_cfg);
@@ -78,11 +79,7 @@ class Editor {
             while (!isQuit)
             {
                 contextManager.HandleEvents();
-
-                // Start the Dear ImGui frame
-                ImGui_ImplOpenGL3_NewFrame();
-                ImGui_ImplSDL2_NewFrame();
-                ImGui::NewFrame();
+                NewFrame();
 
                 ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
                 const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -97,6 +94,7 @@ class Editor {
                 window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+                
                 ImGui::Begin("CoreWindow", NULL, window_flags);
                 window_pos = ImGui::GetWindowPos();
                 ImGui::PopStyleVar(3);
@@ -116,7 +114,7 @@ class Editor {
                 if (show_world_window) 
                     WorldWindow();
                 if (show_properties_window) 
-                    PropertiesWindow();
+                    ImEntity::EntityWindow(entitySelected, &show_properties_window);
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -203,6 +201,13 @@ class Editor {
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplSDL2_Shutdown();
             ImGui::DestroyContext();
+        }
+
+        void NewFrame() {
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplSDL2_NewFrame();
+            ImGui::NewFrame();
         }
 
         ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
@@ -347,218 +352,6 @@ class Editor {
                 std::vector<Entity> entities = Graphics.scene->GetEntities();
                 for (auto e : entities) {
                     WorldNode(e);
-                }
-            }
-            ImGui::End();
-        }
-
-        void CorePanel(Entity e) {
-            if (!e.HasComponent<CoreComponent>()) {
-                std::cout << "ERROR (App): Missing core component." << std::endl;
-                return;
-            }
-            ImGui::PushID(componentPanelCount);
-            CoreComponent& cc = e.GetComponent<CoreComponent>();
-            // entity name
-            ImGui::Text("Name:");
-            ImGui::SameLine();
-            char buffer[256];
-            std::strncpy(buffer, cc.name.c_str(), sizeof(buffer));
-            buffer[sizeof(buffer) - 1] = 0; // Ensure null termination
-            if (ImGui::InputText("##NameEntity", buffer, sizeof(buffer))) {
-                cc.name = std::string(buffer);
-            }
-            ImGui::Checkbox("Active", &cc.active);
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-
-        void TransformPanel(Entity e) {
-            if (!e.HasComponent<TransformComponent>()) {
-                CoreComponent& cc = e.GetComponent<CoreComponent>();
-                std::cout << "ERROR (App): Missing transform component on " << cc.name << std::endl;
-                return;
-            }
-            ImGui::PushID(componentPanelCount);
-            TransformComponent& t = e.GetComponent<TransformComponent>();
-            ImGui::Text("Transform:");
-            // position
-            ImGui::Text("Pos");
-            ImGui::SameLine();
-            ImGui::InputFloat3("##PosInput", t.position.m);
-            // rotation
-            ImGui::Text("Rot");
-            ImGui::SameLine();
-            ImGui::InputFloat3("##RotInput", t.rotation.m);
-            // scale
-            ImGui::Text("Scl");
-            ImGui::SameLine();
-            ImGui::InputFloat3("##SclInput", t.scale.m);
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-
-        void MeshRendererPanel(Entity e) {
-            if (!e.HasComponent<MeshRendererComponent>())
-                return;
-            MeshRendererComponent& mrc = e.GetComponent<MeshRendererComponent>();
-
-            ImGui::PushID(componentPanelCount);
-            ImGui::Separator();
-            ImGui::Text("Mesh Renderer");
-            ImGui::SameLine();
-            if (ImGui::Button("X")) {
-                e.RemoveComponent<MeshRendererComponent>();
-            }
-
-            if (ImGui::BeginCombo("Select Mesh", ((mrc.mesh == nullptr) ? "None": mrc.mesh->name.c_str()))) {
-                if (ImGui::Selectable("None")) {
-                    mrc.mesh = nullptr;
-                }
-                for (auto it = assetManager.begin<OpenGLMesh>(); it != assetManager.end<OpenGLMesh>(); ++it) {
-                    std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(*it);
-                    if (ImGui::Selectable(mesh->name.c_str())) {
-                        mrc.mesh = mesh;
-                    }
-                }
-                ImGui::EndCombo();
-            }
-
-            if (ImGui::BeginCombo("Select Material", ((mrc.material == nullptr) ? "None": mrc.material->name.c_str()))) {
-                if (ImGui::Selectable("None")) {
-                    mrc.material = nullptr;
-                } 
-                for (auto it = assetManager.begin<OpenGLMaterial>(); it != assetManager.end<OpenGLMaterial>(); ++it) {
-                    std::shared_ptr<Material> material = std::dynamic_pointer_cast<Material>(*it);
-                    if (ImGui::Selectable(material->name.c_str())) {
-                        mrc.material = material;
-                    }
-                }
-                ImGui::EndCombo();
-            }
-
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-
-        void CameraPanel(Entity e) {
-            if (!e.HasComponent<CameraComponent>())
-                return;
-            CameraComponent& cc = e.GetComponent<CameraComponent>();
-
-            ImGui::PushID(componentPanelCount);
-            ImGui::Separator();
-            ImGui::Text("Camera");
-            ImGui::SameLine();
-            if (ImGui::Button("X")) {
-                e.RemoveComponent<CameraComponent>();
-            }
-            ImGui::SliderFloat("FOV", &cc.fov, 45.0f, 90.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-        
-        void DirectionalLightWindow(Entity e) {
-            if (!e.HasComponent<DirectionalLightComponent>())
-                return;
-            DirectionalLightComponent& dlc = e.GetComponent<DirectionalLightComponent>();
-
-            ImGui::PushID(componentPanelCount);
-            ImGui::Separator();
-            ImGui::Text("Directional Light");
-            ImGui::SameLine();
-            if (ImGui::Button("X")) {
-                e.RemoveComponent<DirectionalLightComponent>();
-            }
-            ImGui::InputFloat3("Colour", dlc.colour.m);
-            ImGui::SliderFloat("Intensity", &dlc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-
-        void PointLightWindow(Entity e) {
-            if (!e.HasComponent<PointLightComponent>())
-                return;
-            PointLightComponent& plc = e.GetComponent<PointLightComponent>();
-
-            ImGui::PushID(componentPanelCount);
-            ImGui::Separator();
-            ImGui::Text("Point Light");
-            ImGui::SameLine();
-            if (ImGui::Button("X")) {
-                e.RemoveComponent<PointLightComponent>();
-            }
-            ImGui::InputFloat3("Colour", plc.colour.m);
-            ImGui::SliderFloat("Intensity", &plc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-            ImGui::SliderFloat("Range", &plc.range, 0.01f, 20.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-
-        void SpotLightWindow(Entity e) {
-            if (!e.HasComponent<SpotLightComponent>())
-                return;
-            SpotLightComponent& slc = e.GetComponent<SpotLightComponent>();
-
-            ImGui::PushID(componentPanelCount);
-            ImGui::Separator();
-            ImGui::Text("Spot Light");
-            ImGui::SameLine();
-            if (ImGui::Button("X")) {
-                e.RemoveComponent<SpotLightComponent>();
-            }
-            ImGui::InputFloat3("Colour", slc.colour.m);
-            ImGui::SliderFloat("Intensity", &slc.intensity, 0.0f, 5.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-            ImGui::SliderFloat("Cut Off", &slc.cutOff, 5.0f, 15.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-            ImGui::SliderFloat("Outer Cut Off", &slc.outerCutOff, 5.0f, 90.0f, "%.2f", ImGuiSliderFlags_NoRoundToFormat);
-
-            ImGui::PopID();
-            componentPanelCount++;
-        }
-
-        void PropertiesWindow() {
-            ImGuiWindowFlags worldWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("Entity Properties", &show_world_window, worldWindowFlags);
-            if (!entitySelected) {
-                ImGui::Text("Nothing selected");
-            } else {
-                Entity ent = entitySelected;
-                // components display
-                componentPanelCount = 0;
-                if (ImGui::Button("Delete Entity")) {
-                    Graphics.scene->DestroyEntity(ent);
-                    entitySelected = Entity();
-                } else {
-                    // name/enable
-                    CorePanel(ent);
-                    // transform display
-                    TransformPanel(ent);
-                    // non-singlton components
-                    MeshRendererPanel(ent);
-                    CameraPanel(ent);
-                    DirectionalLightWindow(ent);
-                    PointLightWindow(ent);
-                    SpotLightWindow(ent);
-                    
-                    // add component button/drop-down
-                    if (ImGui::Button("Add Component")) {
-                        ImGui::OpenPopup("Add Component");
-                    }
-                    if (ImGui::BeginPopup("Add Component")) {
-                        if (ImGui::MenuItem("Camera")) {
-                            ent.AddComponent<CameraComponent>();
-                        } else if (ImGui::MenuItem("Directional Light")) {
-                            ent.AddComponent<DirectionalLightComponent>();
-                        } else if (ImGui::MenuItem("Point Light")) {
-                            ent.AddComponent<PointLightComponent>();
-                        } else if (ImGui::MenuItem("Spot Light")) {
-                            ent.AddComponent<SpotLightComponent>();
-                        } else if (ImGui::MenuItem("Mesh Renderer")) {
-                            ent.AddComponent<MeshRendererComponent>();
-                        }
-                        ImGui::EndPopup();
-                    }
                 }
             }
             ImGui::End();

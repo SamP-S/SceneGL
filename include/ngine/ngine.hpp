@@ -159,6 +159,13 @@ namespace Ngine {
                 assert(HasComponent<T>() && "We don't have a component of this type to remove.");
                 _scene->_registry.remove<T>(_entityHandle);
             }
+           
+            void Destroy() {
+                assert((_scene == nullptr) && "Cannot destroy entity with no scene bound.");
+                _scene->DestroyEntity(*this);
+                _entityHandle = entt::null;
+                _scene = nullptr;
+            }
 
     };
 

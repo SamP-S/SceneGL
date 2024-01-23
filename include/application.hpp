@@ -16,6 +16,7 @@
 #include "ngine/ngine.hpp"
 using namespace Ngine;
 
+#include "renderer/context_manager.hpp"
 #include "renderer/components.hpp"
 #include "renderer/graphics.hpp"
 #include "renderer/input.hpp"
@@ -25,20 +26,13 @@ using namespace LA;
 
 #include "renderer/editor_camera.hpp"
 
-struct OpenGLConfig {
-    int major = 4;
-    int minor = 6;
-    const char* glsl = "#version 460 core";
-};
-
 class Application {
     private:
         // OpenGL properties
         OpenGLConfig gl_cfg;
 
         // SDL
-        SDL_GLContext gl_context;
-        SDL_Window* window;
+        ContextManager contextManager  = ContextManager();
         bool isQuit = false;
         int _width = WINDOW_WIDTH;
         int _height = WINDOW_HEIGHT;
@@ -78,14 +72,16 @@ class Application {
         _width(WINDOW_WIDTH),
         _height(WINDOW_HEIGHT) {
             
-            Initialise_SDL2(_width, _height);
+            contextManager.Initialise(gl_cfg);
+            contextManager.AddEventHandler([this](SDL_Event& event) { EventHandler(event); });
+            
             Initialise();
             Graphics.Initialise();
 
             // Main loop
             while (!isQuit)
             {
-                HandleEvents();
+                contextManager.HandleEvents();
 
                 // Start the Dear ImGui frame
                 ImGui_ImplOpenGL3_NewFrame();
@@ -133,47 +129,58 @@ class Application {
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
                 if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-                    SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
-                    SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+                    contextManager.BackupContext();
                     ImGui::UpdatePlatformWindows();
                     ImGui::RenderPlatformWindowsDefault();
-                    SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+                    contextManager.RestoreContext();
                 }
-
-                SDL_GL_SwapWindow(window);
+                contextManager.SwapFrame();
             }
             Shutdown();
-            Destroy_SDL2();
+            contextManager.Destroy();
+            // Destroy_SDL2();
         }
 
-        void Initialise_SDL2(int w, int h) {
-            // Initialise SDL subsystems
-            SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
-
-            // GL 4.6 + GLSL 460
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_cfg.major) != 0)
-                gl_cfg.major = 0;
-            if (SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_cfg.minor) != 0)
-                gl_cfg.minor = 0;
-
-            // Create window with graphics context
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-            SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-            SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-            window = SDL_CreateWindow("SceneGL + ImGUI + OpenGL4", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, window_flags);
-            gl_context = SDL_GL_CreateContext(window);
-            SDL_GL_MakeCurrent(window, gl_context);
-            SDL_GL_SetSwapInterval(1); // Enable vsync
-            SDL_SetWindowMinimumSize(window, WINDOW_WIDTH, WINDOW_HEIGHT);
-        }
-
-        void Destroy_SDL2() {
-            SDL_GL_DeleteContext(gl_context);
-            SDL_DestroyWindow(window);
-            SDL_Quit();
+        void EventHandler(SDL_Event& event) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_QUIT) {
+                isQuit = true;
+            }
+                        
+            if (renderer_focused) {
+                switch (event.type) {
+                    case SDL_KEYUP:
+                        Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
+                        break;
+                    case SDL_KEYDOWN:
+                        Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
+                        break;
+                    case SDL_MOUSEMOTION:
+                        {
+                            // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
+                            // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
+                            if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
+                                && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
+                                int x = event.motion.x - render_region_min.x;
+                                int y = event.motion.y - render_region_min.y;
+                                x = ((x >= 0) ? x : 0);
+                                y = ((y >= 0) ? y : 0);
+                                x = ((x <= render_region_max.x) ? x : render_region_max.x);
+                                y = ((y <= render_region_max.y) ? y : render_region_max.y);
+                                Input::MouseMoved(x, y);
+                            }
+                        }
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
+                        break;
+                    case SDL_MOUSEBUTTONUP:
+                        Input::MouseButtonEvent(event.button.button, BUTTON_UP);
+                        break;
+                }
+            } else {
+                Input::ClearStates();
+            }
         }
         
         void Initialise() {
@@ -191,7 +198,7 @@ class Application {
             // ImGui::StyleColorsClassic();
 
             // Setup Platform/Renderer backends
-            ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+            ImGui_ImplSDL2_InitForOpenGL(contextManager.window, contextManager.gl_context);
             ImGui_ImplOpenGL3_Init(gl_cfg.glsl);
         }
 
@@ -200,57 +207,6 @@ class Application {
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplSDL2_Shutdown();
             ImGui::DestroyContext();
-        }
-
-        // Poll and handle events (inputs, window resize, etc.)
-        // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-        // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-        // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-        // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-        void HandleEvents() {
-           SDL_Event event;
-            // SDL_PollEvent returns 1 while there is an event in the queue
-            while (SDL_PollEvent(&event)) {
-                ImGui_ImplSDL2_ProcessEvent(&event);
-                if (event.type == SDL_QUIT) {
-                    isQuit = true;
-                }
-                            
-                if (renderer_focused) {
-                    switch (event.type) {
-                        case SDL_KEYUP:
-                            Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
-                            break;
-                        case SDL_KEYDOWN:
-                            Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
-                            break;
-                        case SDL_MOUSEMOTION:
-                            {
-                                // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
-                                // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
-                                if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
-                                    && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
-                                    int x = event.motion.x - render_region_min.x;
-                                    int y = event.motion.y - render_region_min.y;
-                                    x = ((x >= 0) ? x : 0);
-                                    y = ((y >= 0) ? y : 0);
-                                    x = ((x <= render_region_max.x) ? x : render_region_max.x);
-                                    y = ((y <= render_region_max.y) ? y : render_region_max.y);
-                                    Input::MouseMoved(x, y);
-                                }
-                            }
-                            break;
-                        case SDL_MOUSEBUTTONDOWN:
-                            Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
-                            break;
-                        case SDL_MOUSEBUTTONUP:
-                            Input::MouseButtonEvent(event.button.button, BUTTON_UP);
-                            break;
-                    }
-                } else {
-                    Input::ClearStates();
-                }
-            }
         }
 
         ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {

@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 find_package(Git REQUIRED)
 if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${GIT_EXECUTABLE}
-        submodule update --recursive
+        submodule update --init --recursive
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endif()
 

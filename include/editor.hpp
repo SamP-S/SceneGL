@@ -28,6 +28,7 @@ using namespace LA;
 
 #include "gui/im_entity.hpp"
 #include "gui/im_scene.hpp"
+#include "gui/im_statistics.hpp"
 
 class Editor {
     private:
@@ -110,11 +111,11 @@ class Editor {
                 if (show_render_window)
                     RenderWindow();
                 if (show_stats_window) 
-                    StatisticsWindow();
+                    ImStatistics::StastisticsWindow(&show_stats_window, Graphics.tickTimer);
                 if (show_scene_window) 
-                    ImScene::SceneWindow(Graphics.scene, entitySelected, &show_scene_window);
+                    ImScene::SceneWindow(&show_scene_window, Graphics.scene, entitySelected);
                 if (show_entity_window) 
-                    ImEntity::EntityWindow(entitySelected, &show_entity_window);
+                    ImEntity::EntityWindow(&show_entity_window, entitySelected);
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -319,16 +320,10 @@ class Editor {
             float wWidth = render_region_max.x - render_region_min.x;
             float wHeight = render_region_max.y - render_region_min.y;
             ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
-            Graphics.Render();
-            ImGui::Image((ImTextureID)Graphics.frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
-            // ImGui::GetForegroundDrawList()->AddRect(render_region_min + pos, render_region_max + pos, IM_COL32(255, 255, 0, 255));
-            ImGui::End();
-        }
 
-        void StatisticsWindow() {
-            ImGuiWindowFlags statsWindowFlags = ImGuiWindowFlags_None;
-            ImGui::Begin("Statistics Monitor", &show_stats_window, statsWindowFlags);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            Graphics.Render();
+
+            ImGui::Image((ImTextureID)Graphics.frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
             ImGui::End();
         }
 

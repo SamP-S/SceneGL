@@ -1,17 +1,18 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 
-class frame_timer {
+class TickTimer {
     private:
         std::chrono::time_point<std::chrono::system_clock> _startTime;
         std::chrono::time_point<std::chrono::system_clock> _endTime;
         std::chrono::time_point<std::chrono::system_clock> _lastFrameTime;
-        int _frameCount = 0;
+        uint32_t _tickCount = 0;
         bool _running = true;
 
     public: 
-        frame_timer() {
+        TickTimer() {
             Start();
         }
 
@@ -26,18 +27,18 @@ class frame_timer {
             _running = false;
         }
         
-        void Frame() {
-            _frameCount += 1;
+        void Tick() {
+            _tickCount += 1;
             if (_running) {
                 _lastFrameTime = std::chrono::system_clock::now();
             }
         }
 
-        int GetFrameCount() {
-            return _frameCount;
+        int GetTickCount() {
+            return _tickCount;
         }
 
-        double GetFrameElapsed(bool isMilli = false) {
+        double GetTickElapsed(bool isMilli = false) {
             std::chrono::time_point<std::chrono::system_clock> endTime;
             if(_running) {
                 endTime = std::chrono::system_clock::now();

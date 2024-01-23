@@ -22,7 +22,7 @@ public:
         }   
     }
     
-    static void SceneWindow(std::shared_ptr<Scene> scene, Entity& selected, bool* isOpen) {
+    static void SceneWindow(bool* isOpen, std::shared_ptr<Scene> scene, Entity& selected) {
         ImGui::Begin("World Tree", isOpen, _windowFlags);
         if (scene != nullptr) {
             std::vector<Entity> entities = scene->GetEntities();

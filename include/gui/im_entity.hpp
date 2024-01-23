@@ -40,7 +40,7 @@ public:
         ImGui::PopID();
     }
 
-    static void EntityWindow(Entity& e, bool* isOpen) {
+    static void EntityWindow(bool* isOpen, Entity& e) {
         ImGui::Begin("Entity Properties", isOpen, _windowFlags);
         if (!e) {
             ImGui::Text("Nothing selected");

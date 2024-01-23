@@ -18,7 +18,7 @@
 
 #include "la_extended.h"
 
-#include "core/frame_timer.hpp"
+#include "core/tick_timer.hpp"
 
 #include "platform/opengl/opengl.hpp"
 #include "platform/opengl/opengl_shader.hpp"
@@ -36,7 +36,7 @@ class GraphicsEngine {
         int _width, _height;
 
     public:
-        frame_timer ft = frame_timer();
+        TickTimer tickTimer = TickTimer();
         EditorCamera editorCamera = EditorCamera();
         std::shared_ptr<Scene> scene = std::make_shared<Scene>();
         Ngine::AssetManager& assetManager = Ngine::AssetManager::Instance();
@@ -202,7 +202,7 @@ class GraphicsEngine {
             }
 
             frameBuffer->Unbind();
-            ft.Frame();
+            tickTimer.Tick();
         }
 
     private:
@@ -220,9 +220,9 @@ class GraphicsEngine {
             shader->SetMat4("uProjection", editorCamera.GetProjection());
             // fragment uniforms
             shader->SetVec3("uResolution", _width, _height, 1.0f);
-            shader->SetFloat("uTime", ft.GetTotalElapsed());
-            shader->SetFloat("uTimeDelta", ft.GetFrameElapsed());
-            shader->SetInt("uFrame", ft.GetFrameCount());
+            shader->SetFloat("uTime", tickTimer.GetTotalElapsed());
+            shader->SetFloat("uTimeDelta", tickTimer.GetTickElapsed());
+            shader->SetInt("uFrame", tickTimer.GetTickCount());
             shader->SetVec3("uCameraPosition", editorCamera.transform.position); 
 
             ShaderDirectionalLights(shader);

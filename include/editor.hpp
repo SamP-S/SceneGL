@@ -63,14 +63,6 @@ class Editor {
 
         AssetManager&  assetManager = AssetManager::Instance();
 
-        std::map<char*, float> arMap = {
-            {"None", 0.0f},
-            {"16:9", 16.0f / 9.0f},
-            {"5:4", 5.0f / 4.0f},
-            {"4:3", 4.0f / 3.0f},
-            {"1:1", 1.0f}
-        };
-
     public:
         Editor() {
             // SDL
@@ -190,7 +182,7 @@ class Editor {
             ImGui::CreateContext();
             ImGuiIO& io = ImGui::GetIO();
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-            io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+            // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;  // allow windows to leave base context
             io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
             //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -292,14 +284,6 @@ class Editor {
                         ImGui::StyleColorsLight();
                     else if (ImGui::MenuItem("Dark Mode"))
                         ImGui::StyleColorsDark();
-                    ImGui::EndMenu();
-                }
-                if (ImGui::BeginMenu("Aspect Ratio")) {
-                    for (auto const& ar : arMap) {
-                        if (ImGui::MenuItem(ar.first)) {
-                            aspectRatio = ar.second;
-                        }
-                    }
                     ImGui::EndMenu();
                 }
                 ImGui::EndMenuBar();

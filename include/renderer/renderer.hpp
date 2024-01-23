@@ -1,3 +1,6 @@
+#pragma once
+
+// OPENGL SHOULD BE MOVED TO PLATFORM
 #define GL_VERSION_4_4
 #include <GL/glew.h>
 #include <SDL_opengl.h>
@@ -27,28 +30,35 @@
 #include "platform/opengl/opengl_mesh.hpp"
 
 #include "renderer/editor_camera.hpp"
-
 #include "renderer/model_loader.hpp"
 #include "renderer/shader_loader.hpp"
 
-class GraphicsEngine {
-    private:
-        int _width, _height;
+//// TODO:
+// Might need to pass scene in every frame
+// Detach debug tools from the renderer
 
+
+class Renderer {
     public:
-        TickTimer tickTimer = TickTimer();
-        EditorCamera editorCamera = EditorCamera();
-        std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+        // grab singleton references
         Ngine::AssetManager& assetManager = Ngine::AssetManager::Instance();
-        Ngine::AssetLoaderManager loaderManager = Ngine::AssetLoaderManager();
+        Ngine::AssetLoaderManager& loaderManager = Ngine::AssetLoaderManager::Instance();
+
+        // systems set externally but useful to have references
+        // add more scene validation before usage
+        std::shared_ptr<Scene> scene;
+
+        // debug only
+        std::shared_ptr<TickTimer> tickTimer;
+        std::shared_ptr<EditorCamera> editorCamera;
+
+        // should be moved to camera
         std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
 
-        GraphicsEngine(int width, int height) :
-        _width(width), _height(height) { }
-        ~GraphicsEngine() {}
+        Renderer() = default;
+        ~Renderer() = default;
 
         void Initialise() {
-            SetViewport(_width, _height);
             
             // Initialise GLEW
             // Must be done before any opengl call
@@ -56,7 +66,8 @@ class GraphicsEngine {
             glewExperimental = GL_TRUE;
             glewInit();
 
-            frameBuffer = assetManager.CreateAsset<OpenGLFrameBuffer>("FBO", _width, _height);
+            // frame buffer should be tied to camera
+            frameBuffer = assetManager.CreateAsset<OpenGLFrameBuffer>("FBO", editorCamera->width, editorCamera->height);
             frameBuffer->SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
 
             // add loaders to asset libary
@@ -97,43 +108,6 @@ class GraphicsEngine {
             );
             material->SetProperty("colour", vec4(1.0f));
             material->shader = lighting;
-
-            // load scene
-            LoadScene("scene/Preset.json");    
-
-            // setup editor camera
-            editorCamera.transform.position = LA::vec3{-8,5,8};
-            editorCamera.transform.rotation = LA::vec3({PI/2, PI, 0.0f});
-        }
-        
-        // function to reset our viewport after a window resize
-        void SetViewport(int width, int height) {
-            // protect against divide by 0 and no resoltuion
-            if (width == 0) {
-                std::cout << "WARNING (Graphics): Trying to set width 0" << std::endl;
-                width = 1;
-            }
-                
-            if (height == 0) {
-                std::cout << "WARNING (Graphics): Trying to set height 0" << std::endl;
-                height = 1;
-            }
-                
-            _width = width;
-            _height = height;
-            float ratio = width / height;
-        }
-
-        // Load Scene from JSON
-        void LoadScene(const std::string& filepath) {
-            JsonSerializer js = JsonSerializer(scene);
-            js.Deserialize(filepath);
-        }
-
-        // Save scene to JSON
-        void SaveScene(const std::string& filepath) {
-            JsonSerializer js = JsonSerializer(scene);
-            js.Serialize(filepath);
         }
 
         void RenderObject(Entity entity, mat4 root_trans = mat4(), bool wireframe=false) {
@@ -149,11 +123,11 @@ class GraphicsEngine {
             std::shared_ptr<Mesh> mesh = mrc.mesh;
             std::shared_ptr<Material> material = mrc.material;
             if (mesh == nullptr) {
-                // std::cout << "WARNING (Graphics): Attempting to draw null mesh." << std::endl;
+                // std::cout << "WARNING (Renderer): Attempting to draw null mesh." << std::endl;
                 return;
             }
             if (material == nullptr) {
-                // std::cout << "WARNING (Graphics): Attempting to draw null material." << std::endl;
+                // std::cout << "WARNING (Renderer): Attempting to draw null material." << std::endl;
                 return;
             }
 
@@ -164,7 +138,7 @@ class GraphicsEngine {
                 shader = material->shader;
             }
             if (!material->IsUsable()) {
-                // std::cout << "WARNING (Graphics): Attempting to draw mesh with null shader." << std::endl;
+                // std::cout << "WARNING (Renderer): Attempting to draw mesh with null shader." << std::endl;
                 return;
             }
             
@@ -181,7 +155,7 @@ class GraphicsEngine {
         void Render(bool wireframe=false) {
             frameBuffer->Bind();
             frameBuffer->Clear();
-            editorCamera.Update();
+
             SetupShaders();
 
             std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
@@ -202,7 +176,6 @@ class GraphicsEngine {
             }
 
             frameBuffer->Unbind();
-            tickTimer.Tick();
         }
 
     private:
@@ -216,14 +189,14 @@ class GraphicsEngine {
         void SetupShader(std::shared_ptr<Shader> shader) {
             shader->Bind();
             // vertex uniforms
-            shader->SetMat4("uView", inverse(editorCamera.transform.GetTransform()));
-            shader->SetMat4("uProjection", editorCamera.GetProjection());
+            shader->SetMat4("uView", inverse(editorCamera->transform.GetTransform()));
+            shader->SetMat4("uProjection", editorCamera->GetProjection());
             // fragment uniforms
-            shader->SetVec3("uResolution", _width, _height, 1.0f);
-            shader->SetFloat("uTime", tickTimer.GetTotalElapsed());
-            shader->SetFloat("uTimeDelta", tickTimer.GetTickElapsed());
-            shader->SetInt("uFrame", tickTimer.GetTickCount());
-            shader->SetVec3("uCameraPosition", editorCamera.transform.position); 
+            shader->SetVec3("uResolution", editorCamera->width, editorCamera->height, 1.0f);
+            shader->SetFloat("uTime", tickTimer->GetTotalElapsed());
+            shader->SetFloat("uTimeDelta", tickTimer->GetTickElapsed());
+            shader->SetInt("uFrame", tickTimer->GetTickCount());
+            shader->SetVec3("uCameraPosition", editorCamera->transform.position); 
 
             ShaderDirectionalLights(shader);
             ShaderPointLights(shader);
@@ -235,7 +208,7 @@ class GraphicsEngine {
             
             // directional lights
             if (entities.size() >= DIRECTIONAL_LIGHT_MAX) {
-                std::cout << "WARNING (Graphics): Too many directional lights, only first 4 will be used" << std::endl;
+                std::cout << "WARNING (Renderer): Too many directional lights, only first 4 will be used" << std::endl;
             }
             for (int i = 0; i < DIRECTIONAL_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
@@ -257,7 +230,7 @@ class GraphicsEngine {
 
             // point lights
             if (entities.size() >= POINT_LIGHT_MAX) {
-                std::cout << "WARNING (Graphics): Too many point lights, only first 16 will be used" << std::endl;
+                std::cout << "WARNING (Renderer): Too many point lights, only first 16 will be used" << std::endl;
             }
             for (int i = 0; i < POINT_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";
@@ -279,7 +252,7 @@ class GraphicsEngine {
 
             // point lights
             if (entities.size() >= POINT_LIGHT_MAX) {
-                std::cout << "WARNING (Graphics): Too many spot lights, only first 4 will be used" << std::endl;
+                std::cout << "WARNING (Renderer): Too many spot lights, only first 4 will be used" << std::endl;
             }
             for (int i = 0; i < POINT_LIGHT_MAX; i++) {
                 std::string index = "[" + std::to_string(i) + "]";

@@ -16,9 +16,11 @@
 #include "ngine/ngine.hpp"
 using namespace Ngine;
 
+#include "runtime/runtime_controller.hpp"
+
 #include "renderer/context_manager.hpp"
 #include "renderer/components.hpp"
-#include "renderer/graphics.hpp"
+#include "renderer/renderer.hpp"
 #include "input/input.hpp"
 
 #include "la_extended.h"
@@ -39,8 +41,8 @@ class Editor {
         ContextManager contextManager  = ContextManager();
         bool isQuit = false;
 
-        // Engines
-        GraphicsEngine Graphics = GraphicsEngine(gl_cfg.width, gl_cfg.height);
+        // Runtime Controller
+        RuntimeController runtimeController = RuntimeController();
 
         // Application state
         bool show_render_window = true;
@@ -74,7 +76,7 @@ class Editor {
             contextManager.AddEventHandler([this](SDL_Event& event) { EventHandler(event); });
             
             Initialise();
-            Graphics.Initialise();
+            runtimeController.Initialise();
 
             // Main loop
             while (!isQuit)
@@ -111,9 +113,9 @@ class Editor {
                 if (show_render_window)
                     RenderWindow();
                 if (show_stats_window) 
-                    ImStatistics::StastisticsWindow(&show_stats_window, Graphics.tickTimer);
+                    ImStatistics::StastisticsWindow(&show_stats_window, runtimeController.tickTimer);
                 if (show_scene_window) 
-                    ImScene::SceneWindow(&show_scene_window, Graphics.scene, entitySelected);
+                    ImScene::SceneWindow(&show_scene_window, runtimeController.scene, entitySelected);
                 if (show_entity_window) 
                     ImEntity::EntityWindow(&show_entity_window, entitySelected);
                 if (show_demo_window) {
@@ -131,9 +133,9 @@ class Editor {
                 }
                 contextManager.SwapFrame();
             }
+            runtimeController.Shutdown();
             Shutdown();
             contextManager.Destroy();
-            // Destroy_SDL2();
         }
 
         void EventHandler(SDL_Event& event) {
@@ -227,14 +229,14 @@ class Editor {
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("New")) {
-                        Graphics.LoadScene("scene/Default.json");
+                        runtimeController.LoadScene("scene/Default.json");
                     }
                     if (ImGui::MenuItem("Open")) {
                         const char* filepath = tinyfd_openFileDialog("Open Scene", "./scene/Preset.json", 0, NULL, NULL, 0);
                         if (filepath == nullptr) {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {
-                            Graphics.LoadScene(filepath);
+                            runtimeController.LoadScene(filepath);
                         }
                         
                     }
@@ -243,7 +245,7 @@ class Editor {
                         if (filepath == nullptr) {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {
-                            Graphics.SaveScene(filepath);
+                            runtimeController.SaveScene(filepath);
                         }
                     }
                     ImGui::Separator();
@@ -254,22 +256,22 @@ class Editor {
                 }
                 if (ImGui::BeginMenu("Entity")) {
                     if (ImGui::MenuItem("New Empty")) {
-                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected = runtimeController.scene->CreateEntity();
                     } else if (ImGui::MenuItem("New Cube")) {
-                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected = runtimeController.scene->CreateEntity();
                         MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
                         mrc.mesh = assetManager.FindAsset<OpenGLMesh>("vertex_cube");
                     } else if (ImGui::MenuItem("New Camera")) {
-                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected = runtimeController.scene->CreateEntity();
                         entitySelected.AddComponent<CameraComponent>();
                     } else if (ImGui::MenuItem("New Directional Light")) {
-                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected = runtimeController.scene->CreateEntity();
                         entitySelected.AddComponent<DirectionalLightComponent>();
                     } else if (ImGui::MenuItem("New Point Light")) {
-                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected = runtimeController.scene->CreateEntity();
                         entitySelected.AddComponent<PointLightComponent>();
                     } else if (ImGui::MenuItem("New Spot Light")) {
-                        entitySelected = Graphics.scene->CreateEntity();
+                        entitySelected = runtimeController.scene->CreateEntity();
                         entitySelected.AddComponent<SpotLightComponent>();
                     }
                     ImGui::EndMenu();
@@ -321,9 +323,9 @@ class Editor {
             float wHeight = render_region_max.y - render_region_min.y;
             ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
 
-            Graphics.Render();
+            runtimeController.Tick();
 
-            ImGui::Image((ImTextureID)Graphics.frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((ImTextureID)runtimeController.renderer->frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
             ImGui::End();
         }
 

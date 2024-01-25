@@ -25,16 +25,16 @@ class ImEditorCamera : public IImWindow {
         {1.0f, "1:1"}
     };
 
-    static void PerspectivePanel(std::shared_ptr<EditorCamera> ec) {
+    void PerspectivePanel(std::shared_ptr<EditorCamera> ec) {
         ImGui::SliderFloat("Fov", &ec->fov, 45.f, 110.f);
     }
 
-    static void OrthographicPanel(std::shared_ptr<EditorCamera> ec) {
+    void OrthographicPanel(std::shared_ptr<EditorCamera> ec) {
         ImGui::SliderFloat("Ortho Width", &ec->orthoWidth, 1, 100);
         ImGui::SliderFloat("Ortho Height", &ec->orthoHeight, 1, 100);
     }
 
-    static void CameraPanel(std::shared_ptr<EditorCamera> ec) {
+    void CameraPanel(std::shared_ptr<EditorCamera> ec) {
         ImGui::Text("Camera");
         if (ImGui::BeginCombo("Aspect Ratio", _ARToLabel[ec->aspectRatio].c_str())) {
             for (auto const& ar : _labelToAR) {
@@ -78,7 +78,7 @@ class ImEditorCamera : public IImWindow {
         }
     }
 
-    static void GuizmoPanel(std::shared_ptr<EditorCamera> ec) {
+    void GuizmoPanel(std::shared_ptr<EditorCamera> ec) {
         ImGui::Text("Guizmo");
         // guizmo operation selecton
         if (ImGui::RadioButton("Translate", ec->guizmoOp == ImGuizmo::TRANSLATE))
@@ -101,7 +101,7 @@ class ImEditorCamera : public IImWindow {
             ec->guizmoCoord = ImGuizmo::WORLD;
     }
 
-    static void TransformPanel(std::shared_ptr<EditorCamera> ec) {
+    void TransformPanel(std::shared_ptr<EditorCamera> ec) {
         // camera transform
         ImGui::Text("Transform");
         ImGui::InputFloat3("Pos", ec->transform.position.m);
@@ -110,8 +110,8 @@ class ImEditorCamera : public IImWindow {
     }
 
 public:
-    static void EditorCameraWindow(bool* isOpen, std::shared_ptr<EditorCamera> editorCamera) {
-        ImGui::Begin("Editor Camera", isOpen, _windowFlags);
+    void EditorCameraWindow(std::shared_ptr<EditorCamera> editorCamera) {
+        ImGui::Begin("Editor Camera", &isOpen, _windowFlags);
         CameraPanel(editorCamera);
         ImGui::Separator();
         GuizmoPanel(editorCamera);

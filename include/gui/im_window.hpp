@@ -10,5 +10,7 @@
 class IImWindow {
     protected:
         static inline ImGuiWindowFlags _windowFlags = ImGuiWindowFlags_None;
-
+        
+    public:
+        bool isOpen = true;
 };

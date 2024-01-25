@@ -47,18 +47,25 @@ class Editor {
         RuntimeController runtimeController = RuntimeController();
 
         // Application state
-        bool show_viewport_window = true;
-        bool show_stats_window = true;
-        bool show_scene_window = true;
-        bool show_entity_window = true;
+        // bool show_viewport_window = true;
+        // bool show_stats_window = true;
+        // bool show_scene_window = true;
+        // bool show_entity_window = true;
+        // bool show_camera_window = true;
         bool show_demo_window = false;
-        bool show_camera_window = true;
-        bool renderer_focused = false;
+
         Entity entitySelected;
         int new_entity_count = 0;
         int componentPanelCount = 0;
 
         AssetManager&  assetManager = AssetManager::Instance();
+
+        // gui windows
+        ImViewport imViewport;
+        ImStatistics imStatistics;
+        ImScene imScene;
+        ImEntity imEntity;
+        ImEditorCamera imEditorCamera;
 
     public:
         Editor() {
@@ -102,16 +109,12 @@ class Editor {
 
                 runtimeController.Tick();
 
-                if (show_viewport_window)
-                    ImViewport::ViewportWindow(&show_viewport_window, renderer_focused, runtimeController.renderer->frameBuffer);
-                if (show_stats_window) 
-                    ImStatistics::StastisticsWindow(&show_stats_window, runtimeController.tickTimer);
-                if (show_scene_window) 
-                    ImScene::SceneWindow(&show_scene_window, runtimeController.scene, entitySelected);
-                if (show_entity_window) 
-                    ImEntity::EntityWindow(&show_entity_window, entitySelected);
-                if (show_camera_window)
-                    ImEditorCamera::EditorCameraWindow(&show_camera_window, runtimeController.editorCamera);
+                imViewport.ViewportWindow(runtimeController.renderer->frameBuffer);
+                imStatistics.StastisticsWindow(runtimeController.tickTimer);
+                imScene.SceneWindow(runtimeController.scene, entitySelected);
+                imEntity.EntityWindow(entitySelected);
+                imEditorCamera.EditorCameraWindow(runtimeController.editorCamera);
+
                 if (show_demo_window) {
                     ImGui::ShowDemoWindow();
                 }
@@ -138,7 +141,7 @@ class Editor {
                 isQuit = true;
             }
             
-            if (renderer_focused) {
+            if (imViewport.isFocuesed) {
                 switch (event.type) {
                     case SDL_KEYUP:
                         Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
@@ -147,20 +150,10 @@ class Editor {
                         Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
                         break;
                     case SDL_MOUSEMOTION:
-                        {
-                            // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
-                            // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
-                            
-                            // if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
-                            //     && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
-                            //     int x = event.motion.x - render_region_min.x;
-                            //     int y = event.motion.y - render_region_min.y;
-                            //     x = ((x >= 0) ? x : 0);
-                            //     y = ((y >= 0) ? y : 0);
-                            //     x = ((x <= render_region_max.x) ? x : render_region_max.x);
-                            //     y = ((y <= render_region_max.y) ? y : render_region_max.y);
-                            //     Input::MouseMoved(x, y);
-                            // }
+                        {  
+                            ImVec2 sdlCoords = ImVec2(event.motion.x, event.motion.y);
+                            ImVec2 viewportCoords = imViewport.GetWindowRelative(sdlCoords);
+                            Input::MouseMoved(viewportCoords.x, viewportCoords.y);
                         }
                         break;
                     case SDL_MOUSEBUTTONDOWN:
@@ -257,11 +250,11 @@ class Editor {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Window")) {
-                    ImGui::MenuItem("Render Display", NULL, &show_viewport_window);
-                    ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
-                    ImGui::MenuItem("Scene Tree", NULL, &show_scene_window);
-                    ImGui::MenuItem("Entity", NULL, &show_entity_window);
-                    ImGui::MenuItem("Editor Camera", NULL, &show_camera_window);
+                    ImGui::MenuItem("Render Display", NULL, &imViewport.isOpen);
+                    ImGui::MenuItem("Stats/Performance", NULL, &imStatistics.isOpen);
+                    ImGui::MenuItem("Scene Tree", NULL, &imScene.isOpen);
+                    ImGui::MenuItem("Entity", NULL, &imEntity.isOpen);
+                    ImGui::MenuItem("Editor Camera", NULL, &imEditorCamera.isOpen);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
                     ImGui::EndMenu();
                 }

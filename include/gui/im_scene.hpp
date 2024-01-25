@@ -10,7 +10,7 @@
 class ImScene : public IImWindow {
 public:
     // flattened until scene tree implemented
-    static void SceneNode(Entity& selected, Entity e) {
+    void SceneNode(Entity& selected, Entity e) {
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen;
         if (selected == e)
             node_flags |= ImGuiTreeNodeFlags_Selected;
@@ -23,8 +23,8 @@ public:
         }   
     }
     
-    static void SceneWindow(bool* isOpen, std::shared_ptr<Scene> scene, Entity& selected) {
-        ImGui::Begin("Scene Tree", isOpen, _windowFlags);
+    void SceneWindow(std::shared_ptr<Scene> scene, Entity& selected) {
+        ImGui::Begin("Scene Tree", &isOpen, _windowFlags);
         if (scene != nullptr) {
             std::vector<Entity> entities = scene->GetEntities();
             for (auto e : entities) {

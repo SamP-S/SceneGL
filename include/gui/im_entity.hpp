@@ -11,13 +11,13 @@
 // Implement type LUT to automatically try every panel
 // Automate isRequired and title from the component itself
 
-class ImEntity : IImWindow {
+class ImEntity : public IImWindow {
 private:
     static inline int _panelCount = 0;
 
 public:
     template<typename T>
-    static bool ComponentPanelBegin(Entity e, const std::string& title) {
+    bool ComponentPanelBegin(Entity e, const std::string& title) {
         if (!e.HasComponent<T>())
             return false;
 
@@ -36,12 +36,12 @@ public:
         return true;
     }
 
-    static void ComponentPanelEnd() {
+    void ComponentPanelEnd() {
         ImGui::PopID();
     }
 
-    static void EntityWindow(bool* isOpen, Entity& e) {
-        ImGui::Begin("Entity Properties", isOpen, _windowFlags);
+    void EntityWindow(Entity& e) {
+        ImGui::Begin("Entity Properties", &isOpen, _windowFlags);
         if (!e) {
             ImGui::Text("Nothing selected");
         } else {
@@ -65,7 +65,7 @@ public:
         ImGui::End();
     }
     
-    static void CorePanel(Entity& e) {
+    void CorePanel(Entity& e) {
         if (!ComponentPanelBegin<CoreComponent>(e, "Entity")) {
             std::cout << "ERROR (App): Missing core component." << std::endl;
             return;
@@ -87,7 +87,7 @@ public:
         ComponentPanelEnd();
     }
 
-    static void TransformPanel(Entity& e) {
+    void TransformPanel(Entity& e) {
         if (!ComponentPanelBegin<TransformComponent>(e, "Transform")) {
             std::cout << "ERROR (App): Missing transform component." << std::endl;
             return;
@@ -111,7 +111,7 @@ public:
     }
 
 
-    static void MeshRendererPanel(Entity& e) {
+    void MeshRendererPanel(Entity& e) {
         if (!ComponentPanelBegin<MeshRendererComponent>(e, "Mesh Renderer"))
             return;
 
@@ -147,7 +147,7 @@ public:
         ComponentPanelEnd();
     }
 
-    static void CameraPanel(Entity& e) {
+    void CameraPanel(Entity& e) {
         if (!ComponentPanelBegin<CameraComponent>(e, "Camera"))
             return;
         CameraComponent& cc = e.GetComponent<CameraComponent>();
@@ -155,7 +155,7 @@ public:
         ComponentPanelEnd();
     }
 
-    static void DirectionalLightWindow(Entity e) {
+    void DirectionalLightWindow(Entity e) {
         if (!ComponentPanelBegin<DirectionalLightComponent>(e, "Directional Light"))
             return;
         DirectionalLightComponent& dlc = e.GetComponent<DirectionalLightComponent>();
@@ -164,7 +164,7 @@ public:
         ComponentPanelEnd();
     }
 
-    static void PointLightWindow(Entity& e) {
+    void PointLightWindow(Entity& e) {
         if (!ComponentPanelBegin<PointLightComponent>(e, "Point Light"))
             return;
         PointLightComponent& plc = e.GetComponent<PointLightComponent>();
@@ -175,7 +175,7 @@ public:
         ComponentPanelEnd();
     }
 
-    static void SpotLightWindow(Entity& e) {
+    void SpotLightWindow(Entity& e) {
         if (!ComponentPanelBegin<SpotLightComponent>(e, "Spot Light"))
             return;
         SpotLightComponent& slc = e.GetComponent<SpotLightComponent>();

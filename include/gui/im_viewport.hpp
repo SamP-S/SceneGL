@@ -7,15 +7,16 @@
 // Generalise viewport to draw any texture, not necessarily a frame buffer
 // Should use aspect ratio of texture to ensure it is not stretched
 // Find a way to keep original resolution/downsample better
+// Replace imvec2 with LA::vec2?
 
 class ImViewport : public IImWindow {
 public:
-    static inline ImVec2 render_region_min = ImVec2();
-    static inline ImVec2 render_region_max = ImVec2();
-    static inline bool isFocuesed = false;
-    static inline float aspectRatio = 0.0f;
+    ImVec2 render_region_min = ImVec2();
+    ImVec2 render_region_max = ImVec2();
+    bool isFocuesed = false;
+    float aspectRatio = 0.0f;
 
-    static ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
+    ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
         float maxAspectRatio = maxSize.x / maxSize.y;
         ImVec2 wSize = maxSize;
         if (aspectRatio != 0) {
@@ -27,10 +28,23 @@ public:
         return wSize;
     }
 
+    ImVec2 GetWindowRelative(ImVec2 globalCoord, bool clamp=true) {
+        int x = globalCoord.x - render_region_min.x;
+        int y = globalCoord.y - render_region_min.y;
+        if (!clamp)
+            return ImVec2(x, y);
+        
+        // clamp to render region limits
+        x = ((x >= 0) ? x : 0);
+        y = ((y >= 0) ? y : 0);
+        x = ((x <= render_region_max.x) ? x : render_region_max.x);
+        y = ((y <= render_region_max.y) ? y : render_region_max.y);
+        return ImVec2(x, y);
+    }
 
-    static void ViewportWindow(bool* isOpen, bool& isFocuesed, std::shared_ptr<FrameBuffer> fb) {
+    void ViewportWindow(std::shared_ptr<FrameBuffer> fb) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-        ImGui::Begin("Render Window", isOpen, _windowFlags);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+        ImGui::Begin("Viewport Window", &isOpen, _windowFlags);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
         ImGui::PopStyleVar(1);
 
         isFocuesed = ImGui::IsWindowFocused();
@@ -42,8 +56,10 @@ public:
             ImVec2 parent_pos = ImGui::GetCurrentWindow()->ParentWindow->Pos;
             relativePos.x = globalPos.x - parent_pos.x;
             relativePos.y = globalPos.y - parent_pos.y;
+            std::cout << "global w/parent " << globalPos.x << ", " << globalPos.y << std::endl;
         } else {
             relativePos = globalPos;
+            std::cout << "global no parent " << globalPos.x << ", " << globalPos.y << std::endl;
         }
         render_region_min = ImGui::GetWindowContentRegionMin();
         render_region_min.x += relativePos.x;
@@ -51,6 +67,9 @@ public:
         render_region_max = ImGui::GetWindowContentRegionMax();
         render_region_max.x += relativePos.x;
         render_region_max.y += relativePos.y;
+
+        std::cout << "reg min " << render_region_min.x << ", " << render_region_min.y << std::endl;
+        std::cout << "reg max " << render_region_max.x << ", " << render_region_max.y << std::endl;
         
         // ImVec2 res = (ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin()) + ImGui::GetWindowPos() - window_pos;
         float wWidth = render_region_max.x - render_region_min.x;

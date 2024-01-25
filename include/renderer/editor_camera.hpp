@@ -4,6 +4,7 @@
 
 #include "renderer/components.hpp"
 #include "input/input.hpp"
+#include "ImGuizmo.h"
 
 #define MODE_STOP 0
 #define MOVE_LEFT 1
@@ -19,7 +20,7 @@ class EditorCamera {
         uint32_t width = 800;
         uint32_t height = 600;
         float near = 0.1f;
-        float far = 40.0f;
+        float far = 100.0f;
         bool isPerspective = true;
 
         // perspective properties
@@ -39,6 +40,9 @@ class EditorCamera {
         float speed = 5.0f;
         // transform
         TransformComponent transform = TransformComponent();
+        // debug
+        ImGuizmo::OPERATION guizmoOp = ImGuizmo::TRANSLATE;
+        ImGuizmo::MODE guizmoCoord = ImGuizmo::WORLD;
         
         EditorCamera() {}
         ~EditorCamera() {}

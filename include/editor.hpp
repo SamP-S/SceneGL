@@ -32,6 +32,7 @@ using namespace LA;
 #include "gui/im_scene.hpp"
 #include "gui/im_statistics.hpp"
 #include "gui/im_editor_camera.hpp"
+#include "gui/im_viewport.hpp"
 
 class Editor {
     private:
@@ -46,17 +47,13 @@ class Editor {
         RuntimeController runtimeController = RuntimeController();
 
         // Application state
-        bool show_render_window = true;
+        bool show_viewport_window = true;
         bool show_stats_window = true;
         bool show_scene_window = true;
         bool show_entity_window = true;
         bool show_demo_window = false;
         bool show_camera_window = true;
-        float aspectRatio = 0.0f;
         bool renderer_focused = false;
-        ImVec2 render_region_min = ImVec2();
-        ImVec2 render_region_max = ImVec2();
-        ImVec2 window_pos = ImVec2();
         Entity entitySelected;
         int new_entity_count = 0;
         int componentPanelCount = 0;
@@ -93,7 +90,6 @@ class Editor {
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
                 
                 ImGui::Begin("CoreWindow", NULL, window_flags);
-                window_pos = ImGui::GetWindowPos();
                 ImGui::PopStyleVar(3);
 
                 ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -104,8 +100,10 @@ class Editor {
                 MenuBar();
                 ImGui::End();
 
-                if (show_render_window)
-                    RenderWindow();
+                runtimeController.Tick();
+
+                if (show_viewport_window)
+                    ImViewport::ViewportWindow(&show_viewport_window, renderer_focused, runtimeController.renderer->frameBuffer);
                 if (show_stats_window) 
                     ImStatistics::StastisticsWindow(&show_stats_window, runtimeController.tickTimer);
                 if (show_scene_window) 
@@ -152,16 +150,17 @@ class Editor {
                         {
                             // std::cout << render_region_min.x << ":" << render_region_min.y << std::endl;
                             // std::cout << event.motion.x << "@" << event.motion.y << std::endl;
-                            if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
-                                && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
-                                int x = event.motion.x - render_region_min.x;
-                                int y = event.motion.y - render_region_min.y;
-                                x = ((x >= 0) ? x : 0);
-                                y = ((y >= 0) ? y : 0);
-                                x = ((x <= render_region_max.x) ? x : render_region_max.x);
-                                y = ((y <= render_region_max.y) ? y : render_region_max.y);
-                                Input::MouseMoved(x, y);
-                            }
+                            
+                            // if (event.motion.x >= render_region_min.x && event.motion.y >= render_region_min.y
+                            //     && event.motion.x <= render_region_max.x && event.motion.y <= render_region_max.y) {
+                            //     int x = event.motion.x - render_region_min.x;
+                            //     int y = event.motion.y - render_region_min.y;
+                            //     x = ((x >= 0) ? x : 0);
+                            //     y = ((y >= 0) ? y : 0);
+                            //     x = ((x <= render_region_max.x) ? x : render_region_max.x);
+                            //     y = ((y <= render_region_max.y) ? y : render_region_max.y);
+                            //     Input::MouseMoved(x, y);
+                            // }
                         }
                         break;
                     case SDL_MOUSEBUTTONDOWN:
@@ -205,17 +204,6 @@ class Editor {
             ImGui::NewFrame();
         }
 
-        ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
-            float maxAspectRatio = maxSize.x / maxSize.y;
-            ImVec2 wSize = maxSize;
-            if (aspectRatio != 0) {
-                if (aspectRatio >= maxAspectRatio)
-                    wSize.y = wSize.x / aspectRatio;
-                else if (aspectRatio < maxAspectRatio)
-                    wSize.x = wSize.y * aspectRatio;
-            }
-            return wSize;
-        }
 
         void MenuBar() {
             if (ImGui::BeginMenuBar()) {
@@ -269,7 +257,7 @@ class Editor {
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Window")) {
-                    ImGui::MenuItem("Render Display", NULL, &show_render_window);
+                    ImGui::MenuItem("Render Display", NULL, &show_viewport_window);
                     ImGui::MenuItem("Stats/Performance", NULL, &show_stats_window);
                     ImGui::MenuItem("Scene Tree", NULL, &show_scene_window);
                     ImGui::MenuItem("Entity", NULL, &show_entity_window);
@@ -288,39 +276,6 @@ class Editor {
                 }
                 ImGui::EndMenuBar();
             }
-        }
-
-        void RenderWindow() {
-            ImGuiWindowFlags renderWindowFlags = ImGuiWindowFlags_None;
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-            ImGui::Begin("Render Window", &show_render_window, renderWindowFlags);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::PopStyleVar(1);
-            renderer_focused = ImGui::IsWindowFocused();
-
-            // content size
-            ImVec2 pos = ImGui::GetWindowPos();
-            pos.x -= window_pos.x;
-            pos.y -= window_pos.y;
-            // std::cout << "wpos= " << window_pos.x << ":" << window_pos.y << std::endl;
-            // std::cout << "pos= " << pos.x << ":" << pos.y << std::endl;
-            render_region_min = ImGui::GetWindowContentRegionMin();
-            // std::cout << "min= " << render_region_min.x << ":" << render_region_min.y << std::endl;
-            render_region_min.x += pos.x;
-            render_region_min.y += pos.y;
-            // std::cout << "min+= " << render_region_min.x << ":" << render_region_min.y << std::endl;
-            render_region_max = ImGui::GetWindowContentRegionMax();
-            render_region_max.x += pos.x;
-            render_region_max.y += pos.y;
-            
-            // ImVec2 res = (ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin()) + ImGui::GetWindowPos() - window_pos;
-            float wWidth = render_region_max.x - render_region_min.x;
-            float wHeight = render_region_max.y - render_region_min.y;
-            ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
-
-            runtimeController.Tick();
-
-            ImGui::Image((ImTextureID)runtimeController.renderer->frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
-            ImGui::End();
         }
 
 };

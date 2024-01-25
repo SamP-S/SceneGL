@@ -78,14 +78,43 @@ class ImEditorCamera : public IImWindow {
         }
     }
 
+    static void GuizmoPanel(std::shared_ptr<EditorCamera> ec) {
+        ImGui::Text("Guizmo");
+        // guizmo operation selecton
+        if (ImGui::RadioButton("Translate", ec->guizmoOp == ImGuizmo::TRANSLATE))
+            ec->guizmoOp = ImGuizmo::TRANSLATE;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Rotate", ec->guizmoOp == ImGuizmo::ROTATE))
+            ec->guizmoOp = ImGuizmo::ROTATE;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Scale", ec->guizmoOp == ImGuizmo::SCALE))
+            ec->guizmoOp = ImGuizmo::SCALE;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Universal", ec->guizmoOp == ImGuizmo::UNIVERSAL))
+            ec->guizmoOp = ImGuizmo::UNIVERSAL;
+
+        // local or world coordinate spacing?
+        if (ImGui::RadioButton("Local", ec->guizmoCoord == ImGuizmo::LOCAL))
+            ec->guizmoCoord = ImGuizmo::LOCAL;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("World", ec->guizmoCoord == ImGuizmo::WORLD))
+            ec->guizmoCoord = ImGuizmo::WORLD;
+    }
+
     static void TransformPanel(std::shared_ptr<EditorCamera> ec) {
+        // camera transform
         ImGui::Text("Transform");
+        ImGui::InputFloat3("Pos", ec->transform.position.m);
+        ImGui::InputFloat3("Rot", ec->transform.rotation.m);
+        ImGui::InputFloat3("Scl", ec->transform.scale.m);
     }
 
 public:
     static void EditorCameraWindow(bool* isOpen, std::shared_ptr<EditorCamera> editorCamera) {
         ImGui::Begin("Editor Camera", isOpen, _windowFlags);
         CameraPanel(editorCamera);
+        ImGui::Separator();
+        GuizmoPanel(editorCamera);
         ImGui::Separator();
         TransformPanel(editorCamera);
         ImGui::End();

@@ -92,7 +92,8 @@ Goals:
     ### Serialization
     - [x] Serialize entities
     - [x] Serialize scene
-    - [ ] Serialize assets 
+    - [ ] Serialize assets
+    - [ ] Serialize project settings
 
     ### GUI
     - [x] Implement ImGui
@@ -100,6 +101,8 @@ Goals:
     - [ ] Create resource preview
     - [ ] Create asset manager
     - [ ] Create resource viewer(s)
+    Note: ImGui is immediate mode and simple to use because it doesn't require tons of state systems on the backend.
+    This means you should handle it, not that you should avoid having state with components/sub-components of the gui.
 
     ### Networking
     - [ ] Implement networking socket support

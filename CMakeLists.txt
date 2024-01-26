@@ -25,17 +25,28 @@ set(INCLUDE_DIRS
     "marathon/external/tinygltf/include"
 )
 
-file(GLOB_RECURSE SRC_FILES "marathon/src/**.cpp")
-message(STATUS "SRC_FILES: ${SRC_FILES}")
+# file(GLOB_RECURSE SRC_FILES "marathon/src/**.cpp")
+# message(STATUS "SRC_FILES: ${SRC_FILES}")
 
-add_executable(graphics ${SRC_FILES})
-target_include_directories(graphics PUBLIC ${INCLUDE_DIRS})
+# runtime
+add_executable(sprinter "sprinter/src/main.cpp")
+target_include_directories(sprinter PUBLIC ${INCLUDE_DIRS})
 
-target_link_libraries(graphics PUBLIC tinyfiledialogs)
-target_link_libraries(graphics PUBLIC imguizmo)
-target_link_libraries(graphics PUBLIC la)
-target_link_libraries(graphics PUBLIC ${CMAKE_DL_LIBS})
+target_link_libraries(sprinter PUBLIC tinyfiledialogs)
+target_link_libraries(sprinter PUBLIC imguizmo)
+target_link_libraries(sprinter PUBLIC la)
+target_link_libraries(sprinter PUBLIC ${CMAKE_DL_LIBS})
 
+# editor
+add_executable(spectator "spectator/src/main.cpp")
+target_include_directories(spectator PUBLIC ${INCLUDE_DIRS})
+
+target_link_libraries(spectator PUBLIC tinyfiledialogs)
+target_link_libraries(spectator PUBLIC imguizmo)
+target_link_libraries(spectator PUBLIC la)
+target_link_libraries(spectator PUBLIC ${CMAKE_DL_LIBS})
+
+# test scripts
 add_executable(ecs_test "test/ecs_test.cpp")
 target_include_directories(ecs_test PUBLIC ${INCLUDE_DIRS})
 target_link_libraries(ecs_test PUBLIC la)

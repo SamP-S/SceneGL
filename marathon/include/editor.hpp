@@ -202,20 +202,21 @@ class Editor {
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("New")) {
-                        runtimeController.LoadScene("scene/Default.json");
+                        runtimeController.LoadScene("marathon/assets/scenes/Default.json");
                         entitySelected = Entity();
                     }
                     if (ImGui::MenuItem("Open")) {
-                        const char* filepath = tinyfd_openFileDialog("Open Scene", "./scene/Preset.json", 0, NULL, NULL, 0);
+                        const char* filepath = tinyfd_openFileDialog("Open Scene", "marathon/assets/scenes/Preset.json", 0, NULL, NULL, 0);
                         if (filepath == nullptr) {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {
+                            entitySelected = Entity();
                             runtimeController.LoadScene(filepath);
                         }
                         
                     }
                     if (ImGui::MenuItem("Save As")) {
-                        const char* filepath = tinyfd_saveFileDialog("Save Scene", "./scene/Test.json", 0, NULL, NULL);
+                        const char* filepath = tinyfd_saveFileDialog("Save Scene", "marathon/assets/scenes/Test.json", 0, NULL, NULL);
                         if (filepath == nullptr) {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {

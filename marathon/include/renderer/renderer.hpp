@@ -75,20 +75,20 @@ class Renderer {
             loaderManager.AddLoader(new ShaderLoader());
 
             // load default model(s)
-            loaderManager.Load("models/presets/cone.gltf");
-            loaderManager.Load("models/presets/cube.gltf");
-            loaderManager.Load("models/presets/cylinder.gltf");
-            loaderManager.Load("models/presets/dome.gltf");
-            loaderManager.Load("models/presets/ico_sphere.gltf");
-            loaderManager.Load("models/presets/plane.gltf");
-            loaderManager.Load("models/presets/prism.gltf");
-            loaderManager.Load("models/presets/sphere.gltf");
+            loaderManager.Load("marathon/assets/models/presets/cone.gltf");
+            loaderManager.Load("marathon/assets/models/presets/cube.gltf");
+            loaderManager.Load("marathon/assets/models/presets/cylinder.gltf");
+            loaderManager.Load("marathon/assets/models/presets/dome.gltf");
+            loaderManager.Load("marathon/assets/models/presets/ico_sphere.gltf");
+            loaderManager.Load("marathon/assets/models/presets/plane.gltf");
+            loaderManager.Load("marathon/assets/models/presets/prism.gltf");
+            loaderManager.Load("marathon/assets/models/presets/sphere.gltf");
 
             // load default shader source(s)
-            loaderManager.Load("shaders/base.vert");
-            loaderManager.Load("shaders/base.frag");
-            loaderManager.Load("shaders/lighting.vert");
-            loaderManager.Load("shaders/lighting.frag");
+            loaderManager.Load("marathon/assets/shaders/base.vert");
+            loaderManager.Load("marathon/assets/shaders/base.frag");
+            loaderManager.Load("marathon/assets/shaders/lighting.vert");
+            loaderManager.Load("marathon/assets/shaders/lighting.frag");
 
             // load default shader(s)
             std::shared_ptr<Shader> base = assetManager.CreateAsset<OpenGLShader>(

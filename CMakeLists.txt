@@ -15,17 +15,17 @@ if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endif()
 
-add_subdirectory("dependencies/tinyfiledialogs")
-add_subdirectory("dependencies/imguizmo")
-add_subdirectory("dependencies/la")
+add_subdirectory("marathon/dependencies/tinyfiledialogs")
+add_subdirectory("marathon/dependencies/imguizmo")
+add_subdirectory("marathon/dependencies/la")
 
 set(INCLUDE_DIRS
-    "include" 
-    "external/entt/include"
-    "external/tinygltf/include"
+    "marathon/include" 
+    "marathon/external/entt/include"
+    "marathon/external/tinygltf/include"
 )
 
-file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+file(GLOB_RECURSE SRC_FILES "marathon/src/**.cpp")
 message(STATUS "SRC_FILES: ${SRC_FILES}")
 
 add_executable(graphics ${SRC_FILES})

@@ -33,7 +33,7 @@ class RuntimeController {
             renderer->Initialise();
 
             // load scene
-            LoadScene("scene/Preset.json");    
+            LoadScene("marathon/assets/scenes/Preset.json");    
 
             // setup editor camera
             editorCamera->transform.position = LA::vec3{-8,5,8};

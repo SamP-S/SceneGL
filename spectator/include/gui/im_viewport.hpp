@@ -3,6 +3,7 @@
 #include "gui/im_window.hpp"
 #include "renderer/frame_buffer.hpp"
 #include "renderer/editor_camera.hpp"
+#include "gui/im_editor_camera.hpp"
 
 //// TODO:
 // Generalise viewport to draw any texture, not necessarily a frame buffer
@@ -44,7 +45,7 @@ public:
         return ImVec2(x, y);
     }
 
-    void ViewportWindow(std::shared_ptr<FrameBuffer> fb, std::shared_ptr<EditorCamera> ec, Entity& entitySelected) {
+    void ViewportWindow(std::shared_ptr<FrameBuffer> fb, std::shared_ptr<EditorCamera> ec, Entity& entitySelected, ImEditorCamera& imEC) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport Window", &isOpen, _windowFlags);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
         ImGui::PopStyleVar(1);
@@ -107,7 +108,7 @@ public:
             ImGuizmo::ViewManipulate((float*)&view, distance, ImVec2(viewManipulateRight - 128, viewManipulateTop), ImVec2(128, 128), 0x10101010);
             
             // ImGuizmo::Manipulate((float*)&cameraView, (float*)&cameraProjection, mCurrentGizmoOperation, mCurrentGizmoMode, (float*)&matrix, NULL, useSnap ? &snap[0] : NULL, boundSizing ? bounds : NULL, boundSizingSnap ? boundsSnap : NULL);
-            if (ImGuizmo::Manipulate((float*)&view, (float*)&proj, ec->guizmoOp, ec->guizmoCoord, (float*)&selectedTrans, NULL, NULL, NULL, NULL)) {
+            if (ImGuizmo::Manipulate((float*)&view, (float*)&proj, imEC.guizmoOp, imEC.guizmoCoord, (float*)&selectedTrans, NULL, NULL, NULL, NULL)) {
                 std::cout << "manipulate" << std::endl;
             }
             

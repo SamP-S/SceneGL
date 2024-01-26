@@ -8,6 +8,11 @@ set(CMAKE_CXX_EXTENSIONS        OFF)
 set(CMAKE_BUILD_TYPE            Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+# set opengl config
+if (POLICY CMP0072)
+  cmake_policy (SET CMP0072 NEW)
+endif(POLICY CMP0072)
+
 find_package(Git REQUIRED)
 if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
     execute_process(COMMAND ${GIT_EXECUTABLE}
@@ -34,10 +39,31 @@ add_library(marathon INTERFACE)
 target_include_directories(marathon INTERFACE ${INCLUDE_DIRS})
 target_link_libraries(marathon INTERFACE la)
 
+
 # runtime
 add_executable(sprinter "sprinter/src/main.cpp")
 target_include_directories(sprinter PUBLIC "sprinter/include")
 target_link_libraries(sprinter PUBLIC marathon)
+
+find_package(OpenGL REQUIRED)
+target_include_directories(sprinter PUBLIC ${OPENGL_INCLUDE_DIRS})
+target_link_libraries(sprinter PUBLIC ${OPENGL_LIBRARIES})
+message(STATUS "OpenGL included at ${OPENGL_INCLUDE_DIRS}")
+message(STATUS "OpenGL libraries are ${OPENGL_LIBRARIES}")
+
+find_package(SDL2 REQUIRED)
+target_include_directories(sprinter PUBLIC ${SDL2_INCLUDE_DIRS})
+target_link_libraries(sprinter PUBLIC ${SDL2_LIBRARIES})
+message(STATUS "SDL2 included at ${SDL2_INCLUDE_DIRS}")
+message(STATUS "SDL2 libraries are ${SDL2_LIBRARIES}")
+
+find_package(GLEW REQUIRED)
+target_include_directories(sprinter PUBLIC ${GLEW_INCLUDE_DIRS})
+target_link_libraries(sprinter PUBLIC ${GLEW_LIBRARIES})
+message(STATUS "GLEW included at ${GLEW_INCLUDE_DIRS}")
+message(STATUS "GLEW libraries are ${GLEW_LIBRARIES}")
+
+
 
 # editor
 add_executable(spectator "spectator/src/main.cpp")

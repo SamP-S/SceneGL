@@ -117,7 +117,6 @@ public:
             ImGuizmo::DecomposeMatrixToComponents((float*)&selectedTrans, (float*)&pos, (float*)&rot, (float*)&scl);
             tc.position = pos;
             tc.rotation = LA::vec3({-rot.x, -rot.y, rot.z});
-            std::cout << "rot " << rot.x << "," << rot.y << "," << rot.z << std::endl;
             tc.scale = scl;
         }
 

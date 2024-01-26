@@ -29,7 +29,7 @@ using namespace LA;
 #include "renderer/editor_camera.hpp"
 
 #include "gui/im_entity.hpp"
-#include "gui/im_scene.hpp"
+#include "gui/im_scene_tree.hpp"
 #include "gui/im_statistics.hpp"
 #include "gui/im_editor_camera.hpp"
 #include "gui/im_viewport.hpp"
@@ -54,7 +54,6 @@ class Editor {
         // bool show_camera_window = true;
         bool show_demo_window = false;
 
-        Entity entitySelected;
         int new_entity_count = 0;
         int componentPanelCount = 0;
 
@@ -63,7 +62,7 @@ class Editor {
         // gui windows
         ImViewport imViewport;
         ImStatistics imStatistics;
-        ImScene imScene;
+        ImSceneTree imSceneTree;
         ImEntity imEntity;
         ImEditorCamera imEditorCamera;
 
@@ -109,10 +108,10 @@ class Editor {
 
                 runtimeController.Tick();
 
-                imViewport.ViewportWindow(runtimeController.renderer->frameBuffer, runtimeController.editorCamera, entitySelected);
+                imViewport.ViewportWindow(runtimeController.renderer->frameBuffer, runtimeController.editorCamera, imSceneTree.entitySelected, imEditorCamera);
                 imStatistics.StastisticsWindow(runtimeController.tickTimer);
-                imScene.SceneWindow(runtimeController.scene, entitySelected);
-                imEntity.EntityWindow(entitySelected);
+                imSceneTree.SceneTreeWindow(runtimeController.scene);
+                imEntity.EntityWindow(imSceneTree.entitySelected);
                 imEditorCamera.EditorCameraWindow(runtimeController.editorCamera);
 
                 if (show_demo_window) {
@@ -203,14 +202,14 @@ class Editor {
                 if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("New")) {
                         runtimeController.LoadScene("marathon/assets/scenes/Default.json");
-                        entitySelected = Entity();
+                        imSceneTree.entitySelected = Entity();
                     }
                     if (ImGui::MenuItem("Open")) {
                         const char* filepath = tinyfd_openFileDialog("Open Scene", "marathon/assets/scenes/Preset.json", 0, NULL, NULL, 0);
                         if (filepath == nullptr) {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {
-                            entitySelected = Entity();
+                            imSceneTree.entitySelected = Entity();
                             runtimeController.LoadScene(filepath);
                         }
                         
@@ -231,30 +230,30 @@ class Editor {
                 }
                 if (ImGui::BeginMenu("Entity")) {
                     if (ImGui::MenuItem("New Empty")) {
-                        entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
                     } else if (ImGui::MenuItem("New Cube")) {
-                        entitySelected = runtimeController.scene->CreateEntity();
-                        MeshRendererComponent& mrc = entitySelected.AddComponent<MeshRendererComponent>();
+                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        MeshRendererComponent& mrc = imSceneTree.entitySelected.AddComponent<MeshRendererComponent>();
                         mrc.mesh = assetManager.FindAsset<OpenGLMesh>("vertex_cube");
                     } else if (ImGui::MenuItem("New Camera")) {
-                        entitySelected = runtimeController.scene->CreateEntity();
-                        entitySelected.AddComponent<CameraComponent>();
+                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected.AddComponent<CameraComponent>();
                     } else if (ImGui::MenuItem("New Directional Light")) {
-                        entitySelected = runtimeController.scene->CreateEntity();
-                        entitySelected.AddComponent<DirectionalLightComponent>();
+                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected.AddComponent<DirectionalLightComponent>();
                     } else if (ImGui::MenuItem("New Point Light")) {
-                        entitySelected = runtimeController.scene->CreateEntity();
-                        entitySelected.AddComponent<PointLightComponent>();
+                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected.AddComponent<PointLightComponent>();
                     } else if (ImGui::MenuItem("New Spot Light")) {
-                        entitySelected = runtimeController.scene->CreateEntity();
-                        entitySelected.AddComponent<SpotLightComponent>();
+                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected.AddComponent<SpotLightComponent>();
                     }
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Window")) {
                     ImGui::MenuItem("Render Display", NULL, &imViewport.isOpen);
                     ImGui::MenuItem("Stats/Performance", NULL, &imStatistics.isOpen);
-                    ImGui::MenuItem("Scene Tree", NULL, &imScene.isOpen);
+                    ImGui::MenuItem("Scene Tree", NULL, &imSceneTree.isOpen);
                     ImGui::MenuItem("Entity", NULL, &imEntity.isOpen);
                     ImGui::MenuItem("Editor Camera", NULL, &imEditorCamera.isOpen);
                     ImGui::MenuItem("Demo Window", NULL, &show_demo_window);

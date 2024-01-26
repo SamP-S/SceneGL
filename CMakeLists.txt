@@ -24,27 +24,27 @@ set(INCLUDE_DIRS
     "marathon/external/entt/include"
     "marathon/external/tinygltf/include"
 )
+message(STATUS "INCLUDE_DIRS: " ${INCLUDE_DIRS})
 
 # file(GLOB_RECURSE SRC_FILES "marathon/src/**.cpp")
 # message(STATUS "SRC_FILES: ${SRC_FILES}")
 
+# game engine
+add_library(marathon INTERFACE)
+target_include_directories(marathon INTERFACE ${INCLUDE_DIRS})
+target_link_libraries(marathon INTERFACE la)
+
 # runtime
 add_executable(sprinter "sprinter/src/main.cpp")
-target_include_directories(sprinter PUBLIC ${INCLUDE_DIRS})
-
-target_link_libraries(sprinter PUBLIC tinyfiledialogs)
-target_link_libraries(sprinter PUBLIC imguizmo)
-target_link_libraries(sprinter PUBLIC la)
-target_link_libraries(sprinter PUBLIC ${CMAKE_DL_LIBS})
+target_include_directories(sprinter PUBLIC "sprinter/include")
+target_link_libraries(sprinter PUBLIC marathon)
 
 # editor
 add_executable(spectator "spectator/src/main.cpp")
-target_include_directories(spectator PUBLIC ${INCLUDE_DIRS})
-
+target_include_directories(spectator PUBLIC "spectator/include")
 target_link_libraries(spectator PUBLIC tinyfiledialogs)
 target_link_libraries(spectator PUBLIC imguizmo)
-target_link_libraries(spectator PUBLIC la)
-target_link_libraries(spectator PUBLIC ${CMAKE_DL_LIBS})
+target_link_libraries(spectator PUBLIC marathon)
 
 # test scripts
 add_executable(ecs_test "test/ecs_test.cpp")

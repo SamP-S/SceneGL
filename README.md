@@ -19,7 +19,7 @@ Goals:
     - [x] Support lighting
     - [x] Implement Point Lights
     - [x] Implement Directional Lights
-    - [ ] Implement Spot Lights
+    - [x] Implement Spot Lights
     - [x] Support materials
     - [ ] Support textures
     - [x] Wireframe rendering
@@ -56,8 +56,7 @@ Goals:
     - [x] Ensure all components follow single responsibility
     - [x] Implement using entt
     - [x] Use smart pointers
-    - [ ] Implement gizmos, render all component types
-    - [ ] 
+    - [ ] Implement 2d gizmos per component
 
     ### Asset Manager
     - [x] Implement asset manager
@@ -97,15 +96,13 @@ Goals:
 
     ### GUI
     - [x] Implement ImGui
-    - [ ] Support dynamic gui loading with interfaces
+    - [x] Support dynamic gui loading with interfaces
     - [ ] Create resource preview
     - [ ] Create asset manager
     - [ ] Create resource viewer(s)
+    - [ ] Remove Imguizmo
     Note: ImGui is immediate mode and simple to use because it doesn't require tons of state systems on the backend.
     This means you should handle it, not that you should avoid having state with components/sub-components of the gui.
-
-    ### Networking
-    - [ ] Implement networking socket support
 
     ### Scripting
     - [ ] Create scripting engine

@@ -109,7 +109,7 @@ class Editor {
 
                 runtimeController.Tick();
 
-                imViewport.ViewportWindow(runtimeController.renderer->frameBuffer);
+                imViewport.ViewportWindow(runtimeController.renderer->frameBuffer, runtimeController.editorCamera, entitySelected);
                 imStatistics.StastisticsWindow(runtimeController.tickTimer);
                 imScene.SceneWindow(runtimeController.scene, entitySelected);
                 imEntity.EntityWindow(entitySelected);
@@ -203,6 +203,7 @@ class Editor {
                 if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("New")) {
                         runtimeController.LoadScene("scene/Default.json");
+                        entitySelected = Entity();
                     }
                     if (ImGui::MenuItem("Open")) {
                         const char* filepath = tinyfd_openFileDialog("Open Scene", "./scene/Preset.json", 0, NULL, NULL, 0);

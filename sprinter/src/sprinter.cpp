@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "runtime/application.hpp"
-#include "runtime/runtime.hpp"
+#include "runtime.hpp"
 
 int main(int argc, char *argv[]) {
     // instance main application
@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
     appCfg.name = "Sprinter";
     appCfg.cwd = "~/source/repos/hobby/SceneGL/sample_project";
 
-    Application* app = new Application(appCfg);
-    app->SetOperator(new Runtime());
-    app->Run();
-    delete app;
+    Application& app = Application::Create(appCfg);
+    app.SetOperator(new Runtime());
+    app.Run();
+    Application::Destroy();
     
     std::cout << "end of program" << std::endl;
     return 0;

@@ -34,6 +34,11 @@ struct OpenGLConfig {
     int height = 720;
 };
 
+struct Resolution {
+    int width = 0;
+    int height = 0;
+};
+
 class ContextManager {
     std::vector<std::function<void(SDL_Event&)>> _eventHandlers;
 
@@ -52,7 +57,7 @@ public:
     ContextManager(const ContextManager&) = default;
 
     // setup context
-    void Initialise(OpenGLConfig gl_cfg) {
+    void OnInitialise(OpenGLConfig gl_cfg) {
 
         // Initialise SDL subsystems
         SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
@@ -90,7 +95,7 @@ public:
     }
 
     // destroy context
-    void Destroy() {
+    void OnShutdown() {
         SDL_GL_DeleteContext(gl_context);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -102,7 +107,7 @@ public:
     }
 
     // must be called at the start of very new frame
-    void HandleEvents() {
+    void PollEvents() {
         SDL_Event event;
         // SDL_PollEvent returns 1 while there is an event in the queue
         while (SDL_PollEvent(&event)) {
@@ -115,6 +120,12 @@ public:
     // call at the end of the frame to swap displayed buffer
     void SwapFrame() {
         SDL_GL_SwapWindow(window);
+    }
+
+    Resolution GetContextSize() {
+        Resolution r;
+        SDL_GetWindowSize(window, &r.width, &r.height);
+        return r;
     }
     
     // Backup current context and window

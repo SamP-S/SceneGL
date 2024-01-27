@@ -13,6 +13,10 @@
 #define MOVE_FORWARD 5
 #define MOVE_BACKWARD 6
 
+
+//// TODO:
+// camera should move according to dt not per frame
+
 class EditorCamera {
     public:
         // common properties
@@ -94,7 +98,7 @@ class EditorCamera {
             transform.position += translate;
         } 
 
-        void Update()
+        void Update(double dt)
         {
             if (Input::GetMouseButtonState(3)) {
                 if (Input::GetKeyState("w"))

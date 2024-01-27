@@ -116,5 +116,5 @@ private:
     std::unique_ptr<ContextManager> _contextManager = std::make_unique<ContextManager>();
     std::unique_ptr<TickTimer> _tickTimer = std::make_unique<TickTimer>();
     IOperator* _operator = nullptr;
-    static Application* _instance;
+    static inline Application* _instance = nullptr;
 };

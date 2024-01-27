@@ -1,10 +1,5 @@
 #pragma once
 
-// OPENGL SHOULD BE MOVED TO PLATFORM
-#define GL_VERSION_4_4
-#include <GL/glew.h>
-#include <SDL_opengl.h>
-
 // includes
 #include <map>
 #include <assert.h>
@@ -16,28 +11,27 @@
 #include <sstream>
 #include <memory>
 
-#include "ngine/ngine.hpp"
-#include "serializer/serializer.hpp"
-
 #include "la_extended.h"
 
-#include "core/tick_timer.hpp"
+#include "ngine/ngine.hpp"
+#include "serializer/serializer.hpp"
 
 #include "platform/opengl/opengl.hpp"
 #include "platform/opengl/opengl_shader.hpp"
 #include "platform/opengl/opengl_shader_source.hpp"
-#include "platform/opengl/opengl_frame_buffer.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
 
 #include "renderer/components.hpp"
-#include "renderer/editor_camera.hpp"
 #include "renderer/model_loader.hpp"
 #include "renderer/shader_loader.hpp"
+#include "renderer/editor_camera.hpp"
 
 //// TODO:
 // Might need to pass scene in every frame
 // Detach debug tools from the renderer
 // Extract to platform/opengl specific
+// remove editor camera from renderer
+// per frame operations should be detached from render scene calls
 
 enum DrawMode {
     NONE = 0,
@@ -52,28 +46,9 @@ class Renderer {
         // grab singleton references
         AssetManager& assetManager = AssetManager::Instance();
         AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
-
-        double timeElapsed = 0.0f;
-
-        // debug only
-        std::shared_ptr<TickTimer> tickTimer;
-        std::shared_ptr<EditorCamera> editorCamera;
-
-        // should be moved to camera
-        std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
+        
 
         void Initialise() {
-            
-            // Initialise GLEW
-            // Must be done before any opengl call
-            // easier done before application instanced
-            glewExperimental = GL_TRUE;
-            glewInit();
-
-            // frame buffer should be tied to camera
-            frameBuffer = assetManager.CreateAsset<OpenGLFrameBuffer>("FBO", editorCamera->width, editorCamera->height);
-            frameBuffer->SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
-
             // add loaders to asset libary
             loaderManager.AddLoader(new ModelLoader());
             loaderManager.AddLoader(new ShaderLoader());
@@ -112,6 +87,10 @@ class Renderer {
             );
             material->SetProperty("colour", vec4(1.0f));
             material->shader = lighting;
+        }
+
+        void OnWindowResize(uint32_t width, uint32_t height) {
+            glViewport(0, 0, width, height);
         }
 
         void RenderObject(Entity entity, DrawMode m) {
@@ -186,20 +165,49 @@ class Renderer {
             }
         }
 
-        void Render(std::shared_ptr<Scene> scene, DrawMode m=DrawMode::FILL) {
-            _scene = scene;
-            frameBuffer->Bind();
-            frameBuffer->Clear();
+        void Clear() {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        }
 
-            SetupShaders();
+        void RenderSceneByEditorCamera(std::shared_ptr<Scene> scene, EditorCamera& editorCamera, DrawMode m=DrawMode::FILL) {
+            std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
+            for (auto asset : shaders) {
+                SetPerEditorCameraUniforms(std::dynamic_pointer_cast<Shader>(asset), editorCamera);
+            }
+            RenderScene(scene, m);
+        }
+
+        void RenderSceneByCamera(std::shared_ptr<Scene> scene, Entity& camera, DrawMode m=DrawMode::FILL) {
+            std::cout << "Render scene by camera not implemented" << std::endl;
+            return;
+        }
+
+        void RenderScene(std::shared_ptr<Scene> scene, DrawMode m=DrawMode::FILL) {
+            _scene = scene;
+            std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
+            for (auto asset : shaders) {
+                SetPerFrameUniforms(std::dynamic_pointer_cast<Shader>(asset));
+                SetPerSceneUniforms(std::dynamic_pointer_cast<Shader>(asset));
+            }
 
             std::vector<Entity> renderables = _scene->GetEntitiesWith<MeshRendererComponent>();
             for (auto& ent : renderables) {
                 SetDrawMode(m);
                 RenderObject(ent, m);
             }
+        }
 
-            frameBuffer->Unbind();
+        // Update frame time info
+        void OnUpdate(double dt) {
+            _timeElapsed += dt;
+            _timeDelta = dt;
+            _frameCount++;
+
+            // pass to shaders
+            std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
+            for (auto asset : shaders) {
+                SetPerFrameUniforms(std::dynamic_pointer_cast<Shader>(asset));
+            }
         }
 
     // delete copy and assign operators
@@ -220,27 +228,30 @@ class Renderer {
 
         // keep internal ref after render call to make life easier
         std::shared_ptr<Scene> _scene;
-       
 
-        void SetupShaders() {
-            std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
-            for (auto asset : shaders) {
-                SetupShader(std::dynamic_pointer_cast<Shader>(asset));
-            }
-        }
+        // use these instead of tick timer
+        double _timeElapsed = 0.0f;
+        double _timeDelta = 0.0f;
+        uint32_t _frameCount = 0;
 
-        void SetupShader(std::shared_ptr<Shader> shader) {
+        void SetPerEditorCameraUniforms(std::shared_ptr<Shader> shader, EditorCamera& editorCamera) {
             shader->Bind();
             // vertex uniforms
-            shader->SetMat4("uView", inverse(editorCamera->transform.GetTransform()));
-            shader->SetMat4("uProjection", editorCamera->GetProjection());
+            shader->SetMat4("uView", LA::inverse(editorCamera.transform.GetTransform()));
+            shader->SetMat4("uProjection", editorCamera.GetProjection());
             // fragment uniforms
-            shader->SetVec3("uResolution", editorCamera->width, editorCamera->height, 1.0f);
-            shader->SetFloat("uTime", tickTimer->GetTotalElapsed());
-            shader->SetFloat("uTimeDelta", tickTimer->GetTickElapsed());
-            shader->SetInt("uFrame", tickTimer->GetTickCount());
-            shader->SetVec3("uCameraPosition", editorCamera->transform.position); 
+            shader->SetVec3("uResolution", editorCamera.width, editorCamera.height, 1.0f);
+            shader->SetVec3("uCameraPosition", editorCamera.transform.position);
+        }
 
+        void SetPerFrameUniforms(std::shared_ptr<Shader> shader) {
+            // timing uniforms
+            shader->SetFloat("uTime", _timeElapsed);
+            shader->SetFloat("uTimeDelta", _timeDelta);
+            shader->SetInt("uFrame", _frameCount);
+        }
+
+        void SetPerSceneUniforms(std::shared_ptr<Shader> shader) {
             ShaderDirectionalLights(shader);
             ShaderPointLights(shader);
             ShaderSpotLights(shader);

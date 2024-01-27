@@ -5,7 +5,6 @@
 // internal libs
 #include "ngine/ngine.hpp"
 // #include "ngine/serializer.hpp"
-using namespace Ngine;
 
 // we have two example components here
 struct PositionComponent {

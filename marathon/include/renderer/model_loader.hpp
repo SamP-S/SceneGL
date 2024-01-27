@@ -22,7 +22,7 @@ using namespace LA;
 #include "tiny_gltf.h"
 
 
-class ModelLoader : public Ngine::IAssetLoader {
+class ModelLoader : public IAssetLoader {
 
 private:
     std::vector<std::string> _extensions = {".gltf"};

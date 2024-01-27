@@ -39,7 +39,7 @@ struct is_in_variant<T, std::variant<Ts...>> : std::disjunction<std::is_same<T, 
 template <class T, class... Ts>
 inline constexpr bool is_in_variant_v = is_in_variant<T, Ts...>::value;
 
-class Material : public Ngine::Asset {
+class Material : public Asset {
     public:
         std::map<std::string, GLSLType> properties;
         std::shared_ptr<Shader> shader = nullptr;

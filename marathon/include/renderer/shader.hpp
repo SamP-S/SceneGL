@@ -10,7 +10,7 @@
 #include "ngine/ngine.hpp"
 #include "renderer/shader_source.hpp"
 
-class Shader : public Ngine::Asset {
+class Shader : public Asset {
     public:
         std::shared_ptr<ShaderSource> vs = nullptr;
         std::shared_ptr<ShaderSource> fs = nullptr;

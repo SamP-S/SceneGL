@@ -21,7 +21,7 @@
 // .frag - a fragment shader
 // .comp - a compute shader
 
-class ShaderLoader : public Ngine::IAssetLoader {
+class ShaderLoader : public IAssetLoader {
 private:
     std::vector<std::string> _extensions = {".vert", ".tesc", ".tese", ".geom", ".frag", ".comp"};
     

@@ -17,7 +17,7 @@ enum ShaderStage {
     TESSELLATION_EVALUATION = 6
 };
 
-class ShaderSource : public Ngine::Asset {
+class ShaderSource : public Asset {
     public:
         std::string source = "";
         ShaderStage stage = ShaderStage::INVALID;

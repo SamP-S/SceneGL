@@ -14,7 +14,7 @@
 // support more texture channels
 // add internal state to ensure recompilation if vertices changed
 
-class Mesh : public Ngine::Asset {
+class Mesh : public Asset {
     public:
         std::vector<LA::vec3> vertices;
         std::vector<LA::vec3> normals;

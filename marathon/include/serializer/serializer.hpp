@@ -18,10 +18,10 @@ using namespace nlohmann;
 #include "platform/opengl/opengl_material.hpp"
 
 // note: should make a serializer per scene
-class JsonSerializer : public Ngine::ISerializer
+class JsonSerializer : public ISerializer
 {
 public:
-    JsonSerializer(std::shared_ptr<Ngine::Scene> scene)
+    JsonSerializer(std::shared_ptr<Scene> scene)
         : ISerializer(scene) {}
 
     // output scene to json file
@@ -110,7 +110,7 @@ private:
     void DeserializeEntity(json j) {
         // create entity
         std::string name = j["name"];
-        Ngine::Entity entity = _scene->CreateEntity(name);
+        Entity entity = _scene->CreateEntity(name);
         // extract transform
         TransformComponent &transform = entity.GetComponent<TransformComponent>();
         json transformJson = j["transform"];

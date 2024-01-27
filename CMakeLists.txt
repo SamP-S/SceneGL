@@ -41,7 +41,7 @@ target_link_libraries(marathon INTERFACE la)
 
 
 # runtime
-add_executable(sprinter "sprinter/src/main.cpp")
+add_executable(sprinter "sprinter/src/sprinter.cpp")
 target_include_directories(sprinter PUBLIC "sprinter/include")
 target_link_libraries(sprinter PUBLIC marathon)
 

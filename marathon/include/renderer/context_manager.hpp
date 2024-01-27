@@ -93,6 +93,12 @@ public:
             SDL_GL_SetSwapInterval(0);
 
         SDL_SetWindowMinimumSize(window, gl_cfg.minWidth, gl_cfg.minHeight);
+
+        // Initialise GLEW
+        // Must be done before any opengl call
+        // easier done before application instanced
+        glewExperimental = GL_TRUE;
+        glewInit();
     }
 
     // destroy context

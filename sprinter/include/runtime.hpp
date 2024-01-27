@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ngine/ngine.hpp"
 #include "runtime/ioperator.hpp"
 #include "renderer/renderer.hpp"
 #include "core/tick_timer.hpp"
@@ -18,8 +19,7 @@ public:
 
     void OnInitialise() override {
         // engine Intialisation
-        renderer->scene = scene;
-        renderer->Initialise();
+        renderer.Initialise();
 
         // load scene
         LoadScene("marathon/assets/scenes/Preset.json");    
@@ -42,18 +42,19 @@ public:
             case SDL_MOUSEBUTTONUP:
                 Input::MouseButtonEvent(event.button.button, BUTTON_UP);
                 break;
-            case default:
+            default:
                 std::cout << "WARNING (Runtime): No event handle for @ " << event.type << std::endl;
                 break;
         }
     }
 
     void OnUpdate(double dt) override {
-        renderer->Render();
+        renderer.Render(scene, DrawMode::FILL);
+        renderer.Render(scene, DrawMode::LINES);
     }
 
     void OnShutdown() override {
-        renderer->Shutdown()
+
     }
 
     // Load Scene from JSON

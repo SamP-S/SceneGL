@@ -29,6 +29,7 @@
 #include "platform/opengl/opengl_frame_buffer.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
 
+#include "renderer/components.hpp"
 #include "renderer/editor_camera.hpp"
 #include "renderer/model_loader.hpp"
 #include "renderer/shader_loader.hpp"
@@ -49,12 +50,10 @@ enum DrawMode {
 class Renderer {
     public:
         // grab singleton references
-        Ngine::AssetManager& assetManager = Ngine::AssetManager::Instance();
-        Ngine::AssetLoaderManager& loaderManager = Ngine::AssetLoaderManager::Instance();
+        AssetManager& assetManager = AssetManager::Instance();
+        AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
 
-        // systems set externally but useful to have references
-        // add more scene validation before usage
-        std::shared_ptr<Scene> scene;
+        double timeElapsed = 0.0f;
 
         // debug only
         std::shared_ptr<TickTimer> tickTimer;
@@ -187,14 +186,16 @@ class Renderer {
             }
         }
 
-        void Render(DrawMode m=DrawMode::FILL) {
+        void Render(std::shared_ptr<Scene> scene, DrawMode m=DrawMode::FILL) {
+            _scene = scene;
             frameBuffer->Bind();
             frameBuffer->Clear();
 
             SetupShaders();
 
-            std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
+            std::vector<Entity> renderables = _scene->GetEntitiesWith<MeshRendererComponent>();
             for (auto& ent : renderables) {
+                SetDrawMode(m);
                 RenderObject(ent, m);
             }
 
@@ -217,10 +218,12 @@ class Renderer {
     private:
         Renderer() = default;
 
+        // keep internal ref after render call to make life easier
+        std::shared_ptr<Scene> _scene;
        
 
         void SetupShaders() {
-            std::vector<std::shared_ptr<Ngine::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
+            std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
             for (auto asset : shaders) {
                 SetupShader(std::dynamic_pointer_cast<Shader>(asset));
             }
@@ -244,7 +247,7 @@ class Renderer {
         }
 
         void ShaderDirectionalLights(std::shared_ptr<Shader> shader) {
-            std::vector<Entity> entities = scene->GetEntitiesWith<DirectionalLightComponent>();
+            std::vector<Entity> entities = _scene->GetEntitiesWith<DirectionalLightComponent>();
             
             // directional lights
             if (entities.size() >= DIRECTIONAL_LIGHT_MAX) {
@@ -266,7 +269,7 @@ class Renderer {
         }
 
         void ShaderPointLights(std::shared_ptr<Shader> shader) {
-            std::vector<Entity> entities = scene->GetEntitiesWith<PointLightComponent>();
+            std::vector<Entity> entities = _scene->GetEntitiesWith<PointLightComponent>();
 
             // point lights
             if (entities.size() >= POINT_LIGHT_MAX) {
@@ -288,7 +291,7 @@ class Renderer {
         }
 
         void ShaderSpotLights(std::shared_ptr<Shader> shader) {
-            std::vector<Entity> entities = scene->GetEntitiesWith<SpotLightComponent>();
+            std::vector<Entity> entities = _scene->GetEntitiesWith<SpotLightComponent>();
 
             // point lights
             if (entities.size() >= POINT_LIGHT_MAX) {

@@ -3,7 +3,6 @@
 #include "renderer/context_manager.hpp"
 #include "renderer/renderer.hpp"
 #include "ngine/ngine.hpp"
-using namespace Ngine;
 
 class IOperator {
 public:

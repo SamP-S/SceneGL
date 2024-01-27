@@ -36,6 +36,14 @@
 //// TODO:
 // Might need to pass scene in every frame
 // Detach debug tools from the renderer
+// Extract to platform/opengl specific
+
+enum DrawMode {
+    NONE = 0,
+    POINTS,
+    LINES,
+    FILL
+};
 
 
 class Renderer {
@@ -54,9 +62,6 @@ class Renderer {
 
         // should be moved to camera
         std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
-
-        Renderer() = default;
-        ~Renderer() = default;
 
         void Initialise() {
             
@@ -110,29 +115,24 @@ class Renderer {
             material->shader = lighting;
         }
 
-        void RenderObject(Entity entity, mat4 root_trans = mat4(), bool wireframe=false) {
-            TransformComponent& tc = entity.GetComponent<TransformComponent>();
-            mat4 model = root_trans *  tc.GetTransform();
-
+        void RenderObject(Entity entity, DrawMode m) {
             // check entity has renderer
             if (!entity.HasComponent<MeshRendererComponent>())
                 return;
+
+            TransformComponent& tc = entity.GetComponent<TransformComponent>();
+            mat4 model = tc.GetTransform();
 
             // check meshrenderer mesh is not none
             MeshRendererComponent& mrc = entity.GetComponent<MeshRendererComponent>();
             std::shared_ptr<Mesh> mesh = mrc.mesh;
             std::shared_ptr<Material> material = mrc.material;
-            if (mesh == nullptr) {
-                // std::cout << "WARNING (Renderer): Attempting to draw null mesh." << std::endl;
-                return;
-            }
-            if (material == nullptr) {
-                // std::cout << "WARNING (Renderer): Attempting to draw null material." << std::endl;
+            if (mesh == nullptr || material == nullptr) {
                 return;
             }
 
             std::shared_ptr<Shader> shader;
-            if (wireframe) {
+            if (m != DrawMode::FILL) {
                 shader = assetManager.FindAsset<OpenGLShader>("base");
             } else {
                 shader = material->shader;
@@ -152,7 +152,42 @@ class Renderer {
             mrc.mesh->Draw();
         }
 
-        void Render(bool wireframe=false) {
+        void SetDrawMode(DrawMode m) {
+            switch(m) {
+                case DrawMode::NONE:
+                    std::cout << "ERROR (Renderer): Invalid DrawMode." << std::endl;
+                    break;
+                case DrawMode::POINTS:
+                    {
+                        // draw points
+                        glEnable(GL_DEPTH_TEST);
+                        glDisable(GL_CULL_FACE);
+                        glPointSize(5.0f);
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                    }
+                    break;
+                case DrawMode::LINES:
+                    {
+                        // draw wireframe
+                        glEnable(GL_DEPTH_TEST);
+                        glDisable(GL_CULL_FACE);
+                        glLineWidth(3.0f);
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                    }
+                    break;
+                case DrawMode::FILL:
+                    {
+                        // draw lit
+                        glEnable(GL_DEPTH_TEST);
+                        glEnable(GL_CULL_FACE);
+                        glFrontFace(GL_CCW);
+                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                    }
+                    break;
+            }
+        }
+
+        void Render(DrawMode m=DrawMode::FILL) {
             frameBuffer->Bind();
             frameBuffer->Clear();
 
@@ -160,25 +195,30 @@ class Renderer {
 
             std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
             for (auto& ent : renderables) {
-                // draw lit
-                glEnable(GL_DEPTH_TEST);
-                glEnable(GL_CULL_FACE);
-                glFrontFace(GL_CCW);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                RenderObject(ent, mat4(), false);
-
-                // draw wireframe
-                glEnable(GL_DEPTH_TEST);
-                glDisable(GL_CULL_FACE);
-                glLineWidth(3.0f);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                RenderObject(ent, mat4(), true);
+                RenderObject(ent, m);
             }
 
             frameBuffer->Unbind();
         }
 
+    // delete copy and assign operators
+    // should always get instance from class::instance func
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+
+    // renderer is singleton
+    static Renderer& Instance() {
+        static Renderer instance;
+        return instance;
+    }
+
+    protected:
+        ~Renderer() = default;
     private:
+        Renderer() = default;
+
+       
+
         void SetupShaders() {
             std::vector<std::shared_ptr<Ngine::Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
             for (auto asset : shaders) {

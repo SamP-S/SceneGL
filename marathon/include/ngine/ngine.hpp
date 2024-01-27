@@ -23,6 +23,8 @@
 // Improve GetAssets to remove iterative conversion/vector build
 // Rename asset manager to asset library
 // Consolidate asset manager & asset loader manager into single interface/class, use composition & singleton
+// Fix singletons to remove copy and assignment operators
+// set singleton destructors protected if object contains smart ptrs
 
 
 namespace Ngine {

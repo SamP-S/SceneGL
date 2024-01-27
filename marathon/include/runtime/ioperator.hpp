@@ -5,7 +5,7 @@
 #include "ngine/ngine.hpp"
 using namespace Ngine;
 
-class Operator {
+class IOperator {
 public:
     AssetManager&  assetManager = AssetManager::Instance();
     AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();

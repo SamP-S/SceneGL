@@ -8,7 +8,7 @@
 //// TODO:
 // consolidate naming such that Tick is every frame/on timer
 
-class Runtime : public Operator {
+class Runtime : public IOperator {
 private:
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 

@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <map>
+#include <functional>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600

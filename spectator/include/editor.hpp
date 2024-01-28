@@ -92,12 +92,20 @@ class Editor : public IOperator {
             MenuBar();
             ImGui::End();
 
+            imViewport.frameBuffer->Bind();
+
+            editorCamera->Update(dt);
+            renderer.Clear();
+            renderer.RenderSceneByEditorCamera(scene, *editorCamera, DrawMode::FILL);
+            renderer.RenderSceneByEditorCamera(scene, *editorCamera, DrawMode::LINES);
+            imViewport.frameBuffer->Unbind();
+
             // fix deps
-            imViewport.ViewportWindow(runtimeController.editorCamera, imSceneTree.entitySelected, imEditorCamera);
-            imStatistics.StastisticsWindow(runtimeController.tickTimer);
-            imSceneTree.SceneTreeWindow(runtimeController.scene);
+            imViewport.ViewportWindow(editorCamera, imSceneTree.entitySelected, imEditorCamera);
+            imStatistics.StastisticsWindow(dt);
+            imSceneTree.SceneTreeWindow(scene);
             imEntity.EntityWindow(imSceneTree.entitySelected);
-            imEditorCamera.EditorCameraWindow(runtimeController.editorCamera);
+            imEditorCamera.EditorCameraWindow(editorCamera);
 
             if (show_demo_window) {
                 ImGui::ShowDemoWindow();
@@ -151,10 +159,10 @@ class Editor : public IOperator {
             ImGui_ImplSDL2_InitForOpenGL(Application::Get().GetWindow(), Application::Get().GetContext());
             ImGui_ImplOpenGL3_Init(Application::Get().GetOpenGLConfig().glsl);
 
-           
+            renderer.Initialise();
         }
 
-        void OnShutdown() {
+        void OnShutdown() override {
             // Cleanup
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplSDL2_Shutdown();
@@ -172,7 +180,6 @@ class Editor : public IOperator {
             JsonSerializer js = JsonSerializer(scene);
             js.Serialize(filepath);
         }
-
 
         void MenuBar() {
             if (ImGui::BeginMenuBar()) {

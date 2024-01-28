@@ -54,7 +54,7 @@ public:
         return ImVec2(x, y);
     }
 
-    void ViewportWindow(std::shared_ptr<FrameBuffer> fb, std::shared_ptr<EditorCamera> ec, Entity& entitySelected, ImEditorCamera& imEC) {
+    void ViewportWindow(std::shared_ptr<EditorCamera> ec, Entity& entitySelected, ImEditorCamera& imEC) {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport Window", &isOpen, _windowFlags);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
         ImGui::PopStyleVar(1);
@@ -87,8 +87,7 @@ public:
         ImVec2 wSize = AspectRatioLock(ImVec2(wWidth, wHeight), aspectRatio);
 
         // draw frame to viewport
-        ImGui::Image((ImTextureID)fb->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
-
+        ImGui::Image((ImTextureID)frameBuffer->GetColourAttachment(), wSize, ImVec2(0, 1), ImVec2(1, 0));
 
 
         // imguizmo

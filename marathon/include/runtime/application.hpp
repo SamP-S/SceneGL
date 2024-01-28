@@ -79,13 +79,22 @@ public:
         }
     }
 
-    void GetContext() {
-
+    void Close() {
+        _isQuit = true;
     }
 
-    void GetWindow() {
-
+    void* GetContext() {
+        return _contextManager->gl_context;
     }
+
+    SDL_Window* GetWindow() {
+        return _contextManager->window;
+    }
+
+    OpenGLConfig& GetOpenGLConfig() {
+        return _contextManager->gl_cfg;
+    }
+
 
 private:
     // Construct application using cfg

@@ -14,19 +14,16 @@
 #define WINDOW_HEIGHT 720
 
 #include "ngine/ngine.hpp"
-using namespace Ngine;
 
-#include "runtime/runtime_controller.hpp"
-
-#include "renderer/context_manager.hpp"
 #include "renderer/components.hpp"
 #include "renderer/renderer.hpp"
+#include "renderer/editor_camera.hpp"
 #include "input/input.hpp"
 
 #include "la_extended.h"
 using namespace LA;
 
-#include "renderer/editor_camera.hpp"
+#include "runtime/application.hpp"
 
 #include "gui/im_entity.hpp"
 #include "gui/im_scene_tree.hpp"
@@ -34,30 +31,23 @@ using namespace LA;
 #include "gui/im_editor_camera.hpp"
 #include "gui/im_viewport.hpp"
 
-class Editor {
+//// TODO:
+// remove opengl deps
+
+class Editor : public IOperator {
     private:
-        // OpenGL properties
-        OpenGLConfig gl_cfg;
 
-        // SDL
-        ContextManager contextManager  = ContextManager();
-        bool isQuit = false;
-
-        // Runtime Controller
-        RuntimeController runtimeController = RuntimeController();
-
-        // Application state
-        // bool show_viewport_window = true;
-        // bool show_stats_window = true;
-        // bool show_scene_window = true;
-        // bool show_entity_window = true;
-        // bool show_camera_window = true;
+        // GUI state
         bool show_demo_window = false;
 
         int new_entity_count = 0;
         int componentPanelCount = 0;
 
         AssetManager&  assetManager = AssetManager::Instance();
+        // should be moved to camera
+        
+        std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+        std::shared_ptr<EditorCamera> editorCamera = std::make_shared<EditorCamera>();
 
         // gui windows
         ImViewport imViewport;
@@ -67,79 +57,59 @@ class Editor {
         ImEditorCamera imEditorCamera;
 
     public:
-        Editor() {
-            // SDL
-            contextManager.Initialise(gl_cfg);
-            contextManager.AddEventHandler([this](SDL_Event& event) { EventHandler(event); });
+        Editor() = default;
+        ~Editor() = default;
+
+        void OnUpdate(double dt) {
+
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplSDL2_NewFrame();
+            ImGui::NewFrame();
+
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+            const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+            ImGui::SetNextWindowPos(viewport->WorkPos);
+            ImGui::SetNextWindowSize(viewport->WorkSize);
+            ImGui::SetNextWindowViewport(viewport->ID);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
+            window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             
-            Initialise();
-            runtimeController.Initialise();
+            ImGui::Begin("CoreWindow", NULL, window_flags);
+            ImGui::PopStyleVar(3);
 
-            // Main loop
-            while (!isQuit)
-            {
-                contextManager.HandleEvents();
-                NewFrame();
+            ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+            ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
+            ImVec2 dockspace_size = ImVec2(0, 0);
+            ImGui::DockSpace(dockspace_id, dockspace_size, dockspace_flags);
 
-                ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-                const ImGuiViewport* viewport = ImGui::GetMainViewport();
+            MenuBar();
+            ImGui::End();
 
-                ImGui::SetNextWindowPos(viewport->WorkPos);
-                ImGui::SetNextWindowSize(viewport->WorkSize);
-                ImGui::SetNextWindowViewport(viewport->ID);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-                window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
-                window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-                window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            // fix deps
+            imViewport.ViewportWindow(runtimeController.editorCamera, imSceneTree.entitySelected, imEditorCamera);
+            imStatistics.StastisticsWindow(runtimeController.tickTimer);
+            imSceneTree.SceneTreeWindow(runtimeController.scene);
+            imEntity.EntityWindow(imSceneTree.entitySelected);
+            imEditorCamera.EditorCameraWindow(runtimeController.editorCamera);
 
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-                
-                ImGui::Begin("CoreWindow", NULL, window_flags);
-                ImGui::PopStyleVar(3);
-
-                ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-                ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
-                ImVec2 dockspace_size = ImVec2(0, 0);
-                ImGui::DockSpace(dockspace_id, dockspace_size, dockspace_flags);
-
-                MenuBar();
-                ImGui::End();
-
-                runtimeController.Tick();
-
-                imViewport.ViewportWindow(runtimeController.renderer->frameBuffer, runtimeController.editorCamera, imSceneTree.entitySelected, imEditorCamera);
-                imStatistics.StastisticsWindow(runtimeController.tickTimer);
-                imSceneTree.SceneTreeWindow(runtimeController.scene);
-                imEntity.EntityWindow(imSceneTree.entitySelected);
-                imEditorCamera.EditorCameraWindow(runtimeController.editorCamera);
-
-                if (show_demo_window) {
-                    ImGui::ShowDemoWindow();
-                }
-
-                ImGui::Render();
-                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-                if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-                    contextManager.BackupContext();
-                    ImGui::UpdatePlatformWindows();
-                    ImGui::RenderPlatformWindowsDefault();
-                    contextManager.RestoreContext();
-                }
-                contextManager.SwapFrame();
+            if (show_demo_window) {
+                ImGui::ShowDemoWindow();
             }
-            runtimeController.Shutdown();
-            Shutdown();
-            contextManager.Destroy();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
 
-        void EventHandler(SDL_Event& event) {
+        void OnEvent(SDL_Event& event) override {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT) {
-                isQuit = true;
-            }
-            
+
             if (imViewport.isFocuesed) {
                 switch (event.type) {
                     case SDL_KEYUP:
@@ -167,7 +137,7 @@ class Editor {
             }
         }
         
-        void Initialise() {
+        void OnInitialise() override {
             // Setup Dear ImGui context
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
@@ -178,22 +148,29 @@ class Editor {
             //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
             // Setup Platform/Renderer backends
-            ImGui_ImplSDL2_InitForOpenGL(contextManager.window, contextManager.gl_context);
-            ImGui_ImplOpenGL3_Init(gl_cfg.glsl);
+            ImGui_ImplSDL2_InitForOpenGL(Application::Get().GetWindow(), Application::Get().GetContext());
+            ImGui_ImplOpenGL3_Init(Application::Get().GetOpenGLConfig().glsl);
+
+           
         }
 
-        void Shutdown() {
+        void OnShutdown() {
             // Cleanup
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplSDL2_Shutdown();
             ImGui::DestroyContext();
         }
 
-        void NewFrame() {
-            // Start the Dear ImGui frame
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplSDL2_NewFrame();
-            ImGui::NewFrame();
+        // Load Scene from JSON
+        void LoadScene(const std::string& filepath) {
+            JsonSerializer js = JsonSerializer(scene);
+            js.Deserialize(filepath);
+        }
+
+        // Save scene to JSON
+        void SaveScene(const std::string& filepath) {
+            JsonSerializer js = JsonSerializer(scene);
+            js.Serialize(filepath);
         }
 
 
@@ -201,7 +178,7 @@ class Editor {
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
                     if (ImGui::MenuItem("New")) {
-                        runtimeController.LoadScene("marathon/assets/scenes/Default.json");
+                        LoadScene("marathon/assets/scenes/Default.json");
                         imSceneTree.entitySelected = Entity();
                     }
                     if (ImGui::MenuItem("Open")) {
@@ -210,7 +187,7 @@ class Editor {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {
                             imSceneTree.entitySelected = Entity();
-                            runtimeController.LoadScene(filepath);
+                            LoadScene(filepath);
                         }
                         
                     }
@@ -219,33 +196,33 @@ class Editor {
                         if (filepath == nullptr) {
                             std::cout << "DEBUG (App): No file selected." << std::endl;
                         } else {
-                            runtimeController.SaveScene(filepath);
+                            SaveScene(filepath);
                         }
                     }
                     ImGui::Separator();
                     if (ImGui::MenuItem("Close")) {
-                        isQuit = true;
+                        Application::Get().Close();
                     }
                     ImGui::EndMenu();
                 }
                 if (ImGui::BeginMenu("Entity")) {
                     if (ImGui::MenuItem("New Empty")) {
-                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = scene->CreateEntity();
                     } else if (ImGui::MenuItem("New Cube")) {
-                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = scene->CreateEntity();
                         MeshRendererComponent& mrc = imSceneTree.entitySelected.AddComponent<MeshRendererComponent>();
                         mrc.mesh = assetManager.FindAsset<OpenGLMesh>("vertex_cube");
                     } else if (ImGui::MenuItem("New Camera")) {
-                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = scene->CreateEntity();
                         imSceneTree.entitySelected.AddComponent<CameraComponent>();
                     } else if (ImGui::MenuItem("New Directional Light")) {
-                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = scene->CreateEntity();
                         imSceneTree.entitySelected.AddComponent<DirectionalLightComponent>();
                     } else if (ImGui::MenuItem("New Point Light")) {
-                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = scene->CreateEntity();
                         imSceneTree.entitySelected.AddComponent<PointLightComponent>();
                     } else if (ImGui::MenuItem("New Spot Light")) {
-                        imSceneTree.entitySelected = runtimeController.scene->CreateEntity();
+                        imSceneTree.entitySelected = scene->CreateEntity();
                         imSceneTree.entitySelected.AddComponent<SpotLightComponent>();
                     }
                     ImGui::EndMenu();

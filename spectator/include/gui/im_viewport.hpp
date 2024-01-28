@@ -5,12 +5,14 @@
 #include "renderer/editor_camera.hpp"
 #include "gui/im_editor_camera.hpp"
 
+#include "platform/opengl/opengl_frame_buffer.hpp"
+
 //// TODO:
 // Generalise viewport to draw any texture, not necessarily a frame buffer
 // Should use aspect ratio of texture to ensure it is not stretched
 // Find a way to keep original resolution/downsample better
 // Replace imvec2 with LA::vec2?
-// Fix rotation breaking
+// Figure out how to keep framebuffer with imviewport and resize when the window resizes
 
 class ImViewport : public IImWindow {
 public:
@@ -18,6 +20,13 @@ public:
     ImVec2 render_region_max = ImVec2();
     bool isFocuesed = false;
     float aspectRatio = 0.0f;
+    std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
+
+    ImViewport() {
+         // frame buffer should be tied to camera
+        frameBuffer = AssetManager::Instance().CreateAsset<OpenGLFrameBuffer>("FBO", 1920, 1080);
+        frameBuffer->SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
+    }
 
     ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {
         float maxAspectRatio = maxSize.x / maxSize.y;

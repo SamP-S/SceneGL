@@ -124,6 +124,13 @@ public:
         }
     }
 
+    void CaptureCursor(bool capture) {
+        if (capture)
+            SDL_SetRelativeMouseMode(SDL_TRUE);
+        else
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+    }
+
     // call at the end of the frame to swap displayed buffer
     void SwapFrame() {
         SDL_GL_SwapWindow(window);

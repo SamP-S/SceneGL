@@ -2,9 +2,11 @@
 
 #include <string>
 #include <memory>
+#include <cassert>
 
 #include "core/tick_timer.hpp"
-#include "runtime/ioperator.hpp"
+#include "input/input.hpp"
+#include "runtime/operator.hpp"
 #include "renderer/context_manager.hpp"
 
 
@@ -49,16 +51,51 @@ public:
             _isQuit = true;
             return;
         }
-        _operator->OnEvent(event);
+
+        switch (event.type) {
+            case SDL_KEYUP:
+                Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
+                break;
+            case SDL_KEYDOWN:
+                Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
+                break;
+            case SDL_MOUSEMOTION:
+                Input::MouseMoved(event.motion.x, event.motion.y);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
+                break;
+            case SDL_MOUSEBUTTONUP:
+                Input::MouseButtonEvent(event.button.button, BUTTON_UP);
+                break;
+            case SDL_WINDOWEVENT:
+                {
+                    switch (event.window.event) {
+                        case SDL_WINDOWEVENT_RESIZED:
+                            {   
+                                int w = event.window.data1;
+                                int h = event.window.data2;
+                            }
+                            break;
+                        default:
+                            // std::cout << "DEBUG(Application): Window event handle not implemented." << std::endl;
+                            break;
+                    }
+                }
+                break;
+            default:
+                // std::cout << "WARNING (Runtime): No event handle for @ " << event.type << std::endl;
+                break;
+        }
     }
 
     // Accept externally instanced operator
-    void SetOperator(IOperator* op) {
+    void SetOperator(Operator* op) {
         if (op == nullptr) {
             std::cout << "ERROR (Application): Attempting to set operator null." << std::endl;
         }
         _operator = op;
-        _operator->OnInitialise();
+        _operator->Start();
     }
     
     // Application loop, independant of game/sim loop
@@ -72,7 +109,7 @@ public:
             double dt = _tickTimer->GetTickElapsed();
             
             // operator tick
-            _operator->OnUpdate(dt);
+            _operator->Update(dt);
             
             // swap frame shown
             _contextManager->SwapFrame();
@@ -110,12 +147,13 @@ private:
         _tickTimer->Start();
         // set single app instance
         _instance = this;
+        
     }
     
     // Shutdown and free operator
     // Shutdown window context
     ~Application() {
-        _operator->OnShutdown();
+        _operator->End();
         delete _operator;
         _contextManager->OnShutdown();
     }
@@ -124,6 +162,6 @@ private:
     bool _isQuit = false;
     std::unique_ptr<ContextManager> _contextManager = std::make_unique<ContextManager>();
     std::unique_ptr<TickTimer> _tickTimer = std::make_unique<TickTimer>();
-    IOperator* _operator = nullptr;
+    Operator* _operator = nullptr;
     static inline Application* _instance = nullptr;
 };

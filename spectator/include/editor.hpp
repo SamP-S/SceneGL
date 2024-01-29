@@ -160,6 +160,7 @@ class Editor : public IOperator {
             ImGui_ImplOpenGL3_Init(Application::Get().GetOpenGLConfig().glsl);
 
             renderer.Initialise();
+            LoadScene("marathon/assets/scenes/Preset.json");
         }
 
         void OnShutdown() override {

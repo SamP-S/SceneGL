@@ -39,31 +39,28 @@ add_library(marathon INTERFACE)
 target_include_directories(marathon INTERFACE ${INCLUDE_DIRS})
 target_link_libraries(marathon INTERFACE la)
 
+find_package(OpenGL REQUIRED)
+target_include_directories(marathon INTERFACE ${OPENGL_INCLUDE_DIRS})
+target_link_libraries(marathon INTERFACE ${OPENGL_LIBRARIES})
+message(STATUS "OpenGL included at ${OPENGL_INCLUDE_DIRS}")
+message(STATUS "OpenGL libraries are ${OPENGL_LIBRARIES}")
+
+find_package(SDL2 REQUIRED)
+target_include_directories(marathon INTERFACE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(marathon INTERFACE ${SDL2_LIBRARIES})
+message(STATUS "SDL2 included at ${SDL2_INCLUDE_DIRS}")
+message(STATUS "SDL2 libraries are ${SDL2_LIBRARIES}")
+
+find_package(GLEW REQUIRED)
+target_include_directories(marathon INTERFACE ${GLEW_INCLUDE_DIRS})
+target_link_libraries(marathon INTERFACE ${GLEW_LIBRARIES})
+message(STATUS "GLEW included at ${GLEW_INCLUDE_DIRS}")
+message(STATUS "GLEW libraries are ${GLEW_LIBRARIES}")
 
 # runtime
 add_executable(sprinter "sprinter/src/sprinter.cpp")
 target_include_directories(sprinter PUBLIC "sprinter/include")
 target_link_libraries(sprinter PUBLIC marathon)
-
-find_package(OpenGL REQUIRED)
-target_include_directories(sprinter PUBLIC ${OPENGL_INCLUDE_DIRS})
-target_link_libraries(sprinter PUBLIC ${OPENGL_LIBRARIES})
-message(STATUS "OpenGL included at ${OPENGL_INCLUDE_DIRS}")
-message(STATUS "OpenGL libraries are ${OPENGL_LIBRARIES}")
-
-find_package(SDL2 REQUIRED)
-target_include_directories(sprinter PUBLIC ${SDL2_INCLUDE_DIRS})
-target_link_libraries(sprinter PUBLIC ${SDL2_LIBRARIES})
-message(STATUS "SDL2 included at ${SDL2_INCLUDE_DIRS}")
-message(STATUS "SDL2 libraries are ${SDL2_LIBRARIES}")
-
-find_package(GLEW REQUIRED)
-target_include_directories(sprinter PUBLIC ${GLEW_INCLUDE_DIRS})
-target_link_libraries(sprinter PUBLIC ${GLEW_LIBRARIES})
-message(STATUS "GLEW included at ${GLEW_INCLUDE_DIRS}")
-message(STATUS "GLEW libraries are ${GLEW_LIBRARIES}")
-
-
 
 # editor
 add_executable(spectator "spectator/src/main.cpp")

@@ -62,12 +62,12 @@ add_executable(sprinter "sprinter/src/sprinter.cpp")
 target_include_directories(sprinter PUBLIC "sprinter/include")
 target_link_libraries(sprinter PUBLIC marathon)
 
-# editor
-add_executable(spectator "spectator/src/main.cpp")
-target_include_directories(spectator PUBLIC "spectator/include")
-target_link_libraries(spectator PUBLIC tinyfiledialogs)
-target_link_libraries(spectator PUBLIC imguizmo)
-target_link_libraries(spectator PUBLIC marathon)
+# # editor
+# add_executable(spectator "spectator/src/main.cpp")
+# target_include_directories(spectator PUBLIC "spectator/include")
+# target_link_libraries(spectator PUBLIC tinyfiledialogs)
+# target_link_libraries(spectator PUBLIC imguizmo)
+# target_link_libraries(spectator PUBLIC marathon)
 
 # test scripts
 add_executable(ecs_test "test/ecs_test.cpp")

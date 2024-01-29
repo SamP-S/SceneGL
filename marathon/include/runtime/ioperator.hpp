@@ -8,7 +8,9 @@ class IOperator {
 public:
     AssetManager&  assetManager = AssetManager::Instance();
     AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
-    Renderer& renderer = Renderer::Instance();
+
+    // Modules have capitol first letters
+    Renderer& Renderer = Renderer::Instance();
 
     virtual void OnInitialise() = 0;
     virtual void OnUpdate(double dt) = 0;

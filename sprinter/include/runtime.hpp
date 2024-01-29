@@ -3,6 +3,7 @@
 #include "ngine/ngine.hpp"
 #include "runtime/ioperator.hpp"
 #include "renderer/renderer.hpp"
+#include "engine/graphics_engine.hpp"
 #include "renderer/editor_camera.hpp"
 #include "core/tick_timer.hpp"
 #include "serializer/serializer.hpp"
@@ -15,6 +16,7 @@ class Runtime : public IOperator {
 private:
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
     EditorCamera editorCamera = EditorCamera();
+    GraphicsEngine graphicsEngine = GraphicsEngine();
 
 public:
     Runtime() {}
@@ -22,7 +24,7 @@ public:
 
     void OnInitialise() override {
         // engine Intialisation
-        renderer.Initialise();
+        graphicsEngine.Init();
 
         // load scene
         LoadScene("marathon/assets/scenes/Preset.json");    
@@ -52,7 +54,6 @@ public:
                             {   
                                 int w = event.window.data1;
                                 int h = event.window.data2;
-                                renderer.OnWindowResize(w, h);
                             }
                             break;
                         default:
@@ -69,9 +70,11 @@ public:
 
     void OnUpdate(double dt) override {
         editorCamera.Update(dt);
-        renderer.Clear();
-        renderer.RenderSceneByEditorCamera(scene, editorCamera, DrawMode::FILL);
-        renderer.RenderSceneByEditorCamera(scene, editorCamera, DrawMode::LINES);
+        Renderer.Clear();
+        Renderer.SetDrawMode(DrawMode::FILL);
+        graphicsEngine.RenderSceneByEditorCamera(scene, editorCamera);
+        Renderer.SetDrawMode(DrawMode::LINES);
+        graphicsEngine.RenderSceneByEditorCamera(scene, editorCamera);
     }
 
     void OnShutdown() override {

@@ -6,7 +6,6 @@ class FrameBuffer : public Asset {
     protected:
         int _width = 0;
         int _height = 0;
-        LA::vec4 _clearColour = LA::vec4({0.2f, 0.2f, 0.2f, 1.0f});
 
     public:
         FrameBuffer(const std::string& name, int width, int height)
@@ -22,7 +21,6 @@ class FrameBuffer : public Asset {
         virtual void Unbind() = 0;
         virtual uint32_t GetColourAttachment() = 0;
         virtual uint32_t GetDepthStencilAttachment() = 0;
-        virtual void SetClearColour(float r, float g, float b, float a) = 0;
         virtual void Clear() = 0;
 
 };

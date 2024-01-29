@@ -84,14 +84,9 @@ class OpenGLFrameBuffer : public FrameBuffer {
             return _texDepthStencil;
         }   
 
-        void SetClearColour(float r, float g, float b, float a) override {
-            _clearColour = LA::vec4({r, g, b, a});
-        }
-
         // binds fbo then sets clear colour and clears colour, depth and stencil texture attachments
         void Clear() override {
             glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
-            glClearColor(_clearColour.r, _clearColour.g, _clearColour.b, _clearColour.a);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         }
 };

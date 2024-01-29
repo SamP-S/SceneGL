@@ -23,11 +23,15 @@ public:
     ~Runtime() {}
 
     void OnInitialise() override {
+        
+
         // engine Intialisation
         graphicsEngine.Init();
 
         // load scene
-        LoadScene("marathon/assets/scenes/Preset.json");    
+        LoadScene("marathon/assets/scenes/Preset.json");
+        
+        graphicsEngine.scene = scene;
     }
 
     void OnEvent(SDL_Event& event) {
@@ -57,7 +61,7 @@ public:
                             }
                             break;
                         default:
-                            std::cout << "DEBUG(Application): Window event handle not implemented." << std::endl;
+                            // std::cout << "DEBUG(Application): Window event handle not implemented." << std::endl;
                             break;
                     }
                 }

@@ -44,9 +44,9 @@ public:
     
     void SetDrawMode(DrawMode drawMode) override {
         _drawMode = drawMode;
-        if (m == DrawMode::POINTS)
+        if (_drawMode == DrawMode::POINTS)
             glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        else if (m == DrawMode::LINES)
+        else if (_drawMode == DrawMode::LINES)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -64,8 +64,8 @@ public:
     }
 
     void SetLineWidth(float width) override {
-        _width = width;
-        glLineWidth(width);
+        _lineWidth = width;
+        glLineWidth(_lineWidth);
     }
     float GetLineWidth() override {
         return _lineWidth;
@@ -97,7 +97,7 @@ public:
         else
             glDisable(GL_CULL_FACE);
     }
-    void IsCulling() override {
+    bool IsCulling() override {
         return _culling;
     }
 
@@ -108,7 +108,7 @@ public:
         else
             glDisable(GL_DEPTH_TEST);
     }
-    void IsDepthTesting() override {
+    bool IsDepthTesting() override {
         return _depthTesting;
     }
 
@@ -145,12 +145,9 @@ public:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void SetClearColour(float r, float g, float b, float a) override {
-        glClearColor(r, g, b, a);
-    }
 
-    void RenderMesh(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const LA::mat4& transform) {
-        if (!shader || !Mesh) {
+    void RenderMesh(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const LA::mat4& transform) override {
+        if (!shader || !mesh) {
             std::cout << "ERROR (OpenGLRenderer): Attempting to render with null shader or mesh" << std::endl;
             return;
         }
@@ -161,18 +158,15 @@ public:
         mesh->Draw();
     }
     
-    // delete copy and assign operators
-    // should always get instance from class::instance func
-    Renderer(const Renderer&) = delete;
-    Renderer& operator=(const Renderer&) = delete;
-
     // renderer is singleton
     static Renderer& Instance() {
-        static Renderer instance;
-        return instance;
+        static Renderer* instance;
+        if (!instance)
+            instance = new OpenGLRenderer();
+        return *instance;
     }
 
-private:
+protected:
     OpenGLRenderer() = default;
     ~OpenGLRenderer() = default;
 };

@@ -41,7 +41,7 @@ enum class Winding {
 };
 
 class Renderer : public Module {
-private:
+protected:
     // rendering state
     std::shared_ptr<FrameBuffer> _frameBuffer = nullptr;
     LA::mat4 _projection = LA::mat4();
@@ -75,9 +75,9 @@ public:
     virtual void SetClearColour(const LA::vec4& colour) = 0;
     virtual LA::vec4 GetClearColour() = 0;
     virtual void SetCulling(bool enabled) = 0;
-    virtual void IsCulling() = 0;
+    virtual bool IsCulling() = 0;
     virtual void SetDepthTesting(bool enabled) = 0;
-    virtual void IsDepthTesting() = 0;
+    virtual bool IsDepthTesting() = 0;
 
     // set null to draw directly to screen
     virtual void SetFrameBuffer(std::shared_ptr<FrameBuffer> fb) = 0;
@@ -91,13 +91,13 @@ public:
 
     virtual void Clear() = 0;
     
-    virtual void RenderMesh(std::shared_ptr<Mesh> mesh, const LA::mat4& transform) = 0;
+    virtual void RenderMesh(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const LA::mat4& transform) = 0;
 
     // delete copy and assign operators should always get instance from class::instance func
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
         
-private:
+protected:
     Renderer() = default;
     ~Renderer() = default;
 

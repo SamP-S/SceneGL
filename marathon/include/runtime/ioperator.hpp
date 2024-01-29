@@ -1,8 +1,11 @@
 #pragma once
 
 #include "renderer/context_manager.hpp"
-#include "renderer/renderer.hpp"
+#include "platform/opengl/opengl_renderer.hpp"
 #include "ngine/ngine.hpp"
+
+//// TODO:
+// remove opengl deps
 
 class IOperator {
 public:
@@ -10,7 +13,7 @@ public:
     AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
 
     // Modules have capitol first letters
-    Renderer& Renderer = Renderer::Instance();
+    Renderer& Renderer = OpenGLRenderer::Instance();
 
     virtual void OnInitialise() = 0;
     virtual void OnUpdate(double dt) = 0;

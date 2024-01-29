@@ -11,21 +11,31 @@
 #include "renderer/model_loader.hpp"
 #include "renderer/shader_loader.hpp"
 #include "renderer/material.hpp"
+#include "renderer/editor_camera.hpp"
+#include "platform/opengl/opengl_material.hpp"
 #include "platform/opengl/opengl_renderer.hpp"
 
 //// TODO:
 // Remove this
 // Remove OpenGL deps
 
+enum class ShadingMode {
+    SHADED,
+    WIREFRAME,
+    SHADED_WIREFRAME
+};
+
 class GraphicsEngine {
 public:
     AssetManager& assetManager = AssetManager::Instance();
     AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
     Renderer& Renderer = OpenGLRenderer::Instance();
-    
-    // keep internal ref after render call to make life easier
-    std::shared_ptr<Scene> scene;
+    std::shared_ptr<Scene> scene = nullptr;
 
+
+    ShadingMode shadingMode = ShadingMode::SHADED_WIREFRAME;
+
+ 
     void Init() {
         // add loaders to asset libary
         loaderManager.AddLoader(new ModelLoader());
@@ -68,7 +78,7 @@ public:
     }
 
     void RenderSceneByEditorCamera(std::shared_ptr<Scene> scene, EditorCamera& editorCamera) {
-    
+        
         std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
         for (auto asset : shaders) {
             // set editor camera uniforms
@@ -89,13 +99,10 @@ public:
         for (auto& ent : renderables) {
             RenderObject(ent);
         }
+        
     }
 
     void RenderObject(Entity entity) {
-        // check entity has renderer
-        if (!entity.HasComponent<MeshRendererComponent>())
-            return;
-
         TransformComponent& tc = entity.GetComponent<TransformComponent>();
         mat4 model = tc.GetTransform();
 
@@ -104,53 +111,25 @@ public:
         std::shared_ptr<Mesh> mesh = mrc.mesh;
         std::shared_ptr<Material> material = mrc.material;
         if (mesh == nullptr || material == nullptr) {
+            std::cout << "WARNING (GraphicsEngine): Trying to render null mesh/material." << std::endl;
             return;
         }
 
-        std::shared_ptr<Shader> shader;
-        if (m != DrawMode::FILL) {
-            shader = assetManager.FindAsset<OpenGLShader>("base");
-        } else {
-            shader = material->shader;
-        }
-        if (!material->IsUsable()) {
-            // std::cout << "WARNING (Renderer): Attempting to draw mesh with null shader." << std::endl;
-            return;
-        }
+        // render shaded
+        if (shadingMode == ShadingMode::SHADED || shadingMode == ShadingMode::SHADED_WIREFRAME) {
+            if (material->IsUsable()) {
+                material->Bind();
+                Renderer.RenderMesh(material->shader, mrc.mesh, model);
+            }
+        } 
         
-        // pass model coordinate space
-        material->Bind();
-        // rebind for wireframe
-        shader->Bind();
-        shader->SetMat4("uModel", &model[0][0]);
-
-        // draw mesh
-        mrc.mesh->Draw();
-    }
-
-    void RenderSceneByEditorCamera(std::shared_ptr<Shader>, std::shared_ptr<Scene> scene, EditorCamera& editorCamera) {
-    
-        std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
-        for (auto asset : shaders) {
-            // set editor camera uniforms
-            std::shared_ptr<Shader> shader = std::dynamic_pointer_cast<Shader>(asset);
-            Renderer.SetProjection(editorCamera.GetProjection());
-            Renderer.SetView(LA::inverse(editorCamera.transform.GetTransform()));
-            shader->SetVec3("uResolution", editorCamera.width, editorCamera.height, 1.0f);
-            shader->SetVec3("uCameraPosition", editorCamera.transform.position);
-
-            // set lighting objects
-            ShaderDirectionalLights(shader);
-            ShaderPointLights(shader);
-            ShaderSpotLights(shader);
-        }
-
-        // render entities
-        std::vector<Entity> renderables = scene->GetEntitiesWith<MeshRendererComponent>();
-        for (auto& ent : renderables) {
-            RenderObject(ent);
+        // render wireframe
+        if (shadingMode == ShadingMode::WIREFRAME || shadingMode == ShadingMode::SHADED_WIREFRAME) {
+            std::shared_ptr<Shader> shader = assetManager.FindAsset<OpenGLShader>("base");
+            Renderer.RenderMesh(shader, mrc.mesh, model);
         }
     }
+
 
     void ShaderDirectionalLights(std::shared_ptr<Shader> shader) {
         std::vector<Entity> entities = scene->GetEntitiesWith<DirectionalLightComponent>();

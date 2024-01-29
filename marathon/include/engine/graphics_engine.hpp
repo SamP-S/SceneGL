@@ -85,6 +85,7 @@ public:
             std::shared_ptr<Shader> shader = std::dynamic_pointer_cast<Shader>(asset);
             Renderer.SetProjection(editorCamera.GetProjection());
             Renderer.SetView(LA::inverse(editorCamera.transform.GetTransform()));
+            shader->Bind();
             shader->SetVec3("uResolution", editorCamera.width, editorCamera.height, 1.0f);
             shader->SetVec3("uCameraPosition", editorCamera.transform.position);
 
@@ -115,6 +116,7 @@ public:
             return;
         }
 
+        Renderer.SetDrawMode(DrawMode::FILL);
         // render shaded
         if (shadingMode == ShadingMode::SHADED || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             if (material->IsUsable()) {
@@ -123,6 +125,7 @@ public:
             }
         } 
         
+        Renderer.SetDrawMode(DrawMode::LINES);
         // render wireframe
         if (shadingMode == ShadingMode::WIREFRAME || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             std::shared_ptr<Shader> shader = assetManager.FindAsset<OpenGLShader>("base");

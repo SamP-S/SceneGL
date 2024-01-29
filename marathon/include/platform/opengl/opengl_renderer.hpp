@@ -152,9 +152,9 @@ public:
             return;
         }
         shader->Bind();
-        shader->SetMat4("uView", &_view[0][0]);
-        shader->SetMat4("uProjection", &_projection[0][0]);
-        shader->SetMat4("uModel", &transform[0][0]);
+        shader->SetMat4("uView", _view);
+        shader->SetMat4("uProjection", _projection);
+        shader->SetMat4("uModel", transform);
         mesh->Draw();
     }
     

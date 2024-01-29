@@ -23,6 +23,7 @@ public:
     ~Runtime() {}
 
     void OnInitialise() override {
+        Renderer.Boot();
         
 
         // engine Intialisation
@@ -30,7 +31,7 @@ public:
 
         // load scene
         LoadScene("marathon/assets/scenes/Preset.json");
-        
+
         graphicsEngine.scene = scene;
     }
 
@@ -75,15 +76,13 @@ public:
     void OnUpdate(double dt) override {
         editorCamera.Update(dt);
         Renderer.Clear();
-        Renderer.SetDrawMode(DrawMode::FILL);
-        graphicsEngine.RenderSceneByEditorCamera(scene, editorCamera);
-        Renderer.SetDrawMode(DrawMode::LINES);
+        graphicsEngine.shadingMode = ShadingMode::SHADED_WIREFRAME;
         graphicsEngine.RenderSceneByEditorCamera(scene, editorCamera);
     }
 
     void OnShutdown() override {
-
-    }
+        Renderer.Shutdown();
+    }   
 
     // Load Scene from JSON
     void LoadScene(const std::string& filepath) {

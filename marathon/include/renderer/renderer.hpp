@@ -54,7 +54,7 @@ protected:
     bool _depthTesting = true;
     bool _culling = true;
     Winding _winding = Winding::CCW;
-    LA::vec4 _clearColour = LA::vec4(1.0f);
+    LA::vec4 _clearColour = LA::vec4({0.35f, 0.35f, 0.5f, 1.0f});
 
 public:
     std::string GetName() override {

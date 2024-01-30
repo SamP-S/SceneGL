@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
     appCfg.name = "Sprinter";
     appCfg.cwd = "~/source/repos/hobby/SceneGL/sample_project";
 
-    Application& app = Application::Create(appCfg);
-    app.SetOperator(new Runtime());
-    app.Run();
-    Application::Destroy();
+    Application* app = Application::Create(appCfg);
+    app->SetOperator(new Runtime());
+    app->Run();
+    delete app;
     
     std::cout << "end of program" << std::endl;
     return 0;

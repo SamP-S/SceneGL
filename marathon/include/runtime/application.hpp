@@ -8,6 +8,7 @@
 #include "input/input.hpp"
 #include "runtime/interactive.hpp"
 #include "window/window.hpp"
+#include "platform/opengl/opengl_renderer.hpp"
 
 
 //// TODO:
@@ -30,6 +31,7 @@ class Application {
 public:
 
     Window& Window = Window::Instance();
+    Renderer& Renderer = OpenGLRenderer::Instance();
 
     static Application* Create(ApplicationConfig cfg) {
         assert(_instance == nullptr && "Attempting to create application twice. Only 1 allowed.");
@@ -79,6 +81,7 @@ private:
     Application(ApplicationConfig cfg)
         : _cfg(cfg) {
         Window.Boot();
+        Renderer.Boot();
         // start timer
         _tickTimer->Start();
         // set single app instance

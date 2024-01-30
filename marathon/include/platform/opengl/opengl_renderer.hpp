@@ -1,6 +1,5 @@
 #pragma once
 
-// includes
 #include <map>
 #include <assert.h>
 #include <string>
@@ -16,10 +15,8 @@
 #include "platform/opengl/opengl_shader.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
 
-
 //// TODO:
 // no method for glViewport(0, 0, width, height);
-
 
 //// NOTES:
 // switching shader will need all uniforms reassigned
@@ -28,143 +25,35 @@
 
 class OpenGLRenderer : public Renderer {
 public:
-    void Boot() override {
-        std::cout << "DEBUG (OpenGLRenderer): Boot." << std::endl;
-        SetPointSize(_pointSize);
-        SetLineWidth(_lineWidth);
-        SetWinding(_winding);
-        SetClearColour(_clearColour);
-        SetCulling(true);
-        SetDepthTesting(true);
-    }
+    void Boot() override;
+    void Shutdown() override;
 
-    void Shutdown() override {
-        std::cout << "DEBUG (OpenGLRenderer): Shutdown." << std::endl;
-    }
-    
-    void SetDrawMode(DrawMode drawMode) override {
-        _drawMode = drawMode;
-        if (_drawMode == DrawMode::POINTS)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        else if (_drawMode == DrawMode::LINES)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-    DrawMode GetDrawMode() override {
-        return _drawMode;
-    }
+    void SetDrawMode(DrawMode drawMode) override;
+    DrawMode GetDrawMode() override;
+    void SetPointSize(float size) override;
+    float GetPointSize() override;
+    void SetLineWidth(float width) override;
+    float GetLineWidth() override;
+    void SetWinding(Winding winding) override;
+    Winding GetWinding() override;
+    void SetClearColour(const LA::vec4& c) override;
+    LA::vec4 GetClearColour() override;
+    void SetCulling(bool enabled) override;
+    bool IsCulling() override;
+    void SetDepthTesting(bool enabled) override;
+    bool IsDepthTesting() override;
 
-    void SetPointSize(float size) override {
-        _pointSize = size;
-        glPointSize(size);
-    }
-    float GetPointSize() override {
-        return _pointSize;
-    }
+    // set null to draw directly to window
+    void SetFrameBuffer(std::shared_ptr<FrameBuffer> fb);
+    std::shared_ptr<FrameBuffer> GetFrameBuffer();
+    void SetProjection(const LA::mat4& proj) override;
+    LA::mat4 GetProjection() override;
+    void SetView(const LA::mat4& view) override;
+    LA::mat4 GetView() override;
 
-    void SetLineWidth(float width) override {
-        _lineWidth = width;
-        glLineWidth(_lineWidth);
-    }
-    float GetLineWidth() override {
-        return _lineWidth;
-    }
-
-    void SetWinding(Winding winding) override {
-        _winding = winding;
-        if (winding == Winding::CW)
-            glFrontFace(GL_CW);
-        else
-            glFrontFace(GL_CCW);
-    }
-    Winding GetWinding() override {
-        return _winding;
-    }
-
-    void SetClearColour(const LA::vec4& c) override {
-        _clearColour = c;
-        glClearColor(c.r, c.g, c.b, c.a);
-    }
-    LA::vec4 GetClearColour() override {
-        return _clearColour;
-    }
-
-    void SetCulling(bool enabled) override {
-        _culling = enabled;
-        if (_culling)
-            glEnable(GL_CULL_FACE);
-        else
-            glDisable(GL_CULL_FACE);
-    }
-    bool IsCulling() override {
-        return _culling;
-    }
-
-    void SetDepthTesting(bool enabled) override {
-        _depthTesting = enabled;
-        if (_depthTesting)
-            glEnable(GL_DEPTH_TEST);
-        else
-            glDisable(GL_DEPTH_TEST);
-    }
-    bool IsDepthTesting() override {
-        return _depthTesting;
-    }
-
-    // set null to draw directly to screen
-    void SetFrameBuffer(std::shared_ptr<FrameBuffer> fb) {
-        _frameBuffer = fb;
-        if (fb == nullptr)
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        else
-            fb->Bind();
-    }
-    std::shared_ptr<FrameBuffer> GetFrameBuffer() { 
-        return _frameBuffer;
-    }
-
-    void SetProjection(const LA::mat4& proj) override {
-        _projection = proj;
-    }
-    LA::mat4 GetProjection() override {
-        return _projection;
-    }
-
-    void SetView(const LA::mat4& view) override {
-        _view = view;
-    }
-    LA::mat4 GetView() override {
-        return _view;
-    }
-
-    void Clear() override {
-        if (_frameBuffer)
-            _frameBuffer->Clear();
-        else
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    }
-
-
-    void RenderMesh(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const LA::mat4& transform) override {
-        if (!shader || !mesh) {
-            std::cout << "ERROR (OpenGLRenderer): Attempting to render with null shader or mesh" << std::endl;
-            return;
-        }
-        shader->Bind();
-        shader->SetMat4("uView", _view);
-        shader->SetMat4("uProjection", _projection);
-        shader->SetMat4("uModel", transform);
-        mesh->Draw();
-    }
-    
-    // renderer is singleton
-    static Renderer& Instance() {
-        static Renderer* instance;
-        if (!instance)
-            instance = new OpenGLRenderer();
-        return *instance;
-    }
+    void Clear() override;
+    void RenderMesh(std::shared_ptr<Shader> shader, std::shared_ptr<Mesh> mesh, const LA::mat4& transform) override;
+    static Renderer& Instance();
 
 protected:
     OpenGLRenderer() = default;

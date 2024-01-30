@@ -29,31 +29,30 @@ set(INCLUDE_DIRS
     "marathon/external/entt/include"
     "marathon/external/tinygltf/include"
 )
+file(GLOB_RECURSE SRC_FILES "marathon/src/**.cpp")
 message(STATUS "INCLUDE_DIRS: " ${INCLUDE_DIRS})
-
-# file(GLOB_RECURSE SRC_FILES "marathon/src/**.cpp")
-# message(STATUS "SRC_FILES: ${SRC_FILES}")
+message(STATUS "SRC_FILES: ${SRC_FILES}")
 
 # game engine
-add_library(marathon INTERFACE)
-target_include_directories(marathon INTERFACE ${INCLUDE_DIRS})
-target_link_libraries(marathon INTERFACE la)
+add_library(marathon ${SRC_FILES})
+target_include_directories(marathon PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(marathon PUBLIC la)
 
 find_package(OpenGL REQUIRED)
-target_include_directories(marathon INTERFACE ${OPENGL_INCLUDE_DIRS})
-target_link_libraries(marathon INTERFACE ${OPENGL_LIBRARIES})
+target_include_directories(marathon PUBLIC ${OPENGL_INCLUDE_DIRS})
+target_link_libraries(marathon PUBLIC ${OPENGL_LIBRARIES})
 message(STATUS "OpenGL included at ${OPENGL_INCLUDE_DIRS}")
 message(STATUS "OpenGL libraries are ${OPENGL_LIBRARIES}")
 
 find_package(SDL2 REQUIRED)
-target_include_directories(marathon INTERFACE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(marathon INTERFACE ${SDL2_LIBRARIES})
+target_include_directories(marathon PUBLIC ${SDL2_INCLUDE_DIRS})
+target_link_libraries(marathon PUBLIC ${SDL2_LIBRARIES})
 message(STATUS "SDL2 included at ${SDL2_INCLUDE_DIRS}")
 message(STATUS "SDL2 libraries are ${SDL2_LIBRARIES}")
 
 find_package(GLEW REQUIRED)
-target_include_directories(marathon INTERFACE ${GLEW_INCLUDE_DIRS})
-target_link_libraries(marathon INTERFACE ${GLEW_LIBRARIES})
+target_include_directories(marathon PUBLIC ${GLEW_INCLUDE_DIRS})
+target_link_libraries(marathon PUBLIC ${GLEW_LIBRARIES})
 message(STATUS "GLEW included at ${GLEW_INCLUDE_DIRS}")
 message(STATUS "GLEW libraries are ${GLEW_LIBRARIES}")
 

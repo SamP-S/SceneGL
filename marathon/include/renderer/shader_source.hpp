@@ -7,7 +7,7 @@
 
 #include "ngine/ngine.hpp"
 
-enum ShaderStage {
+enum class ShaderStage {
     INVALID = 0,
     VERTEX = 1,
     FRAGMENT = 2,

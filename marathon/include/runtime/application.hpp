@@ -16,8 +16,8 @@
 // Application should set project settings
 // Application should handle the window manager
 // Application should accept an operator that controls the main game engine/game loop
-// Remove SDL_Event dependency
 // Allow for dynamic opengl config
+// All modules should be boot/shutdown from application
 
 struct ApplicationConfig {
     std::string name = "Example Project";

@@ -2,7 +2,8 @@
 
 #define GL_VERSION_4_4
 #include <GL/glew.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +21,7 @@
 // Abstract so not SDL specific implementation
 // Implement all the window  property get/set
 // Rm event handling from here should be put in event class
+// Add support for OpenGL 4.6
 
 //// NOTE:
 // can add sRGB to OpenGLConfig
@@ -45,8 +47,8 @@ struct WindowConfig {
 
 struct OpenGLConfig {
     int major = 4;
-    int minor = 6;
-    const char* glsl = "#version 460 core";
+    int minor = 4;
+    const char* glsl = "#version 440 core";
 
     // swap buffers on refresh rate
     int vsync = 1;
@@ -100,7 +102,7 @@ public:
         // Initialise SDL subsystems
         SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO);
 
-        // Core OpenGL 4.6 + GLSL 460
+        // OpenGL version
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, _openglConfig.major);

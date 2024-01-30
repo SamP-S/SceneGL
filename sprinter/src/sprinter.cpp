@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
     appCfg.cwd = "~/source/repos/hobby/SceneGL/sample_project";
 
     Application* app = Application::Create(appCfg);
-    app->SetOperator(new Runtime());
+    app->SetInteractive(new Runtime());
     app->Run();
     delete app;
     

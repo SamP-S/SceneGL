@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ngine/ngine.hpp"
-#include "runtime/operator.hpp"
+#include "runtime/interactive.hpp"
 #include "renderer/renderer.hpp"
 #include "core/tick_timer.hpp"
 #include "serializer/serializer.hpp"
@@ -23,7 +23,7 @@ enum class ShadingMode {
     SHADED_WIREFRAME
 };
 
-class Runtime : public Operator {
+class Runtime : public Interactive {
 private:
     // global modules
     AssetManager& assetManager = AssetManager::Instance();

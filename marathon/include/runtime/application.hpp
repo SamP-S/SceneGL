@@ -6,16 +6,16 @@
 
 #include "core/tick_timer.hpp"
 #include "input/input.hpp"
-#include "runtime/operator.hpp"
+#include "runtime/interactive.hpp"
 #include "window/window.hpp"
 
 
 //// TODO:
 // Implement events wrapping/parsing at the highest level before propogating
-// Application should not be touched by end user, it is the higher level to the operator
+// Application should not be touched by end user, it is the higher level to the interactive
 // Application should set project settings
 // Application should handle the window manager
-// Application should accept an operator that controls the main game engine/game loop
+// Application should accept an interactive that controls the main game engine/game loop
 // Allow for dynamic opengl config
 // All modules should be boot/shutdown from application
 
@@ -38,13 +38,13 @@ public:
         return _instance;
     }
 
-    // Accept externally instanced operator
-    void SetOperator(Operator* op) {
+    // Accept externally instanced interactive
+    void SetInteractive(Interactive* op) {
         if (op == nullptr) {
-            std::cout << "ERROR (Application): Attempting to set operator null." << std::endl;
+            std::cout << "ERROR (Application): Attempting to set interactive null." << std::endl;
         }
-        _operator = op;
-        _operator->Start();
+        _interactive = op;
+        _interactive->Start();
     }
     
     // Application loop, independant of game/sim loop
@@ -57,19 +57,19 @@ public:
             _tickTimer->Tick();
             double dt = _tickTimer->GetTickElapsed();
             
-            // operator tick
-            _operator->Update(dt);
+            // interactive tick
+            _interactive->Update(dt);
             
             // swap frame shown
             Window.SwapFrame();
         }
     }
 
-    // Shutdown modules and free operator
+    // Shutdown modules and free interactive
     // Shutdown window context
     ~Application() {
-        _operator->End();
-        delete _operator;
+        _interactive->End();
+        delete _interactive;
         Window.Shutdown();
     }
 
@@ -88,6 +88,6 @@ private:
 
     ApplicationConfig _cfg;
     std::unique_ptr<TickTimer> _tickTimer = std::make_unique<TickTimer>();
-    Operator* _operator = nullptr;
+    Interactive* _interactive = nullptr;
     static inline Application* _instance = nullptr;
 };

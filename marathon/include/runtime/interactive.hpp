@@ -3,7 +3,7 @@
 //// TODO:
 // move module instances here
 
-class Operator {
+class Interactive {
 public:
     virtual void Start() = 0;
     virtual void Update(double dt) = 0;

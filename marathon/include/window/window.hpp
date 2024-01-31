@@ -64,8 +64,8 @@ private:
     bool _isOpen = false;
 
 protected:
-    Window();
-    ~Window();
+    Window() = default;
+    ~Window() = default;
 
 public:
     Window(const Window&) = delete;

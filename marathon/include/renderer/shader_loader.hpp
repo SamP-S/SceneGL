@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ngine/ngine.hpp"
+#include "ecs/asset.hpp"
 #include "core/filepath.hpp"
 #include "platform/opengl/opengl_shader.hpp"
 #include "platform/opengl/opengl_shader_source.hpp"

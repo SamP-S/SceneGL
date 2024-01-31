@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ngine/ngine.hpp"
+#include "ecs/asset.hpp"
 
 class FrameBuffer : public Asset {
     protected:

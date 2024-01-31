@@ -3,8 +3,7 @@
 #include <string>
 
 // internal libs
-#include "ngine/ngine.hpp"
-// #include "ngine/serializer.hpp"
+#include "ecs/ngine.hpp"
 
 // we have two example components here
 struct PositionComponent {

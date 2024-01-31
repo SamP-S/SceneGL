@@ -6,7 +6,7 @@
 #include <variant>
 #include <type_traits>
 
-#include "ngine/ngine.hpp"
+#include "ecs/asset.hpp"
 #include "la_extended.h"
 #include "renderer/shader.hpp"
 

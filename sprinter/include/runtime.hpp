@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ngine/ngine.hpp"
+#include "ecs/ngine.hpp"
 #include "runtime/interactive.hpp"
 #include "renderer/renderer.hpp"
 #include "core/tick_timer.hpp"
@@ -37,13 +37,13 @@ private:
 
     // Load Scene from JSON
     void LoadScene(const std::string& filepath) {
-        JsonSerializer js = JsonSerializer(scene);
+        SceneSerializer js = SceneSerializer(*scene);
         js.Deserialize(filepath);
     }
 
     // Save scene to JSON
     void SaveScene(const std::string& filepath) {
-        JsonSerializer js = JsonSerializer(scene);
+        SceneSerializer js = SceneSerializer(*scene);
         js.Serialize(filepath);
     }
     
@@ -54,8 +54,8 @@ public:
 
     void Start() override {
         // add loaders to asset libary
-        loaderManager.AddLoader(new ModelLoader());
-        loaderManager.AddLoader(new ShaderLoader());
+        loaderManager.AddLoader(std::make_shared<ModelLoader>());
+        loaderManager.AddLoader(std::make_shared<ShaderLoader>());
 
         // load default model(s)
         loaderManager.Load("marathon/assets/models/presets/cone.gltf");

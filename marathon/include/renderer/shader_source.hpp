@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "ngine/ngine.hpp"
+#include "ecs/asset.hpp"
 
 enum class ShaderStage {
     INVALID = 0,

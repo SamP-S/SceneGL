@@ -7,7 +7,6 @@
 #include <vector>
 
 // internal libs
-#include "ngine/ngine.hpp"
 #include "la_extended.h"
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"

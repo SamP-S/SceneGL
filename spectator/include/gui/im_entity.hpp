@@ -4,7 +4,7 @@
 #include <string>
 
 #include "gui/im_window.hpp"
-#include "ngine/ngine.hpp"
+#include "ecs/ngine.hpp"
 #include "renderer/components.hpp"
 
 //// TODO:

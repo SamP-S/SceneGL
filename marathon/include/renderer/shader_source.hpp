@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "ngine/ngine.hpp"
+#include "renderer/renderer_api.hpp"
 
 enum class ShaderStage {
     INVALID = 0,
@@ -18,13 +19,15 @@ enum class ShaderStage {
 };
 
 class ShaderSource : public Asset {
-    public:
-        std::string source = "";
-        ShaderStage stage = ShaderStage::INVALID;
-    
-        ShaderSource(const std::string& name="Default Shader Stage", const std::string& source="", const ShaderStage& stage=ShaderStage::INVALID)
-            : Asset(name), source(source), stage(stage) {}
+public:
+    std::string source = "";
+    ShaderStage stage = ShaderStage::INVALID;
 
-        virtual uint32_t Compile() = 0;
+    ShaderSource(const std::string& name="Default Shader Stage", const std::string& source="", const ShaderStage& stage=ShaderStage::INVALID)
+        : Asset(name), source(source), stage(stage) {}
+
+    virtual uint32_t Compile() = 0;
+
+    static std::shared_ptr<ShaderSource> Create(const std::string& name, const std::string& source="", const ShaderStage& stage=ShaderStage::INVALID);
 
 };

@@ -8,6 +8,7 @@
 
 #include "ngine/ngine.hpp"
 #include "la_extended.h"
+#include "renderer/renderer_api.hpp"
 #include "renderer/shader.hpp"
 
 //// TODO:
@@ -40,40 +41,42 @@ template <class T, class... Ts>
 inline constexpr bool is_in_variant_v = is_in_variant<T, Ts...>::value;
 
 class Material : public Asset {
-    public:
-        std::map<std::string, GLSLType> properties;
-        std::shared_ptr<Shader> shader = nullptr;
+public:
+    std::map<std::string, GLSLType> properties;
+    std::shared_ptr<Shader> shader = nullptr;
 
-        Material(std::string name="Material")
-            : Asset(name) {}
+    Material(std::string name="Material")
+        : Asset(name) {}
 
-        virtual bool IsUsable() const = 0;
-        virtual void Bind() = 0;
+    virtual bool IsUsable() const = 0;
+    virtual void Bind() = 0;
 
-        void SetProperty(const std::string& key, GLSLType value) {
-            properties[key] = value;
-        }
+    void SetProperty(const std::string& key, GLSLType value) {
+        properties[key] = value;
+    }
 
-        void RemoveProperty(const std::string& key) {
-            properties.erase(key);
-        }
+    void RemoveProperty(const std::string& key) {
+        properties.erase(key);
+    }
 
-        template<typename T>
-        T& GetProperty(const std::string& key) const {
-            static_assert(is_in_variant_v<T>, "T must be a type in GLSLType");
-            auto it = properties.find(key);
-            if (it != properties.end()) {
-                try {
-                    return std::get<T>(it->second);
-                } catch (const std::bad_variant_access& e) {
-                    std::cout << "WARNING (Material): " << key << " is not of type " << typeid(T).name() << std::endl;
-                    std::cout << e.what() << std::endl; 
-                }
-                return 0;
+    template<typename T>
+    T& GetProperty(const std::string& key) const {
+        static_assert(is_in_variant_v<T>, "T must be a type in GLSLType");
+        auto it = properties.find(key);
+        if (it != properties.end()) {
+            try {
+                return std::get<T>(it->second);
+            } catch (const std::bad_variant_access& e) {
+                std::cout << "WARNING (Material): " << key << " is not of type " << typeid(T).name() << std::endl;
+                std::cout << e.what() << std::endl; 
             }
-            // Handle case where property is not found
-            std::cout << "WARNING (Material): Can't find property matching given key @ " << key << std::endl;
             return 0;
         }
+        // Handle case where property is not found
+        std::cout << "WARNING (Material): Can't find property matching given key @ " << key << std::endl;
+        return 0;
+    }
+
+    static std::shared_ptr<Material> Create(const std::string& name);
 
 };

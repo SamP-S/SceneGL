@@ -46,6 +46,7 @@ protected:
     Winding _winding = Winding::CCW;
     LA::vec4 _clearColour = LA::vec4({0.35f, 0.35f, 0.5f, 1.0f});
 
+public:
     virtual void SetDrawMode(DrawMode m) = 0;
     virtual DrawMode GetDrawMode() = 0;
     virtual void SetPointSize(float size) = 0;
@@ -61,14 +62,13 @@ protected:
     virtual void SetDepthTesting(bool enabled) = 0;
     virtual bool IsDepthTesting() = 0;
 
+    Context() = default;
+    ~Context() = default;
+
     // delete copy and assign operators should always get instance from class::instance func
     Context(const Context&) = delete;
     Context& operator=(const Context&) = delete;
 
     static std::shared_ptr<Context> Create();
-        
-protected:
-    Context() = default;
-    ~Context() = default;
 
 };

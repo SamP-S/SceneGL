@@ -143,7 +143,7 @@ public:
             return;
         }
 
-        Renderer.SetDrawMode(DrawMode::FILL);
+        Renderer.context->SetDrawMode(DrawMode::FILL);
         // render shaded
         if (shadingMode == ShadingMode::SHADED || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             if (material->IsUsable()) {
@@ -152,7 +152,7 @@ public:
             }
         } 
         
-        Renderer.SetDrawMode(DrawMode::LINES);
+        Renderer.context->SetDrawMode(DrawMode::LINES);
         // render wireframe
         if (shadingMode == ShadingMode::WIREFRAME || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             std::shared_ptr<Shader> shader = assetManager.FindAsset<OpenGLShader>("base");

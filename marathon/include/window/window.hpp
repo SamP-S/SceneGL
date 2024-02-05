@@ -62,6 +62,7 @@ private:
     SDL_GLContext _openglContext;
     SDL_Window* _window;
     bool _isOpen = false;
+    std::vector<std::function<void(SDL_Event&)>> _eventHandlers;
 
 protected:
     Window() = default;
@@ -81,6 +82,8 @@ public:
     // common
     void* GetGLContext();
     SDL_Window* GetWindow();
+    // Add event handler for general context event
+    void AddEventHandler(std::function<void(SDL_Event&)> handler);
     void PollEvents();
     void SwapFrame();
     bool IsOpen();

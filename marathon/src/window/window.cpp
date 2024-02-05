@@ -72,11 +72,20 @@ SDL_Window* Window::GetWindow() {
     return _window;
 }
 
+void Window::AddEventHandler(std::function<void(SDL_Event&)> handler) {
+    _eventHandlers.push_back(handler);
+}
+
 // must be called at the start of very new frame
 void Window::PollEvents() {
     SDL_Event event;
     // SDL_PollEvent returns 1 while there is an event in the queue
     while (SDL_PollEvent(&event)) {
+        // pass straight to handlers
+        for (auto& handler : _eventHandlers) {
+            handler(event);
+        }
+        // also pass to INPUT module
         switch (event.type) {
             case SDL_QUIT:
                 Close();

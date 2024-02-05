@@ -139,32 +139,6 @@ public:
 
     void OnEvent(SDL_Event& event) {
         ImGui_ImplSDL2_ProcessEvent(&event);
-
-        if (imViewport.isFocuesed) {
-            switch (event.type) {
-                case SDL_KEYUP:
-                    Input::KeyEvent(event.key.keysym.scancode, KEY_UP);
-                    break;
-                case SDL_KEYDOWN:
-                    Input::KeyEvent(event.key.keysym.scancode, KEY_DOWN);
-                    break;
-                case SDL_MOUSEMOTION:
-                    {  
-                        ImVec2 sdlCoords = ImVec2(event.motion.x, event.motion.y);
-                        ImVec2 viewportCoords = imViewport.GetWindowRelative(sdlCoords);
-                        Input::MouseMoved(viewportCoords.x, viewportCoords.y);
-                    }
-                    break;
-                case SDL_MOUSEBUTTONDOWN:
-                    Input::MouseButtonEvent(event.button.button, BUTTON_DOWN);
-                    break;
-                case SDL_MOUSEBUTTONUP:
-                    Input::MouseButtonEvent(event.button.button, BUTTON_UP);
-                    break;
-            }
-        } else {
-            Input::ClearStates();
-        }
     }
     
     void Start() override {
@@ -180,6 +154,8 @@ public:
         // Setup Platform/Renderer backends
         ImGui_ImplSDL2_InitForOpenGL(Window.GetWindow(), Window.GetGLContext());
         ImGui_ImplOpenGL3_Init(Window.GetOpenGLConfig().glsl);
+
+        Window.AddEventHandler([this](SDL_Event& event) { OnEvent(event); });
 
         // add loaders to asset libary
         loaderManager.AddLoader(std::make_shared<ModelLoader>());

@@ -3,7 +3,7 @@
 #include <string>
 
 #include "gui/im_window.hpp"
-#include "renderer/editor_camera.hpp"
+#include "editor_camera.hpp"
 
 #include "ImGuizmo.h"
 

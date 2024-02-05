@@ -71,18 +71,29 @@ public:
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
     static Window& Instance();
+    
+    // module interface
     void Boot() override;
     void Shutdown() override;
     std::string GetName() override;
     ModuleType GetType() override;
+
+    // common
+    void* GetGLContext();
+    SDL_Window* GetWindow();
     void PollEvents();
     void SwapFrame();
+    bool IsOpen();
     bool Close();
+
+    // readonly
+    OpenGLConfig GetOpenGLConfig();
+
+    // properties
     void SetWindowMinSize(int minWidth, int minHeight);
     void GetWindowMinSize(int& minWidth, int& minHeight);
     void SetWindowSize(int width, int height);
     void GetWindowSize(int& width, int& height);
     void SetCursorCapture(bool capture);
     bool GetCursorCapture();
-    bool IsOpen();
 };

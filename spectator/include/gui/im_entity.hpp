@@ -1,11 +1,14 @@
 #pragma once
 
 #include <iostream>
+#include <cstring>
 #include <string>
 
 #include "gui/im_window.hpp"
 #include "ecs/ngine.hpp"
 #include "renderer/components.hpp"
+#include "renderer/material.hpp"
+#include "renderer/mesh.hpp"
 
 //// TODO:
 // Implement type LUT to automatically try every panel
@@ -122,7 +125,7 @@ public:
             if (ImGui::Selectable("None")) {
                 mrc.mesh = nullptr;
             }
-            for (auto it = assetManager.begin<OpenGLMesh>(); it != assetManager.end<OpenGLMesh>(); ++it) {
+            for (auto it = assetManager.begin<Mesh>(); it != assetManager.end<Mesh>(); ++it) {
                 std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(*it);
                 if (ImGui::Selectable(mesh->name.c_str())) {
                     mrc.mesh = mesh;
@@ -135,7 +138,7 @@ public:
             if (ImGui::Selectable("None")) {
                 mrc.material = nullptr;
             } 
-            for (auto it = assetManager.begin<OpenGLMaterial>(); it != assetManager.end<OpenGLMaterial>(); ++it) {
+            for (auto it = assetManager.begin<Mesh>(); it != assetManager.end<Mesh>(); ++it) {
                 std::shared_ptr<Material> material = std::dynamic_pointer_cast<Material>(*it);
                 if (ImGui::Selectable(material->name.c_str())) {
                     mrc.material = material;

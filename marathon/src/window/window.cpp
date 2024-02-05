@@ -65,6 +65,13 @@ ModuleType Window::GetType() {
     return ModuleType::WINDOW;
 }
 
+void* Window::GetGLContext() {
+    return _openglContext;
+}
+SDL_Window* Window::GetWindow() {
+    return _window;
+}
+
 // must be called at the start of very new frame
 void Window::PollEvents() {
     SDL_Event event;
@@ -116,7 +123,6 @@ void Window::SwapFrame() {
     SDL_GL_SwapWindow(_window);
 }
 
-
 bool Window::Close() {
     if (_openglContext) {
         SDL_GL_DeleteContext(_openglContext);
@@ -130,6 +136,13 @@ bool Window::Close() {
         SDL_FlushEvent(SDL_WINDOWEVENT);
     }
     _isOpen = false;
+}
+bool Window::IsOpen() {
+    return _isOpen;
+}
+
+OpenGLConfig Window::GetOpenGLConfig() {
+    return _openglConfig;
 }
 
 
@@ -152,8 +165,4 @@ void Window::SetCursorCapture(bool capture) {
 }
 bool Window::GetCursorCapture() {
     return (bool)SDL_GetRelativeMouseMode();
-}
-
-bool Window::IsOpen() {
-    return _isOpen;
 }

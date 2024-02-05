@@ -5,10 +5,9 @@
 #include <cassert>
 
 #include "core/tick_timer.hpp"
-#include "input/input.hpp"
 #include "runtime/interactive.hpp"
 #include "window/window.hpp"
-#include "platform/opengl/opengl_renderer.hpp"
+#include "renderer/renderer.hpp"
 
 
 //// TODO:
@@ -31,7 +30,7 @@ class Application {
 public:
 
     Window& Window = Window::Instance();
-    Renderer& Renderer = OpenGLRenderer::Instance();
+    Renderer& Renderer = Renderer::Instance();
 
     static Application* Create(ApplicationConfig cfg) {
         assert(_instance == nullptr && "Attempting to create application twice. Only 1 allowed.");
@@ -72,6 +71,7 @@ public:
     ~Application() {
         _interactive->End();
         delete _interactive;
+        Renderer.Shutdown();
         Window.Shutdown();
     }
 

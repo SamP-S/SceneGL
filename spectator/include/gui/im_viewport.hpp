@@ -2,10 +2,9 @@
 
 #include "gui/im_window.hpp"
 #include "renderer/frame_buffer.hpp"
-#include "renderer/editor_camera.hpp"
+#include "editor_camera.hpp"
 #include "gui/im_editor_camera.hpp"
 
-#include "platform/opengl/opengl_frame_buffer.hpp"
 
 //// TODO:
 // Generalise viewport to draw any texture, not necessarily a frame buffer
@@ -23,9 +22,9 @@ public:
     std::shared_ptr<FrameBuffer> frameBuffer = nullptr;
 
     ImViewport() {
-         // frame buffer should be tied to camera
-        frameBuffer = AssetManager::Instance().CreateAsset<OpenGLFrameBuffer>("FBO", 1920, 1080);
-        frameBuffer->SetClearColour(0.2f, 0.2f, 0.2f, 1.0f);
+        // frame buffer should be tied to camera
+        frameBuffer = FrameBuffer::Create("FBO", 1920, 1080);
+        // frameBuffer = AssetManager::Instance().CreateAsset<FrameBuffer>();
     }
 
     ImVec2 AspectRatioLock(const ImVec2 maxSize, float aspectRatio) {

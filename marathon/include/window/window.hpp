@@ -47,7 +47,7 @@ struct OpenGLConfig {
     int major = 4;
     int minor = 4;
     const char* glsl = "#version 440 core";
-    int vsync = 0;
+    int vsync = 1;
     int doubleBuffering = 1;
     int msaa = 1;
     int msaaSamples = 4;

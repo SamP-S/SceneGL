@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gui/im_window.hpp"
-#include "ngine/ngine.hpp"
+#include "ecs/ngine.hpp"
 
 //// TODO:
 // Implement as tree

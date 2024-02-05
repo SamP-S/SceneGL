@@ -13,7 +13,7 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-#include "ngine/ngine.hpp"
+#include "ecs/ngine.hpp"
 
 #include "renderer/components.hpp"
 #include "renderer/renderer.hpp"

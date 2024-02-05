@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "core/filepath.hpp"
-#include "ngine/ngine.hpp"
+#include "ecs/asset.hpp"
 #include "renderer/mesh.hpp"
 #include "renderer/material.hpp"
 #include "la_extended.h"

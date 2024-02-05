@@ -12,30 +12,36 @@ using namespace nlohmann;
 
 // internal libs
 #include "la_extended.h"
-#include "ngine/ngine.hpp"
+#include "ecs/ngine.hpp"
 #include "renderer/components.hpp"
 #include "platform/opengl/opengl_mesh.hpp"
 #include "platform/opengl/opengl_material.hpp"
 
-// note: should make a serializer per scene
-class JsonSerializer : public ISerializer
-{
+//// TODO:
+// Might want to replace with Method Injection
+
+//// NOTES:
+// Using Dependancy Injection, passing in the scene to the serializer
+// Should create a serializer per scene you want to serialize.
+// Scene reference is the only state this class should have.
+
+class SceneSerializer {
 public:
-    JsonSerializer(std::shared_ptr<Scene> scene)
-        : ISerializer(scene) {}
+    SceneSerializer(Scene& scene)
+        : _scene(scene) {}
 
     // output scene to json file
-    void Serialize(const std::string &filepath) override {
+    void Serialize(const std::string &filepath) {
         json j = json::array();
-        for (auto e : _scene->GetEntities()) {
+        for (auto e : _scene.GetEntities()) {
             j.push_back(SerializeEntity(e));
         }
         SaveJson(filepath, j);
     }
 
     // read in json file to scene
-    void Deserialize(const std::string &filepath) override {
-        _scene->Clear();
+    void Deserialize(const std::string &filepath) {
+        _scene.Clear();
         json j = LoadJson(filepath);
         for (const auto &entityJson : j) {
             DeserializeEntity(entityJson);
@@ -43,6 +49,8 @@ public:
     }
 
 private:
+    Scene& _scene;
+    AssetManager& _assetManager = AssetManager::Instance();
 
     json SerializeEntity(Entity e) {
         json j;
@@ -110,7 +118,7 @@ private:
     void DeserializeEntity(json j) {
         // create entity
         std::string name = j["name"];
-        Entity entity = _scene->CreateEntity(name);
+        Entity entity = _scene.CreateEntity(name);
         // extract transform
         TransformComponent &transform = entity.GetComponent<TransformComponent>();
         json transformJson = j["transform"];
@@ -143,7 +151,7 @@ private:
                 MeshRendererComponent &mrc = entity.AddComponent<MeshRendererComponent>();
                 try {
                     std::string meshName = value["meshRenderer"]["meshName"];
-                    mrc.mesh = assetManager.FindAsset<OpenGLMesh>(meshName);
+                    mrc.mesh = _assetManager.FindAsset<OpenGLMesh>(meshName);
                 } catch (const std::exception& e) {
                     std::cout << "WARNING (Serializer): mesh name bad." << std::endl;
                     std::cout << e.what() << std::endl;
@@ -151,7 +159,7 @@ private:
 
                 try {
                     std::string materialName = value["meshRenderer"]["materialName"];
-                    mrc.material = assetManager.FindAsset<OpenGLMaterial>(materialName);
+                    mrc.material = _assetManager.FindAsset<OpenGLMaterial>(materialName);
                 } catch (const std::exception& e) {
                     std::cout << "WARNING (Serializer): material name bad." << std::endl;
                     std::cout << e.what() << std::endl;
@@ -163,7 +171,7 @@ private:
                 cc.near = value["camera"]["near"];
                 cc.far = value["camera"]["far"];
             } else {
-                std::cout << "WARNING (JsonSerializer): Trying to deserializer unknown component:" << std::endl;
+                std::cout << "WARNING (SceneSerializer): Trying to deserializer unknown component:" << std::endl;
                 std::cout << value << std::endl;
             }
         }
@@ -174,12 +182,12 @@ private:
         std::ifstream inputFile(filepath);
         if (!inputFile.good())
         {
-            std::cout << "WARNING (JsonSerializer): Scene file does not exist: " << filepath << std::endl;
+            std::cout << "WARNING (SceneSerializer): Scene file does not exist: " << filepath << std::endl;
             return json();
         }
         if (!inputFile.is_open())
         {
-            std::cout << "WARNING (JsonSerializer): Can't open file: " << filepath << std::endl;
+            std::cout << "WARNING (SceneSerializer): Can't open file: " << filepath << std::endl;
             return json();
         }
         json jsonFile = json::parse(inputFile);
@@ -192,7 +200,7 @@ private:
         std::ofstream outputFile(filepath);
         if (!outputFile.is_open())
         {
-            std::cout << "WARNING (JsonSerializer): Can't open file: " << filepath << std::endl;
+            std::cout << "WARNING (SceneSerializer): Can't open file: " << filepath << std::endl;
             return false;
         }
         outputFile << jsonData.dump(4); // Write the JSON data to the file with indentation of 4 spaces

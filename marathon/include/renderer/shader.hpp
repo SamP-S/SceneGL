@@ -7,7 +7,7 @@
 
 #include "la_extended.h"
 
-#include "ngine/ngine.hpp"
+#include "ecs/asset.hpp"
 #include "renderer/renderer_api.hpp"
 #include "renderer/shader_source.hpp"
 

@@ -40,6 +40,10 @@ public:
     int y = 0;
     float sens = 5.0f;
     float speed = 5.0f;
+
+    // active
+    bool isActive = false;
+
     // transform
     TransformComponent transform = TransformComponent();
     
@@ -99,24 +103,31 @@ public:
 
     void Update(double dt)
     {
-        if (Input::GetKeyState("w"))
-            Move(MOVE_FORWARD);
-        if (Input::GetKeyState("s"))
-            Move(MOVE_BACKWARD);
-        if (Input::GetKeyState("a"))
-            Move(MOVE_LEFT);
-        if (Input::GetKeyState("d"))
-            Move(MOVE_RIGHT);
-        if (Input::GetKeyState("left ctrl"))
-            Move(MOVE_DOWN);
-        if (Input::GetKeyState("space"))
-            Move(MOVE_UP);
+        if (Input::GetMouseButtonState(1)) {
+            if (Input::GetKeyState("w"))
+                Move(MOVE_FORWARD);
+            if (Input::GetKeyState("s"))
+                Move(MOVE_BACKWARD);
+            if (Input::GetKeyState("a"))
+                Move(MOVE_LEFT);
+            if (Input::GetKeyState("d"))
+                Move(MOVE_RIGHT);
+            if (Input::GetKeyState("left ctrl"))
+                Move(MOVE_DOWN);
+            if (Input::GetKeyState("space"))
+                Move(MOVE_UP);
 
-        int dx = Input::GetMouseX() - x;
-        int dy = Input::GetMouseY() - y;
-        RotateCamera(dx, dy);
-        
-        x = Input::GetMouseX();
-        y = Input::GetMouseY();
+            if (!isActive) {
+                isActive = true;
+            } else {
+                int dx = Input::GetMouseX() - x;
+                int dy = Input::GetMouseY() - y;
+                RotateCamera(dx, dy);
+            }
+            x = Input::GetMouseX();
+            y = Input::GetMouseY();
+        } else {
+            isActive = false;
+        }
     }
 };

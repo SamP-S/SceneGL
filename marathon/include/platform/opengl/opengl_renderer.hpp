@@ -28,21 +28,6 @@ public:
     void Boot() override;
     void Shutdown() override;
 
-    void SetDrawMode(DrawMode drawMode) override;
-    DrawMode GetDrawMode() override;
-    void SetPointSize(float size) override;
-    float GetPointSize() override;
-    void SetLineWidth(float width) override;
-    float GetLineWidth() override;
-    void SetWinding(Winding winding) override;
-    Winding GetWinding() override;
-    void SetClearColour(const LA::vec4& c) override;
-    LA::vec4 GetClearColour() override;
-    void SetCulling(bool enabled) override;
-    bool IsCulling() override;
-    void SetDepthTesting(bool enabled) override;
-    bool IsDepthTesting() override;
-
     // set null to draw directly to window
     void SetFrameBuffer(std::shared_ptr<FrameBuffer> fb);
     std::shared_ptr<FrameBuffer> GetFrameBuffer();

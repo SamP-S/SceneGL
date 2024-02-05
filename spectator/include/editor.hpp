@@ -19,7 +19,7 @@
 #include "window/window.hpp"
 #include "editor_camera.hpp"
 #include "input/input.hpp"
-#include "serializer/serializer.hpp"
+#include "serializer/scene_serializer.hpp"
 
 #include "la_extended.h"
 using namespace LA;

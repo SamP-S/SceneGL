@@ -4,7 +4,7 @@
 #include "runtime/interactive.hpp"
 #include "renderer/renderer.hpp"
 #include "core/tick_timer.hpp"
-#include "serializer/serializer.hpp"
+#include "serializer/scene_serializer.hpp"
 #include "input/input.hpp"
 #include "platform/opengl/opengl_material.hpp"
 #include "platform/opengl/opengl_renderer.hpp"

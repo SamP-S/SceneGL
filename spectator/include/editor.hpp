@@ -13,18 +13,28 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
-#include "ecs/ngine.hpp"
-#include "renderer/components.hpp"
-#include "renderer/renderer.hpp"
-#include "window/window.hpp"
-#include "editor_camera.hpp"
-#include "input/input.hpp"
-#include "serializer/scene_serializer.hpp"
-
 #include "la_extended.h"
 using namespace LA;
 
 #include "runtime/interactive.hpp"
+#include "input/input.hpp"
+
+#include "ecs/ngine.hpp"
+#include "ecs/asset.hpp"
+
+#include "window/window.hpp"
+
+#include "renderer/components.hpp"
+#include "renderer/renderer.hpp"
+#include "renderer/shader_loader.hpp"
+#include "renderer/model_loader.hpp"
+
+#include "platform/opengl/opengl_shader.hpp"
+#include "platform/opengl/opengl_mesh.hpp"
+
+#include "serializer/scene_serializer.hpp"
+
+#include "editor_camera.hpp"
 
 #include "gui/im_entity.hpp"
 #include "gui/im_scene_tree.hpp"
@@ -50,7 +60,8 @@ private:
     int new_entity_count = 0;
     int componentPanelCount = 0;
 
-    AssetManager&  assetManager = AssetManager::Instance();
+    AssetManager& assetManager = AssetManager::Instance();
+    AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
     // should be moved to camera
     
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -170,6 +181,46 @@ public:
         ImGui_ImplSDL2_InitForOpenGL(Window.GetWindow(), Window.GetGLContext());
         ImGui_ImplOpenGL3_Init(Window.GetOpenGLConfig().glsl);
 
+        // add loaders to asset libary
+        loaderManager.AddLoader(std::make_shared<ModelLoader>());
+        loaderManager.AddLoader(std::make_shared<ShaderLoader>());
+
+        // load default model(s)
+        loaderManager.Load("marathon/assets/models/presets/cone.gltf");
+        loaderManager.Load("marathon/assets/models/presets/cube.gltf");
+        loaderManager.Load("marathon/assets/models/presets/cylinder.gltf");
+        loaderManager.Load("marathon/assets/models/presets/dome.gltf");
+        loaderManager.Load("marathon/assets/models/presets/ico_sphere.gltf");
+        loaderManager.Load("marathon/assets/models/presets/plane.gltf");
+        loaderManager.Load("marathon/assets/models/presets/prism.gltf");
+        loaderManager.Load("marathon/assets/models/presets/sphere.gltf");
+
+        // load default shader source(s)
+        loaderManager.Load("marathon/assets/shaders/base.vert");
+        loaderManager.Load("marathon/assets/shaders/base.frag");
+        loaderManager.Load("marathon/assets/shaders/lighting.vert");
+        loaderManager.Load("marathon/assets/shaders/lighting.frag");
+
+        // load default shader(s)
+        std::shared_ptr<Shader> base = assetManager.CreateAsset<OpenGLShader>(
+            "base",
+            assetManager.FindAsset<OpenGLShaderSource>("base_vert"),
+            assetManager.FindAsset<OpenGLShaderSource>("base_frag")
+        );
+        std::shared_ptr<Shader> lighting = assetManager.CreateAsset<OpenGLShader>(
+            "lighting",
+            assetManager.FindAsset<OpenGLShaderSource>("lighting_vert"),
+            assetManager.FindAsset<OpenGLShaderSource>("lighting_frag")
+        );
+
+        // load material(s)
+        std::shared_ptr<Material> material = assetManager.CreateAsset<OpenGLMaterial>(
+            "default-material"
+        );
+        material->SetProperty("colour", vec4(1.0f));
+        material->shader = lighting;
+
+        // load scene
         LoadScene("marathon/assets/scenes/Preset.json");
     }
 
@@ -229,7 +280,7 @@ public:
                 } else if (ImGui::MenuItem("New Cube")) {
                     imSceneTree.entitySelected = scene->CreateEntity();
                     MeshRendererComponent& mrc = imSceneTree.entitySelected.AddComponent<MeshRendererComponent>();
-                    mrc.mesh = assetManager.FindAsset<Mesh>("vertex_cube");
+                    mrc.mesh = assetManager.FindAsset<OpenGLMesh>("vertex_cube");
                 } else if (ImGui::MenuItem("New Camera")) {
                     imSceneTree.entitySelected = scene->CreateEntity();
                     imSceneTree.entitySelected.AddComponent<CameraComponent>();
@@ -315,7 +366,7 @@ public:
         Renderer.context->SetDrawMode(DrawMode::LINES);
         // render wireframe
         if (shadingMode == ShadingMode::WIREFRAME || shadingMode == ShadingMode::SHADED_WIREFRAME) {
-            std::shared_ptr<Shader> shader = assetManager.FindAsset<Shader>("base");
+            std::shared_ptr<Shader> shader = assetManager.FindAsset<OpenGLShader>("base");
             Renderer.RenderMesh(shader, mrc.mesh, model);
         }
     }

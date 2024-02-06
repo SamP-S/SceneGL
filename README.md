@@ -9,14 +9,14 @@ Goals:
 ### Tasks
 
 ### High Level Operation
-- [ ] Create ISystem for systems to inherit
-- [ ] Implement each system to initialise, start, update, stop, shutdown
-- [ ] Create sim abstraction to encapsulate all game/sim runtime systems & scenes
-- [ ] Create simulation to be able to run given simulation, configured at runtime
+- [x] Create Module for main abstract modules to inherit
+- [x] Implement each module to boot & shutdown
+- [x] Implement each Interactive (game/simulation/editor) to start, update, stop
+- [ ] Allow interactive to be chosen at runtime
 
 ### Engine/Editor Abstraction
 - [ ] Editor should require project to open
-- [ ] Editor should be extracted from engine as seperate layer
+- [x] Editor should be extracted from engine as seperate layer
 - [ ] Implement operator that runs a given project (with game engine ticks and seperate gui ticks)
 
 ### Rendering
@@ -69,9 +69,11 @@ Goals:
 - [x] Use smart pointers
 - [x] Implement generic, centralise all assets
 - [x] Store each asset type in its own array
+- [ ] Modify asset manager to store generic types
 
 ### Asset Loaders
-- [ ] Support loading and saving
+- [ ] Support project loading and saving
+- [x] Support scene loading and saving
 - [x] Support json files
 - [ ] Support audio files
 - [ ] Support image files

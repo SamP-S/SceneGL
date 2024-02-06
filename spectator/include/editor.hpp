@@ -116,9 +116,9 @@ public:
         ImGui::End();
 
         imViewport.frameBuffer->Bind();
-
         editorCamera->Update(dt);
         Renderer.Clear();
+        shadingMode = ShadingMode::SHADED_WIREFRAME;
         RenderScene(scene, *editorCamera);
         imViewport.frameBuffer->Unbind();
 
@@ -295,7 +295,7 @@ public:
     }
 
     void RenderScene(std::shared_ptr<Scene> scene, EditorCamera& camera) {
-        std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<Shader>();
+        std::vector<std::shared_ptr<Asset>> shaders = assetManager.GetAssets<OpenGLShader>();
         for (auto asset : shaders) {
             // set editor camera uniforms
             std::shared_ptr<Shader> shader = std::dynamic_pointer_cast<Shader>(asset);

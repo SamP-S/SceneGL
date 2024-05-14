@@ -1,0 +1,19 @@
+PyCraft - not working really but could spend a weekend patching to a working state
+Game of life - sucks but technically works, needs an actual webpage to wrap around it to explain it all
+PyScripts - mix of useful and useless features
+Project Rho - dead, hide, please
+PixelGL - missing libraries, need to git submodule link them and ensure it works on linux
+Hermes - shit dead
+Ron - polish, document
+SceneGL - 
+OpenCV_Playgroud - polish, document
+    assimp not included with repos
+    SDL2 not included with repos
+    Works!!
+    Remove direct model links or included in repository if open source models
+Dataset_Extender - in progress
+
+Example Engines:
+Love2D
+Hazel
+

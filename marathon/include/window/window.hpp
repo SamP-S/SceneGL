@@ -44,9 +44,9 @@ struct WindowConfig {
 };
 
 struct OpenGLConfig {
-    int major = 4;
-    int minor = 4;
-    const char* glsl = "#version 440 core";
+    int major = 3;
+    int minor = 3;
+    const char* glsl = "#version 330 core";
     int vsync = 1;
     int doubleBuffering = 1;
     int msaa = 1;
@@ -61,6 +61,7 @@ private:
     WindowConfig _windowConfig;
     SDL_GLContext _openglContext;
     SDL_Window* _window;
+    bool _isOk = false;
     bool _isOpen = false;
     std::vector<std::function<void(SDL_Event&)>> _eventHandlers;
 
@@ -88,6 +89,7 @@ public:
     void SwapFrame();
     bool IsOpen();
     bool Close();
+    bool IsOk();
 
     // readonly
     OpenGLConfig GetOpenGLConfig();

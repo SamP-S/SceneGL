@@ -2,6 +2,11 @@
 
 void OpenGLRenderer::Boot() {
     std::cout << "DEBUG (OpenGLRenderer): Boot." << std::endl;
+    std::cout << "DEBUG (OpenGLRenderer): OpenGL version: " << glGetString(GL_VERSION) << std::endl;
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "OpenGL error: " << err << std::endl;
+    }
     context = Context::Create();
 }
 

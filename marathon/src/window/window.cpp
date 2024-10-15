@@ -48,7 +48,14 @@ void Window::Boot() {
 
     // Must be done before any opengl call but after opengl context created
     glewExperimental = GL_TRUE;
-    glewInit();
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        std::cerr << "Window.cpp: Failed to initialize GLEW" << std::endl;
+        std::cerr << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
+        _isOk = false;
+    } else {
+        _isOk = true;
+    }
 }
 
 // destroy context
@@ -145,6 +152,9 @@ bool Window::Close() {
         SDL_FlushEvent(SDL_WINDOWEVENT);
     }
     _isOpen = false;
+}
+bool Window::IsOk() {
+    return _isOk;
 }
 bool Window::IsOpen() {
     return _isOpen;

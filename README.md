@@ -3,7 +3,7 @@
 
 ## Requirements
 - CMake
-- OpenGL
+- OpenGL 3.3+
 ``` bash
     sudo apt install cmake pkg-config   # installs build tools
     sudo apt install mesa-utils libglu1-mesa-dev freeglut3-dev mesa-common-dev llvm  # installs opengl libs

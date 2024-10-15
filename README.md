@@ -1,6 +1,16 @@
 # SceneGL - Sam Pearson-Smith
 ### C++ | SDL2 | OpenGL
 
+## Requirements
+- CMake
+- OpenGL
+``` bash
+    sudo apt install cmake pkg-config   # installs build tools
+    sudo apt install mesa-utils libglu1-mesa-dev freeglut3-dev mesa-common-dev llvm  # installs opengl libs
+    sudo apt install libglew-dev libsdl2-dev    # window/low-level access libs
+    export VK_ICD_FILENAMES="" # disable vulkan cause its breaking stuff on WSL
+```
+
 ## Summary
 A simple OpenGL rendering engine for experimenting with graphics and game engine features.
 

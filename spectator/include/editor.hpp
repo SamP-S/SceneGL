@@ -80,8 +80,8 @@ public:
     Editor() = default;
     ~Editor() = default;
 
-    Window& Window = Window::Instance();
-    Renderer& Renderer = Renderer::Instance();
+    Window& window = Window::Instance();
+    Renderer& renderer = Renderer::Instance();
 
     void Update(double dt) override {
 
@@ -117,7 +117,7 @@ public:
 
         imViewport.frameBuffer->Bind();
         editorCamera->Update(dt);
-        Renderer.Clear();
+        renderer.Clear();
         shadingMode = ShadingMode::SHADED_WIREFRAME;
         RenderScene(scene, *editorCamera);
         imViewport.frameBuffer->Unbind();
@@ -152,10 +152,10 @@ public:
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
         // Setup Platform/Renderer backends
-        ImGui_ImplSDL2_InitForOpenGL(Window.GetWindow(), Window.GetGLContext());
-        ImGui_ImplOpenGL3_Init(Window.GetOpenGLConfig().glsl);
+        ImGui_ImplSDL2_InitForOpenGL(window.GetWindow(), window.GetGLContext());
+        ImGui_ImplOpenGL3_Init(window.GetOpenGLConfig().glsl);
 
-        Window.AddEventHandler([this](SDL_Event& event) { OnEvent(event); });
+        window.AddEventHandler([this](SDL_Event& event) { OnEvent(event); });
 
         // add loaders to asset libary
         loaderManager.AddLoader(std::make_shared<ModelLoader>());
@@ -246,7 +246,7 @@ public:
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Close")) {
-                    Window.Close();
+                    window.Close();
                 }
                 ImGui::EndMenu();
             }
@@ -299,8 +299,8 @@ public:
         for (auto asset : shaders) {
             // set editor camera uniforms
             std::shared_ptr<Shader> shader = std::dynamic_pointer_cast<Shader>(asset);
-            Renderer.SetProjection(camera.GetProjection());
-            Renderer.SetView(LA::inverse(camera.transform.GetTransform()));
+            renderer.SetProjection(camera.GetProjection());
+            renderer.SetView(LA::inverse(camera.transform.GetTransform()));
             shader->Bind();
             shader->SetVec3("uResolution", camera.width, camera.height, 1.0f);
             shader->SetVec3("uCameraPosition", camera.transform.position);
@@ -330,20 +330,20 @@ public:
             return;
         }
 
-        Renderer.context->SetDrawMode(DrawMode::FILL);
+        renderer.context->SetDrawMode(DrawMode::FILL);
         // render shaded
         if (shadingMode == ShadingMode::SHADED || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             if (material->IsUsable()) {
                 material->Bind();
-                Renderer.RenderMesh(material->shader, mrc.mesh, model);
+                renderer.RenderMesh(material->shader, mrc.mesh, model);
             }
         } 
         
-        Renderer.context->SetDrawMode(DrawMode::LINES);
+        renderer.context->SetDrawMode(DrawMode::LINES);
         // render wireframe
         if (shadingMode == ShadingMode::WIREFRAME || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             std::shared_ptr<Shader> shader = assetManager.FindAsset<OpenGLShader>("base");
-            Renderer.RenderMesh(shader, mrc.mesh, model);
+            renderer.RenderMesh(shader, mrc.mesh, model);
         }
     }
 

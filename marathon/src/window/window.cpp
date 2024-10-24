@@ -27,9 +27,9 @@ void Window::Boot() {
     // Create window with graphics context
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, _openglConfig.doubleBuffering);
 
-    // msaa
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, _openglConfig.msaa);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, _openglConfig.msaaSamples);
+    // // msaa
+    // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, _openglConfig.msaa);
+    // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, _openglConfig.msaaSamples);
 
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     
@@ -38,7 +38,19 @@ void Window::Boot() {
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
         _windowConfig.width, _windowConfig.height, 
         window_flags);
+    if (!_window) {
+        std::cerr << "marathon/src/window/window.cpp: Failed to create window" << std::endl;
+        std::cerr << "SDL error: " << SDL_GetError() << std::endl;
+        return;
+    }
+
     _openglContext = SDL_GL_CreateContext(_window);
+        if (!_window) {
+        std::cerr << "marathon/src/window/window.cpp: Failed to create opengl context" << std::endl;
+        std::cerr << "SDL error: " << SDL_GetError() << std::endl;
+        return;
+    }
+    _isOpen = true;
 
     SDL_GL_MakeCurrent(_window, _openglContext);
     SDL_GL_SetSwapInterval(_openglConfig.vsync);

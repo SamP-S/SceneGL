@@ -29,8 +29,8 @@ struct ApplicationConfig {
 class Application {
 public:
 
-    Window& Window = Window::Instance();
-    Renderer& Renderer = Renderer::Instance();
+    Window& window = Window::Instance();
+    Renderer& renderer = Renderer::Instance();
 
     static Application* Create(ApplicationConfig cfg) {
         assert(_instance == nullptr && "Attempting to create application twice. Only 1 allowed.");
@@ -50,9 +50,9 @@ public:
     
     // Application loop, independant of game/sim loop
     void Run() {
-        while (!Window.IsOpen()) {
+        while (window.IsOpen()) {
             // poll events
-            Window.PollEvents();
+            window.PollEvents();
 
             // get time delta
             _tickTimer->Tick();
@@ -62,7 +62,7 @@ public:
             _interactive->Update(dt);
             
             // swap frame shown
-            Window.SwapFrame();
+            window.SwapFrame();
         }
     }
 
@@ -71,8 +71,8 @@ public:
     ~Application() {
         _interactive->End();
         delete _interactive;
-        Renderer.Shutdown();
-        Window.Shutdown();
+        renderer.Shutdown();
+        window.Shutdown();
     }
 
 private:
@@ -80,8 +80,8 @@ private:
     // Initialise context and start tick timer
     Application(ApplicationConfig cfg)
         : _cfg(cfg) {
-        Window.Boot();
-        Renderer.Boot();
+        window.Boot();
+        renderer.Boot();
         // start timer
         _tickTimer->Start();
         // set single app instance

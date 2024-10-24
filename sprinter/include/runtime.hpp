@@ -28,7 +28,7 @@ private:
     // global modules
     AssetManager& assetManager = AssetManager::Instance();
     AssetLoaderManager& loaderManager = AssetLoaderManager::Instance();
-    Renderer& Renderer = OpenGLRenderer::Instance();
+    Renderer& renderer = OpenGLRenderer::Instance();
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
     // local stuff
@@ -98,7 +98,7 @@ public:
 
     void Update(double dt) override {
         firstPersonCamera.Update(dt);
-        Renderer.Clear();
+        renderer.Clear();
         shadingMode = ShadingMode::SHADED_WIREFRAME;
         RenderScene(scene, firstPersonCamera);
     }
@@ -112,8 +112,8 @@ public:
         for (auto asset : shaders) {
             // set editor camera uniforms
             std::shared_ptr<Shader> shader = std::dynamic_pointer_cast<Shader>(asset);
-            Renderer.SetProjection(camera.GetProjection());
-            Renderer.SetView(LA::inverse(camera.transform.GetTransform()));
+            renderer.SetProjection(camera.GetProjection());
+            renderer.SetView(LA::inverse(camera.transform.GetTransform()));
             shader->Bind();
             shader->SetVec3("uResolution", camera.width, camera.height, 1.0f);
             shader->SetVec3("uCameraPosition", camera.transform.position);
@@ -143,20 +143,20 @@ public:
             return;
         }
 
-        Renderer.context->SetDrawMode(DrawMode::FILL);
+        renderer.context->SetDrawMode(DrawMode::FILL);
         // render shaded
         if (shadingMode == ShadingMode::SHADED || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             if (material->IsUsable()) {
                 material->Bind();
-                Renderer.RenderMesh(material->shader, mrc.mesh, model);
+                renderer.RenderMesh(material->shader, mrc.mesh, model);
             }
         } 
         
-        Renderer.context->SetDrawMode(DrawMode::LINES);
+        renderer.context->SetDrawMode(DrawMode::LINES);
         // render wireframe
         if (shadingMode == ShadingMode::WIREFRAME || shadingMode == ShadingMode::SHADED_WIREFRAME) {
             std::shared_ptr<Shader> shader = assetManager.FindAsset<OpenGLShader>("base");
-            Renderer.RenderMesh(shader, mrc.mesh, model);
+            renderer.RenderMesh(shader, mrc.mesh, model);
         }
     }
 

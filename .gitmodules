@@ -1,9 +1,9 @@
 [submodule "dependencies/tinyfiledialogs"]
-	path = marathon/dependencies/tinyfiledialogs
+	path = marathon/external/tinyfiledialogs
 	url = https://github.com/SamP-S/libtinyfiledialogs
 [submodule "dependencies/la"]
-	path = marathon/dependencies/la
+	path = marathon/external/la
 	url = git@github.com:SamP-S/LA.git
 [submodule "dependencies/imguizmo"]
-	path = marathon/dependencies/imguizmo
+	path = marathon/external/imguizmo
 	url = git@github.com:SamP-S/libimguizmo.git

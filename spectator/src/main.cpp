@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     std::cout << "start of program" << std::endl;
     ApplicationConfig appCfg;
     appCfg.name = "Sprinter";
-    appCfg.cwd = "~/source/repos/hobby/SceneGL/sample_project";
+    appCfg.cwd = "~/source/repos/hobby/SceneGL/test/sample_project";
 
     Application* app = Application::Create(appCfg);
     app->SetInteractive(new Editor());

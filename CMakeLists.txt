@@ -20,9 +20,9 @@ if (NOT EXISTS ${LIBTFD_DIR}/CMakeLists.txt)
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 endif()
 
-add_subdirectory("marathon/dependencies/tinyfiledialogs")
-add_subdirectory("marathon/dependencies/imguizmo")
-add_subdirectory("marathon/dependencies/la")
+add_subdirectory("marathon/external/tinyfiledialogs")
+add_subdirectory("marathon/external/imguizmo")
+add_subdirectory("marathon/external/la")
 
 set(INCLUDE_DIRS
     "marathon/include" 
@@ -69,13 +69,13 @@ target_link_libraries(spectator PUBLIC imguizmo)
 target_link_libraries(spectator PUBLIC marathon)
 
 # test scripts
-add_executable(ecs_test "test/ecs_test.cpp")
+add_executable(ecs_test "marathon/test/ecs_test.cpp")
 target_include_directories(ecs_test PUBLIC ${INCLUDE_DIRS})
 target_link_libraries(ecs_test PUBLIC la)
 
-add_executable(la_test "test/la_test.cpp")
+add_executable(la_test "marathon/test/la_test.cpp")
 target_link_libraries(la_test PUBLIC la)
 
-add_executable(imguizmo_test "test/imguizmo_test.cpp")
+add_executable(imguizmo_test "marathon/test/imguizmo_test.cpp")
 target_link_libraries(imguizmo_test PUBLIC la)
 target_link_libraries(imguizmo_test PUBLIC imguizmo)

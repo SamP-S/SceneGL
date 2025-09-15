@@ -7,3 +7,9 @@
 [submodule "dependencies/imguizmo"]
 	path = marathon/external/imguizmo
 	url = git@github.com:SamP-S/libimguizmo.git
+[submodule "marathon/external/tinygltf"]
+	path = marathon/external/tinygltf
+	url = git@github.com:syoyo/tinygltf.git
+[submodule "marathon/external/entt"]
+	path = marathon/external/entt
+	url = git@github.com:skypjack/entt.git
